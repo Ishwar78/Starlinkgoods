@@ -327,18 +327,23 @@ export default function UserProducts() {
               type="button"
               className={`category-pill ${isSelected ? "active" : ""}`}
               onClick={() => setSelectedCategory(catName)}
+              title={`View ${catName} products`}
             >
-              {iconUrl && (
+              {iconUrl ? (
                 <img
                   src={iconUrl}
                   alt={catName}
                   className="category-pill-icon"
                   onError={(e) => {
-                    e.target.style.display = "none";
+                    e.currentTarget.style.display = "none";
                   }}
                 />
+              ) : (
+                <span className="category-pill-all-icon">
+                  <FiLayers />
+                </span>
               )}
-              <span>{catName}</span>
+              <span className="category-pill-name">{catName}</span>
               <span className="cat-count">
                 {catName === "All"
                   ? products.length

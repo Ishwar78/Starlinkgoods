@@ -19,6 +19,9 @@ import {
   FiCheck,
   FiAlertTriangle,
   FiShoppingBag,
+  FiStar,
+  FiArrowLeft,
+  FiArrowRight,
 } from "react-icons/fi";
 import {
   getProducts,
@@ -176,16 +179,18 @@ export default function AdminProducts() {
     setBadge(prod.badge || "None");
     setDescription(prod.description || "");
 
-    // Populate existing images (up to 5)
-    const rawImages =
-      Array.isArray(prod.images) && prod.images.length > 0
-        ? prod.images
-        : prod.image
-        ? [prod.image]
-        : [];
+    // Populate existing images safely (handles string or array)
+    let rawImages = [];
+    if (Array.isArray(prod.images) && prod.images.length > 0) {
+      rawImages = prod.images;
+    } else if (typeof prod.images === "string" && prod.images.trim()) {
+      rawImages = [prod.images.trim()];
+    } else if (prod.image) {
+      rawImages = [prod.image];
+    }
 
     const existingItems = rawImages.slice(0, 5).map((img, idx) => ({
-      id: `existing-${idx}-${Date.now()}`,
+      id: `existing-${idx}-${Date.now()}-${Math.random()}`,
       type: "existing",
       url: img,
       preview: formatImageUrl(img),
@@ -195,6 +200,30 @@ export default function AdminProducts() {
     setCustomUrlInput("");
     setImageMode("file");
     setShowModal(true);
+  };
+
+  // Set an image as the main cover (#1)
+  const handleSetCover = (index) => {
+    if (index === 0 || index >= imageList.length) return;
+    setImageList((prev) => {
+      const copy = [...prev];
+      const [chosen] = copy.splice(index, 1);
+      copy.unshift(chosen);
+      return copy;
+    });
+  };
+
+  // Move an image left or right
+  const handleMoveImage = (index, direction) => {
+    const targetIdx = index + direction;
+    if (targetIdx < 0 || targetIdx >= imageList.length) return;
+    setImageList((prev) => {
+      const copy = [...prev];
+      const temp = copy[index];
+      copy[index] = copy[targetIdx];
+      copy[targetIdx] = temp;
+      return copy;
+    });
   };
 
   // Handle local files selection (allows up to 5 total images)
@@ -295,20 +324,30 @@ export default function AdminProducts() {
       formData.append("badge", badge === "None" ? "" : badge);
       formData.append("description", description.trim());
 
-      // Append files
+      // Append files and build imageOrder manifest
+      let fileIdx = 0;
+      const imageOrderManifest = [];
+
       imageList.forEach((item) => {
         if (item.type === "file" && item.file) {
           formData.append("images", item.file);
+          imageOrderManifest.push({ type: "file", fileIdx: fileIdx++ });
+        } else if (item.type === "existing" && item.url) {
+          imageOrderManifest.push({ type: "existing", url: item.url });
+        } else if (item.type === "url" && item.url) {
+          imageOrderManifest.push({ type: "url", url: item.url });
         }
       });
 
-      // Retained existing images
+      formData.append("imageOrder", JSON.stringify(imageOrderManifest));
+
+      // Retained existing images (fallback)
       const existingImages = imageList
         .filter((item) => item.type === "existing" && item.url)
         .map((item) => item.url);
       formData.append("existingImages", JSON.stringify(existingImages));
 
-      // External URLs
+      // External URLs (fallback)
       const urlImages = imageList
         .filter((item) => item.type === "url" && item.url)
         .map((item) => item.url);
@@ -893,131 +932,196 @@ export default function AdminProducts() {
                   />
                 </div>
 
-                {/* Multi-Image Section (Up to 5 images) */}
-                <div className="form-group span-2">
-                  <div className="image-field-header">
-                    <label>
-                      Product Photos ({imageList.length}/5) &bull;{" "}
-                      <small style={{ color: "#ffd044" }}>
-                        First image is the main cover
-                      </small>
-                    </label>
-                    <div className="image-mode-toggle">
-                      <button
-                        type="button"
-                        className={`toggle-tab ${imageMode === "file" ? "active" : ""}`}
-                        onClick={() => setImageMode("file")}
-                      >
-                        Upload Photos
-                      </button>
-                      <button
-                        type="button"
-                        className={`toggle-tab ${imageMode === "url" ? "active" : ""}`}
-                        onClick={() => setImageMode("url")}
-                      >
-                        Add Photo URL
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Thumbnails Gallery Strip */}
-                  {imageList.length > 0 && (
-                    <div className="admin-prod-imgs-grid">
-                      {imageList.map((item, idx) => (
-                        <div key={item.id} className="admin-prod-thumb-box">
-                          <img
-                            src={item.preview}
-                            alt={`Photo ${idx + 1}`}
-                            onError={(e) => {
-                              e.currentTarget.src =
-                                "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=200&q=80";
-                            }}
-                          />
-                          <span className={`thumb-index-badge ${idx === 0 ? "is-cover" : ""}`}>
-                            {idx === 0 ? "★ Cover" : `#${idx + 1}`}
-                          </span>
-                          <button
-                            type="button"
-                            className="thumb-remove-btn"
-                            onClick={() => handleRemoveImageIndex(idx)}
-                            title="Remove this photo"
-                          >
-                            <FiTrash2 />
-                          </button>
-                        </div>
-                      ))}
-
-                      {imageList.length < 5 && imageMode === "file" && (
-                        <div
-                          className="admin-prod-add-more-box"
-                          onClick={() => fileInputRef.current?.click()}
-                        >
-                          <FiPlus />
-                          <span>Add More</span>
-                          <small>({5 - imageList.length} left)</small>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {imageMode === "file" ? (
-                    imageList.length < 5 ? (
-                      <div className="file-upload-zone">
-                        <div
-                          className="dropzone-area"
-                          onClick={() => fileInputRef.current?.click()}
-                        >
-                          <input
-                            type="file"
-                            ref={fileInputRef}
-                            style={{ display: "none" }}
-                            accept="image/*"
-                            multiple
-                            onChange={handleFileChange}
-                          />
-                          <div className="dropzone-icon">
-                            <FiUploadCloud />
-                          </div>
-                          <h4>Click or drag up to 5 photos</h4>
-                          <p>PNG, JPG, WEBP up to 10MB each (Saved directly to server storage)</p>
-                        </div>
+                  {/* Multi-Image Section (Up to 5 images) */}
+                  <div className="form-group span-2 admin-images-section">
+                    <div className="image-field-header">
+                      <div>
+                        <label className="admin-section-label">
+                          Product Images ({imageList.length}/5)
+                        </label>
+                        <span className="field-hint" style={{ marginTop: "2px", display: "block" }}>
+                          ⭐ Slot #1 is the primary Cover Photo displayed on cards &amp; catalog.
+                        </span>
                       </div>
-                    ) : (
-                      <p className="photo-limit-notice">
-                        <FiCheckCircle /> Maximum 5 photos added for this product.
-                      </p>
-                    )
-                  ) : (
-                    <div className="url-input-wrap">
-                      <div style={{ display: "flex", gap: "8px" }}>
-                        <input
-                          type="url"
-                          placeholder="Paste image URL (https://...)"
-                          value={customUrlInput}
-                          onChange={(e) => setCustomUrlInput(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              handleAddUrlImage();
-                            }
-                          }}
-                        />
+                      <div className="image-mode-toggle">
                         <button
                           type="button"
-                          className="admin-prod-primary-btn"
-                          onClick={handleAddUrlImage}
-                          disabled={!customUrlInput.trim() || imageList.length >= 5}
-                          style={{ padding: "0 18px", fontSize: "13px" }}
+                          className={`toggle-tab ${imageMode === "file" ? "active" : ""}`}
+                          onClick={() => setImageMode("file")}
                         >
-                          Add URL
+                          <FiUploadCloud /> Upload Files
+                        </button>
+                        <button
+                          type="button"
+                          className={`toggle-tab ${imageMode === "url" ? "active" : ""}`}
+                          onClick={() => setImageMode("url")}
+                        >
+                          <FiImage /> Image URL
                         </button>
                       </div>
-                      <span className="field-hint">
-                        Paste external link and click "Add URL" to append to photos.
-                      </span>
                     </div>
-                  )}
-                </div>
+
+                    {/* 5-Slot Interactive Photo Grid */}
+                    <div className="admin-photo-slots-grid">
+                      {[0, 1, 2, 3, 4].map((slotIndex) => {
+                        const item = imageList[slotIndex];
+                        const isCover = slotIndex === 0;
+
+                        if (item) {
+                          return (
+                            <div
+                              key={item.id}
+                              className={`admin-photo-card ${isCover ? "is-cover-slot" : ""}`}
+                            >
+                              <div className="photo-card-img-wrap">
+                                <img
+                                  src={item.preview}
+                                  alt={`Slot ${slotIndex + 1}`}
+                                  onError={(e) => {
+                                    e.currentTarget.src =
+                                      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=300&q=80";
+                                  }}
+                                />
+                                <div className="photo-card-overlay">
+                                  <div className="photo-order-arrows">
+                                    {slotIndex > 0 && (
+                                      <button
+                                        type="button"
+                                        className="order-arrow-btn"
+                                        onClick={() => handleMoveImage(slotIndex, -1)}
+                                        title="Move Left"
+                                      >
+                                        <FiArrowLeft />
+                                      </button>
+                                    )}
+                                    {slotIndex < imageList.length - 1 && (
+                                      <button
+                                        type="button"
+                                        className="order-arrow-btn"
+                                        onClick={() => handleMoveImage(slotIndex, 1)}
+                                        title="Move Right"
+                                      >
+                                        <FiArrowRight />
+                                      </button>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="photo-card-header">
+                                <span className={`photo-slot-pill ${isCover ? "cover-badge" : ""}`}>
+                                  {isCover ? "★ Main Cover" : `#${slotIndex + 1}`}
+                                </span>
+                                <button
+                                  type="button"
+                                  className="photo-remove-btn"
+                                  onClick={() => handleRemoveImageIndex(slotIndex)}
+                                  title="Delete photo"
+                                >
+                                  <FiTrash2 />
+                                </button>
+                              </div>
+
+                              {!isCover && (
+                                <button
+                                  type="button"
+                                  className="photo-set-cover-btn"
+                                  onClick={() => handleSetCover(slotIndex)}
+                                  title="Make this the Cover image"
+                                >
+                                  <FiStar /> Set Cover
+                                </button>
+                              )}
+                            </div>
+                          );
+                        }
+
+                        // Empty slot
+                        return (
+                          <div
+                            key={`empty-${slotIndex}`}
+                            className={`admin-photo-empty-card ${
+                              slotIndex === imageList.length ? "is-next-slot" : ""
+                            }`}
+                            onClick={() => {
+                              if (imageMode === "file") {
+                                fileInputRef.current?.click();
+                              }
+                            }}
+                          >
+                            <div className="empty-slot-content">
+                              <FiPlus className="empty-slot-icon" />
+                              <span className="empty-slot-title">
+                                {slotIndex === 0 ? "Cover Photo" : `Slot #${slotIndex + 1}`}
+                              </span>
+                              <span className="empty-slot-sub">
+                                {slotIndex === imageList.length ? "Click to Add" : "Empty"}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Hidden file input */}
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      style={{ display: "none" }}
+                      accept="image/*"
+                      multiple
+                      onChange={handleFileChange}
+                    />
+
+                    {/* Mode Panels */}
+                    {imageMode === "file" ? (
+                      imageList.length < 5 ? (
+                        <div
+                          className="file-dropzone-box"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          <FiUploadCloud className="dropzone-cloud-icon" />
+                          <div className="dropzone-text">
+                            <strong>Click or Drag photos here to upload</strong>
+                            <span>JPG, PNG, WEBP (Up to {5 - imageList.length} more photos left)</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="photo-limit-notice">
+                          <FiCheckCircle /> All 5 photo slots filled. You can rearrange or remove any photo above.
+                        </div>
+                      )
+                    ) : (
+                      <div className="url-input-wrap">
+                        <div style={{ display: "flex", gap: "8px" }}>
+                          <input
+                            type="url"
+                            placeholder="Paste external image URL (https://...)"
+                            value={customUrlInput}
+                            onChange={(e) => setCustomUrlInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                handleAddUrlImage();
+                              }
+                            }}
+                          />
+                          <button
+                            type="button"
+                            className="admin-prod-primary-btn"
+                            onClick={handleAddUrlImage}
+                            disabled={!customUrlInput.trim() || imageList.length >= 5}
+                            style={{ padding: "0 18px", fontSize: "13px" }}
+                          >
+                            Add URL
+                          </button>
+                        </div>
+                        <span className="field-hint">
+                          Paste external image link and press "Add URL" to append to available slots.
+                        </span>
+                      </div>
+                    )}
+                  </div>
               </div>
 
               {/* Form Footer Buttons */}

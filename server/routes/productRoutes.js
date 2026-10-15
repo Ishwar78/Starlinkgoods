@@ -202,8 +202,33 @@ router.post("/", (req, res) => {
         parsedUrls = [singleImageUrl.trim()];
       }
 
-      // Combine up to 5 images
-      let allImages = [...uploadedFilePaths, ...parsedUrls].filter(Boolean);
+      // Reconstruct allImages based on imageOrder manifest if supplied
+      let allImages = [];
+      if (req.body.imageOrder) {
+        try {
+          const manifest = JSON.parse(req.body.imageOrder);
+          if (Array.isArray(manifest) && manifest.length > 0) {
+            let fileCounter = 0;
+            manifest.forEach((entry) => {
+              if (entry.type === "file") {
+                if (fileCounter < uploadedFilePaths.length) {
+                  allImages.push(uploadedFilePaths[fileCounter++]);
+                }
+              } else if (entry.url) {
+                allImages.push(entry.url);
+              }
+            });
+          }
+        } catch (manifestErr) {
+          console.warn("Could not parse imageOrder in POST:", manifestErr.message);
+        }
+      }
+
+      // Fallback if imageOrder was not provided
+      if (allImages.length === 0) {
+        allImages = [...uploadedFilePaths, ...parsedUrls].filter(Boolean);
+      }
+
       if (allImages.length === 0) {
         allImages = [
           "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=700&q=85",
@@ -352,18 +377,44 @@ router.put("/:id", (req, res) => {
         parsedUrls = [singleImageUrl.trim()];
       }
 
-      // If user uploaded new files or specified existing/URL images, update images
-      if (
-        newUploadedPaths.length > 0 ||
-        retainedImages.length > 0 ||
-        parsedUrls.length > 0
-      ) {
-        let finalImages = [
+      // Reconstruct finalImages in user-specified order
+      let finalImages = [];
+      if (req.body.imageOrder) {
+        try {
+          const manifest = JSON.parse(req.body.imageOrder);
+          if (Array.isArray(manifest) && manifest.length > 0) {
+            let fileCounter = 0;
+            manifest.forEach((entry) => {
+              if (entry.type === "file") {
+                if (fileCounter < newUploadedPaths.length) {
+                  finalImages.push(newUploadedPaths[fileCounter++]);
+                }
+              } else if (entry.url) {
+                finalImages.push(entry.url);
+              }
+            });
+          }
+        } catch (manifestErr) {
+          console.warn("Could not parse imageOrder manifest:", manifestErr.message);
+        }
+      }
+
+      // Fallback if imageOrder was not used or produced empty array
+      if (finalImages.length === 0) {
+        finalImages = [
           ...retainedImages,
           ...newUploadedPaths,
           ...parsedUrls,
         ].filter(Boolean);
+      }
 
+      // If user provided image information (manifest, files, or retained), update images
+      if (
+        req.body.imageOrder !== undefined ||
+        newUploadedPaths.length > 0 ||
+        retainedImages.length > 0 ||
+        parsedUrls.length > 0
+      ) {
         if (finalImages.length === 0) {
           finalImages = [
             product.image ||
@@ -373,11 +424,20 @@ router.put("/:id", (req, res) => {
 
         finalImages = finalImages.slice(0, 5);
 
+        // Safe extraction of current images (handles string, array, or undefined)
+        const currentImages = Array.isArray(product.images)
+          ? product.images
+          : typeof product.images === "string" && product.images.trim()
+          ? [product.images.trim()]
+          : product.image
+          ? [product.image]
+          : [];
+
         // Clean up removed local files
-        const currentImages = product.images || [product.image];
         currentImages.forEach((img) => {
           if (
             img &&
+            typeof img === "string" &&
             img.startsWith("/uploads/products/") &&
             !finalImages.includes(img)
           ) {
