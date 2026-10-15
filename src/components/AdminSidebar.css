@@ -1,0 +1,219 @@
+/* =========================================================
+   STARLINK ADMIN SIDEBAR
+   Black & Gold Navbar Matched Theme
+========================================================= */
+
+.admin-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  width: 258px;
+  padding: 22px 15px 18px;
+  border-right: 1px solid rgba(255, 199, 45, 0.25);
+  color: #ffffff;
+  background: #050505;
+  box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+}
+
+.admin-sidebar-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5px 27px;
+  border-bottom: 1px solid rgba(255, 199, 45, 0.18);
+  margin-bottom: 18px;
+}
+
+.admin-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.admin-sidebar-brand-icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  color: #080808;
+  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  font-size: 20px;
+  box-shadow: 0 4px 12px rgba(255, 196, 34, 0.3);
+}
+
+.admin-sidebar-brand-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-sidebar-brand-copy strong {
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 20px;
+  color: #ffffff;
+}
+
+.admin-sidebar-brand-copy small {
+  color: #ffd044;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.admin-sidebar-caption {
+  margin: 0;
+  padding: 0 12px 11px;
+  color: #8c8376;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.admin-sidebar-nav {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 8px;
+  color: #cccccc;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s, transform 0.15s;
+}
+
+.admin-sidebar-link svg {
+  flex-shrink: 0;
+  font-size: 18px;
+}
+
+.admin-sidebar-link:hover {
+  color: #ffd044;
+  background: rgba(255, 199, 45, 0.08);
+}
+
+.admin-sidebar-link.active {
+  color: #080808;
+  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(255, 196, 34, 0.25);
+}
+
+.admin-sidebar-bottom {
+  display: grid;
+  gap: 7px;
+  margin-top: auto;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 199, 45, 0.15);
+}
+
+.admin-sidebar-help {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 9px;
+  padding: 12px 11px;
+  border: 1px solid rgba(255, 199, 45, 0.2);
+  border-radius: 10px;
+  background: #111111;
+}
+
+.admin-help-icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  color: #ffd044;
+  background: rgba(255, 199, 45, 0.12);
+  font-size: 18px;
+}
+
+.admin-sidebar-help div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.admin-sidebar-help strong {
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.admin-sidebar-help small {
+  color: #a89d8d;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.admin-sidebar-bottom-link {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #dddddd;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+}
+
+.admin-sidebar-bottom-link:hover {
+  color: #ffd044;
+  background: rgba(255, 199, 45, 0.08);
+}
+
+.admin-sidebar-close,
+.admin-sidebar-backdrop {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .admin-sidebar {
+    transform: translateX(-105%);
+    transition: transform 0.24s ease;
+    box-shadow: 12px 0 40px rgba(0, 0, 0, 0.7);
+  }
+
+  .admin-sidebar.is-open {
+    transform: translateX(0);
+  }
+
+  .admin-sidebar-close {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(255, 199, 45, 0.3);
+    border-radius: 8px;
+    color: #ffd044;
+    background: #141414;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .admin-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    border: 0;
+    background: rgba(0, 0, 0, 0.65);
+  }
+
+  .admin-sidebar-backdrop.is-visible {
+    display: block;
+  }
+}

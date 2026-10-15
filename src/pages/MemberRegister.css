@@ -1,0 +1,936 @@
+
+/* =========================================
+   STAR LINK GOODS - MEMBER REGISTRATION
+   Theme: Black, Gold & Warm Cream
+========================================= */
+
+.slg-register-page {
+  --reg-gold: #edb51b;
+  --reg-gold-light: #ffdc75;
+  --reg-ink: #1b1712;
+  --reg-muted: #71685e;
+  --reg-cream: #fffaf3;
+
+  width: 100%;
+  min-height: 70vh;
+  overflow: hidden;
+  background: var(--reg-cream);
+  color: var(--reg-ink);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.slg-register-page *,
+.slg-register-page *::before,
+.slg-register-page *::after {
+  box-sizing: border-box;
+}
+
+.slg-register-page img {
+  display: block;
+  max-width: 100%;
+}
+
+.slg-register-page button,
+.slg-register-page input,
+.slg-register-page select,
+.slg-register-page textarea {
+  font: inherit;
+}
+
+.slg-register-page a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.slg-register-page button:focus-visible,
+.slg-register-page input:focus-visible,
+.slg-register-page select:focus-visible,
+.slg-register-page textarea:focus-visible,
+.slg-register-page a:focus-visible {
+  outline: 2px solid #c58b00;
+  outline-offset: 3px;
+}
+
+/* Main split layout */
+
+.slg-register-layout {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(0, 1fr);
+  align-items: stretch;
+  width: 100%;
+  min-height: 690px;
+  isolation: isolate;
+  background: #f6eee3;
+}
+
+.slg-register-layout::before {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background-image: url(
+    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2200&q=90"
+  );
+  background-position: center;
+  background-size: cover;
+  content: "";
+}
+
+.slg-register-layout::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 249, 240, 0.88) 0%,
+    rgba(255, 249, 240, 0.78) 35%,
+    rgba(255, 249, 240, 0.36) 58%,
+    rgba(245, 233, 217, 0.55) 100%
+  );
+  content: "";
+}
+
+/* Left introduction */
+
+.slg-register-intro {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  padding: 48px clamp(25px, 4.8vw, 75px);
+}
+
+.slg-register-intro-content {
+  width: 100%;
+  max-width: 570px;
+  margin: 0 auto;
+}
+
+.slg-register-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #a96d00;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 1.7px;
+}
+
+.slg-register-eyebrow i {
+  width: 29px;
+  height: 2px;
+  background: var(--reg-gold);
+}
+
+.slg-register-intro h1 {
+  margin: 19px 0 14px;
+  color: #201a14;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(39px, 4.1vw, 62px);
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  line-height: 1.04;
+}
+
+.slg-register-intro h1 span {
+  display: block;
+  color: #a7730b;
+}
+
+.slg-register-intro-description {
+  max-width: 410px;
+  margin: 0 0 23px;
+  color: #1e1b18;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1.8;
+}
+
+.slg-membership-fee-card {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1.5px solid rgba(237, 181, 27, 0.45);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 24px;
+  box-shadow: 0 6px 20px rgba(184, 134, 11, 0.1);
+}
+
+.membership-fee-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(237, 181, 27, 0.18);
+  border: 1px solid rgba(237, 181, 27, 0.4);
+  color: #8c5b00;
+  font-size: 12px;
+  font-weight: 750;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.membership-fee-pricing {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.fee-symbol {
+  font-size: 20px;
+  font-weight: 800;
+  color: #201a14;
+}
+
+.fee-amount {
+  font-size: 36px;
+  font-weight: 850;
+  color: #1a1610;
+  line-height: 1;
+}
+
+.fee-period {
+  font-size: 13px;
+  color: #6d6255;
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.membership-fee-note {
+  margin: 0;
+  font-size: 12.5px;
+  color: #5d5449;
+  line-height: 1.5;
+}
+
+/* Membership benefits */
+
+.slg-register-benefits {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.slg-register-benefit {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  min-width: 0;
+}
+
+.slg-register-benefit-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgba(221, 167, 31, 0.32);
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffe7a1, #ffd765);
+  color: #21180a;
+  font-size: 21px;
+  box-shadow: 0 5px 15px rgba(164, 117, 17, 0.08);
+}
+
+.slg-register-benefit h3 {
+  margin: 0 0 3px;
+  color: #241d16;
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.slg-register-benefit p {
+  margin: 0;
+  color: #34302b;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+/* Right form panel */
+
+.slg-register-form-panel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 24px clamp(18px, 3.2vw, 50px) 24px 12px;
+}
+
+.slg-register-card {
+  width: 100%;
+  max-width: 690px;
+  padding: clamp(23px, 2.4vw, 37px);
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  border-radius: 17px;
+  background: rgba(255, 253, 249, 0.97);
+  box-shadow:
+    0 20px 65px rgba(43, 29, 13, 0.15),
+    0 2px 8px rgba(43, 29, 13, 0.04);
+  backdrop-filter: blur(12px);
+}
+
+.slg-register-card-heading {
+  margin-bottom: 21px;
+}
+
+.slg-register-card-kicker {
+  display: block;
+  margin-bottom: 7px;
+  color: #9c6b0b;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1.35px;
+}
+
+.slg-register-card-heading h2 {
+  margin: 0 0 7px;
+  color: #1d1813;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(29px, 2.7vw, 40px);
+  font-weight: 700;
+  letter-spacing: -0.8px;
+  line-height: 1.12;
+}
+
+/* Form grid */
+
+.slg-register-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 16px;
+}
+
+.slg-register-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.slg-register-field-full {
+  grid-column: 1 / -1;
+}
+
+.slg-register-field > label {
+  color: #2b251f;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.slg-register-field > label span {
+  color: #d23e27;
+}
+
+/* Input wrappers */
+
+.slg-register-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 45px;
+  padding: 0 11px;
+  border: 1px solid #ddd7ce;
+  border-radius: 8px;
+  background: #fffefd;
+  color: #655e55;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.slg-register-input-wrap:focus-within {
+  border-color: #d9a419;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(237, 181, 27, 0.12);
+}
+
+.slg-register-input-wrap > svg {
+  flex: 0 0 17px;
+  width: 17px;
+  height: 17px;
+  color: #5c5954;
+  stroke-width: 1.7;
+}
+
+.slg-register-input-wrap input,
+.slg-register-input-wrap select,
+.slg-register-input-wrap textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 10px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #171514;
+  font-size: 15px;
+  line-height: 1.5;
+  box-shadow: none;
+}
+
+.slg-register-input-wrap input::placeholder,
+.slg-register-input-wrap textarea::placeholder {
+  color: #918a82;
+  opacity: 1;
+}
+
+.slg-register-input-wrap input:focus,
+.slg-register-input-wrap select:focus,
+.slg-register-input-wrap textarea:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.slg-register-input-wrap select {
+  cursor: pointer;
+  appearance: auto;
+}
+
+.slg-register-input-wrap select option {
+  background: #fffefd;
+  color: #171514;
+}
+
+.slg-register-input-wrap input[type="date"] {
+  min-height: 41px;
+  color: #6e665d;
+}
+
+/* City input and suggestions */
+
+.slg-register-field-hint {
+  display: block;
+  margin-top: 1px;
+  color: #766b5e;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* Mobile number */
+
+.slg-register-mobile-wrap {
+  gap: 9px;
+}
+
+.slg-register-country-code {
+  display: inline-flex;
+  align-items: center;
+  align-self: stretch;
+  padding: 0 9px;
+  border-right: 1px solid #e8e0d6;
+  color: #443c33;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.slg-register-mobile-wrap input {
+  flex: 1;
+}
+
+/* Password visibility */
+
+.slg-register-password-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 30px;
+  width: 30px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #716960;
+  cursor: pointer;
+}
+
+.slg-register-password-toggle:hover {
+  background: #f7eedc;
+  color: #936400;
+}
+
+.slg-register-password-toggle svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Address */
+
+.slg-register-address-wrap {
+  align-items: flex-start;
+  min-height: 82px;
+  padding-top: 11px;
+}
+
+.slg-register-address-wrap > svg {
+  margin-top: 2px;
+}
+
+.slg-register-address-wrap textarea {
+  min-height: 61px;
+  padding: 0;
+  resize: vertical;
+}
+
+/* Terms and conditions */
+
+.slg-register-terms {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  margin-top: 15px;
+  color: #71685e;
+  font-size: 13px;
+  line-height: 1.7;
+  cursor: pointer;
+}
+
+.slg-register-terms > input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.slg-register-custom-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 20px;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  border: 1px solid #c9c0b3;
+  border-radius: 4px;
+  background: #fff;
+  color: transparent;
+}
+
+.slg-register-custom-checkbox svg {
+  width: 12px;
+  height: 12px;
+}
+
+.slg-register-terms
+  > input:checked
+  + .slg-register-custom-checkbox {
+  border-color: #c9950b;
+  background: #f2bd32;
+  color: #251a08;
+}
+
+.slg-register-terms
+  > input:focus-visible
+  + .slg-register-custom-checkbox {
+  outline: 2px solid #c58b00;
+  outline-offset: 3px;
+}
+
+.slg-register-terms a {
+  color: #986100;
+  font-weight: 700;
+}
+
+.slg-register-terms a:hover {
+  text-decoration: underline;
+}
+
+/* Form feedback */
+
+.slg-register-message {
+  margin: 14px 0 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.error-message-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+}
+
+.error-message-content .error-icon {
+  flex-shrink: 0;
+  font-size: 17px;
+  margin-top: 2px;
+  color: #c0392b;
+}
+
+.error-signin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #c0392b;
+  color: #ffffff !important;
+  font-weight: 700;
+  font-size: 12.5px;
+  padding: 7px 14px;
+  border-radius: 6px;
+  width: fit-content;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.error-signin-btn:hover {
+  background: #a93226;
+  transform: translateX(2px);
+}
+
+.slg-register-error {
+  border: 1px solid #f0c5bd;
+  background: #fff0ed;
+  color: #922b21;
+}
+
+.slg-register-success {
+  border: 1px solid #b8dec4;
+  background: #effaf2;
+  color: #1e8449;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.slg-register-success .success-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  color: #27ae60;
+}
+
+.btn-spinner-icon {
+  animation: spinRegister 0.8s linear infinite;
+}
+
+@keyframes spinRegister {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Submit button */
+
+.slg-register-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 17px;
+  padding: 12px 18px;
+  border: 1px solid #e3ac12;
+  border-radius: 8px;
+  background: linear-gradient(
+    110deg,
+    #ffda69,
+    #f1b918 68%,
+    #e9a600
+  );
+  color: #1b1509;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 7px 16px rgba(196, 139, 0, 0.12);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
+}
+
+.slg-register-submit:hover {
+  transform: translateY(-2px);
+  filter: saturate(1.08);
+  box-shadow: 0 10px 22px rgba(196, 139, 0, 0.22);
+}
+
+.slg-register-submit:active {
+  transform: translateY(0);
+}
+
+.slg-register-submit svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* Login link */
+
+.slg-register-login {
+  margin: 14px 0 0;
+  color: #2f2c29;
+  font-size: 14px;
+  text-align: center;
+}
+
+.slg-register-login a {
+  color: #976000;
+  font-weight: 800;
+}
+
+.slg-register-login a:hover {
+  text-decoration: underline;
+}
+
+/* Tablet */
+
+@media (max-width: 1050px) {
+  .slg-register-layout {
+    grid-template-columns:
+      minmax(0, 0.85fr)
+      minmax(0, 1.15fr);
+  }
+
+  .slg-register-intro {
+    padding: 35px 23px;
+  }
+
+  .slg-register-intro h1 {
+    font-size: clamp(34px, 4vw, 46px);
+  }
+
+  .slg-register-intro-description {
+    font-size: 16px;
+  }
+
+  .slg-register-benefit-icon {
+    flex-basis: 42px;
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
+  }
+
+  .slg-register-benefit h3 {
+    font-size: 16px;
+  }
+
+  .slg-register-benefit p {
+    font-size: 14px;
+  }
+
+  .slg-register-form-panel {
+    padding: 22px 18px 22px 0;
+  }
+
+  .slg-register-card {
+    padding: 24px;
+  }
+
+  .slg-register-fields {
+    gap: 13px 12px;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 760px) {
+  .slg-register-layout {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: auto;
+  }
+
+  .slg-register-layout::before {
+    background-position: center;
+  }
+
+  .slg-register-layout::after {
+    background: rgba(255, 249, 240, 0.84);
+  }
+
+  .slg-register-intro {
+    padding: 36px 22px 24px;
+  }
+
+  .slg-register-intro-content {
+    max-width: 560px;
+  }
+
+  .slg-register-intro h1 {
+    margin: 14px 0 10px;
+    font-size: clamp(37px, 8vw, 49px);
+  }
+
+  .slg-register-intro-description {
+    max-width: 500px;
+    margin-bottom: 19px;
+    font-size: 16px;
+  }
+
+  .slg-register-benefits {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 12px;
+  }
+
+  .slg-register-benefit {
+    align-items: flex-start;
+    gap: 9px;
+  }
+
+  .slg-register-benefit-icon {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
+  }
+
+  .slg-register-benefit h3 {
+    font-size: 14px;
+  }
+
+  .slg-register-benefit p {
+    font-size: 13px;
+  }
+
+  .slg-register-form-panel {
+    padding: 8px 16px 30px;
+  }
+
+  .slg-register-card {
+    max-width: 560px;
+    padding: 24px 20px;
+    border-radius: 13px;
+  }
+
+  .slg-register-card-heading h2 {
+    font-size: 31px;
+  }
+
+  .slg-register-fields {
+    gap: 14px 12px;
+  }
+
+  .slg-register-input-wrap {
+    min-height: 45px;
+  }
+
+  .slg-register-input-wrap input,
+  .slg-register-input-wrap select,
+  .slg-register-input-wrap textarea {
+    font-size: 15px;
+  }
+
+  .slg-register-address-wrap {
+    min-height: 82px;
+  }
+
+  .slg-register-address-wrap textarea {
+    min-height: 65px;
+  }
+
+  .slg-register-terms {
+    font-size: 13px;
+  }
+}
+
+/* Small phones */
+
+@media (max-width: 430px) {
+  .slg-register-intro {
+    padding: 29px 16px 22px;
+  }
+
+  .slg-register-intro h1 {
+    font-size: 36px;
+    letter-spacing: -0.8px;
+  }
+
+  .slg-register-intro-description {
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .slg-register-benefits {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .slg-register-benefit {
+    align-items: center;
+  }
+
+  .slg-register-benefit-icon {
+    flex-basis: 40px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .slg-register-form-panel {
+    padding: 6px 10px 23px;
+  }
+
+  .slg-register-card {
+    padding: 22px 15px;
+  }
+
+  .slg-register-card-heading h2 {
+    font-size: 28px;
+  }
+
+  .slg-register-card-heading p {
+    font-size: 14px;
+  }
+
+  .slg-register-fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 13px;
+  }
+
+  .slg-register-field-full {
+    grid-column: auto;
+  }
+
+  .slg-register-field > label {
+    font-size: 14px;
+  }
+
+  .slg-register-input-wrap {
+    min-height: 46px;
+  }
+
+  .slg-register-input-wrap input,
+  .slg-register-input-wrap select,
+  .slg-register-input-wrap textarea {
+    font-size: 15px;
+  }
+
+  .slg-register-address-wrap {
+    min-height: 82px;
+  }
+
+  .slg-register-terms {
+    font-size: 12px;
+  }
+
+  .slg-register-submit {
+    min-height: 49px;
+    font-size: 14px;
+  }
+}
+
+/* Accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .slg-register-page *,
+  .slg-register-page *::before,
+  .slg-register-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

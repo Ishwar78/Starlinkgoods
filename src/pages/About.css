@@ -1,0 +1,1153 @@
+/* =========================================
+   STAR LINK GOODS - ABOUT PAGE
+   Dedicated stylesheet: About.css
+   Theme: Black, Gold & Cream
+========================================= */
+
+.slg-about-page {
+  --about-gold: #e9ad12;
+  --about-gold-light: #ffdc72;
+  --about-ink: #211b16;
+  --about-muted: #766d63;
+  --about-cream: #fffaf4;
+
+  width: 100%;
+  overflow: hidden;
+  background: var(--about-cream);
+  color: var(--about-ink);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.slg-about-page *,
+.slg-about-page *::before,
+.slg-about-page *::after {
+  box-sizing: border-box;
+}
+
+.slg-about-page img {
+  display: block;
+  max-width: 100%;
+}
+
+.slg-about-page a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.slg-about-page a:focus-visible {
+  outline: 2px solid var(--about-gold);
+  outline-offset: 4px;
+}
+
+/* =========================================
+   SECTION LABEL
+========================================= */
+
+.slg-about-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #b87b00;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 1.55px;
+  line-height: 1.5;
+}
+
+.slg-about-eyebrow::before {
+  display: inline-block;
+  width: 27px;
+  height: 1px;
+  background: var(--about-gold);
+  content: "";
+}
+
+/* =========================================
+   BUTTON
+========================================= */
+
+.slg-about-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-height: 43px;
+  padding: 11px 17px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: linear-gradient(
+    135deg,
+    #ffdf79,
+    #e9ad0b
+  );
+  color: #19140a;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.2;
+  box-shadow: 0 5px 14px rgba(211, 151, 0, 0.12);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.slg-about-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.slg-about-button svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+/* =========================================
+   HERO SECTION
+========================================= */
+
+.slg-about-hero {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 300px;
+  isolation: isolate;
+  overflow: hidden;
+  background: #eee0cd;
+}
+
+.slg-about-hero-image {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  background-image: url(
+    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2200&q=90"
+  );
+  background-position: center 54%;
+  background-size: cover;
+}
+
+.slg-about-hero::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 249, 240, 0.98) 0%,
+    rgba(255, 249, 240, 0.93) 27%,
+    rgba(255, 249, 240, 0.68) 43%,
+    rgba(255, 249, 240, 0.08) 72%,
+    rgba(255, 249, 240, 0.05) 100%
+  );
+  content: "";
+}
+
+.slg-about-hero-content {
+  width: min(510px, 49%);
+  padding: 43px 0 43px clamp(25px, 6vw, 92px);
+}
+
+.slg-about-hero-content h1 {
+  margin: 12px 0 11px;
+  color: #211b16;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(36px, 4vw, 57px);
+  font-weight: 700;
+  letter-spacing: -1.5px;
+  line-height: 0.99;
+}
+
+.slg-about-hero-content h1 span {
+  display: block;
+  color: #a9740a;
+}
+
+.slg-about-hero-content p {
+  max-width: 390px;
+  margin: 0 0 19px;
+  color: #0b0a09;
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+.slg-about-hero-note {
+  position: absolute;
+  top: 50%;
+  right: clamp(20px, 4vw, 65px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #282019;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(17px, 2vw, 27px);
+  font-style: italic;
+  line-height: 1.18;
+  transform: translateY(-50%) rotate(-5deg);
+  text-align: center;
+  text-shadow: 0 1px 12px rgba(255, 250, 240, 0.8);
+}
+
+.slg-about-hero-note i {
+  width: 78px;
+  height: 3px;
+  margin-top: 12px;
+  background: var(--about-gold);
+  transform: rotate(-9deg);
+}
+
+/* =========================================
+   BENEFITS SECTION
+========================================= */
+
+.slg-about-benefits {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  width: calc(100% - clamp(28px, 5vw, 76px));
+  max-width: 1500px;
+  margin: -1px auto 0;
+  padding: 15px 12px;
+  border: 1px solid #ead8c1;
+  border-radius: 12px;
+  background: rgba(255, 253, 249, 0.97);
+  box-shadow: 0 8px 25px rgba(56, 40, 22, 0.08);
+}
+
+.slg-about-benefit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 5px clamp(8px, 2vw, 27px);
+  border-right: 1px solid #ebdeca;
+}
+
+.slg-about-benefit:last-child {
+  border-right: 0;
+}
+
+.slg-about-benefit-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 45px;
+  width: 45px;
+  height: 45px;
+  border: 1px solid var(--about-gold);
+  border-radius: 50%;
+  background: #14120e;
+  color: var(--about-gold-light);
+  font-size: 19px;
+}
+
+.slg-about-benefit h3 {
+  margin: 0 0 3px;
+  color: #211b16;
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.slg-about-benefit p {
+  margin: 0;
+  color: var(--about-muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+/* =========================================
+   OUR STORY SECTION
+========================================= */
+
+.slg-about-story {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1.08fr)
+    minmax(0, 1.12fr)
+    minmax(160px, 0.5fr);
+  align-items: center;
+  gap: clamp(22px, 3vw, 42px);
+  width: min(
+    calc(100% - 2 * clamp(24px, 4vw, 60px)),
+    1500px
+  );
+  margin: 0 auto;
+  padding: 39px 0 35px;
+}
+
+.slg-about-story-visual {
+  position: relative;
+  min-width: 0;
+  padding-bottom: 18px;
+}
+
+.slg-about-story-main-image {
+  width: 100%;
+  height: 265px;
+  border-radius: 9px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.slg-about-story-small-image {
+  position: absolute;
+  right: -13px;
+  bottom: 0;
+  width: 42%;
+  height: 120px;
+  border: 5px solid var(--about-cream);
+  border-radius: 11px;
+  object-fit: cover;
+  box-shadow: 0 5px 18px rgba(36, 24, 10, 0.15);
+}
+
+.slg-about-image-caption {
+  position: absolute;
+  bottom: 25px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  max-width: 57%;
+  padding: 10px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 6px;
+  background: rgba(20, 17, 13, 0.75);
+  color: #fff;
+  backdrop-filter: blur(6px);
+}
+
+.slg-about-image-caption span {
+  color: #f2d18a;
+  font-size: 9px;
+}
+
+.slg-about-image-caption strong {
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.slg-about-story-copy {
+  min-width: 0;
+}
+
+.slg-about-story-copy h2,
+.slg-about-testimonials-heading h2 {
+  margin: 9px 0 10px;
+  color: #211b16;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(25px, 2.6vw, 35px);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  line-height: 1.13;
+}
+
+.slg-about-story-copy p {
+  margin: 0 0 11px;
+  color: #090908;
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+.slg-about-story-copy .slg-about-button {
+  margin-top: 6px;
+}
+
+/* Story statistics cards */
+
+.slg-about-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.slg-about-stat {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 59px;
+  padding: 8px 10px;
+  border: 1px solid #f0e5d5;
+  border-radius: 8px;
+  background: #fffdf9;
+}
+
+.slg-about-stat > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 39px;
+  width: 39px;
+  height: 39px;
+  border-radius: 50%;
+  background: #fbf0d7;
+  color: #956000;
+  font-size: 17px;
+}
+
+.slg-about-stat div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.slg-about-stat strong {
+  color: #282019;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.slg-about-stat small {
+  color: #1b1a18;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* =========================================
+   MISSION, VISION AND VALUES
+========================================= */
+
+.slg-about-values {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0;
+  padding: 20px clamp(24px, 4vw, 65px);
+  border-top: 1px solid #f2e7d9;
+  border-bottom: 1px solid #f2e7d9;
+  background: #fffdf9;
+}
+
+.slg-about-value {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  min-width: 0;
+  padding: 4px clamp(8px, 2vw, 27px);
+  border-right: 1px solid #e8d9c3;
+}
+
+.slg-about-value:first-child {
+  padding-left: 0;
+}
+
+.slg-about-value:last-child {
+  padding-right: 0;
+  border-right: 0;
+}
+
+.slg-about-value-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 43px;
+  width: 43px;
+  height: 43px;
+  border-radius: 50%;
+  background: #fbf0d7;
+  color: #986000;
+  font-size: 19px;
+}
+
+.slg-about-value h3 {
+  margin: 0 0 4px;
+  color: #2b241d;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.slg-about-value p {
+  margin: 0;
+  color: #1a1817;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+/* =========================================
+   WHY CHOOSE STAR LINK GOODS
+========================================= */
+
+.slg-about-why {
+  display: grid;
+  grid-template-columns:
+    minmax(205px, 0.92fr)
+    minmax(0, 2.8fr);
+  gap: clamp(20px, 3vw, 38px);
+  padding: 32px clamp(24px, 4vw, 65px);
+  background:
+    radial-gradient(
+      ellipse at top left,
+      rgba(224, 167, 28, 0.08),
+      transparent 38%
+    ),
+    #0b0b0a;
+  color: #fff;
+}
+
+.slg-about-why-intro {
+  align-self: center;
+  min-width: 0;
+}
+
+.slg-about-why-intro .slg-about-eyebrow {
+  color: #f0c653;
+}
+
+.slg-about-why-intro h2 {
+  margin: 10px 0;
+  color: #fffaf0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(26px, 2.5vw, 35px);
+  letter-spacing: -0.5px;
+  line-height: 1.08;
+}
+
+.slg-about-why-intro p {
+  margin: 0 0 18px;
+  color: #b8b0a2;
+  font-size: 16px;
+  line-height: 1.85;
+}
+
+/* Feature cards */
+
+.slg-about-reasons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  min-width: 0;
+}
+
+.slg-about-reason-card {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #302b22;
+  border-radius: 9px;
+  background: #121211;
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.slg-about-reason-card:hover {
+  transform: translateY(-3px);
+  border-color: #8e6c20;
+}
+
+.slg-about-reason-image {
+  position: relative;
+  height: 118px;
+  overflow: hidden;
+}
+
+.slg-about-reason-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.35s ease;
+}
+
+.slg-about-reason-card:hover
+.slg-about-reason-image img {
+  transform: scale(1.05);
+}
+
+.slg-about-reason-image > span {
+  position: absolute;
+  bottom: -1px;
+  left: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 39px;
+  height: 39px;
+  border: 2px solid var(--about-gold);
+  border-radius: 50%;
+  background: #0e0e0d;
+  color: var(--about-gold-light);
+  font-size: 16px;
+}
+
+.slg-about-reason-copy {
+  padding: 14px 12px 16px;
+}
+
+.slg-about-reason-copy h3 {
+  margin: 0 0 5px;
+  color: #fff8e8;
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.5;
+}
+
+.slg-about-reason-copy p {
+  margin: 0;
+  color: #e8e2d9;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+/* =========================================
+   BRAND SHOWCASE
+========================================= */
+
+.slg-about-brands {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+  padding: 21px clamp(24px, 4vw, 65px);
+  border-bottom: 1px solid #efe2d0;
+  background: #fffaf3;
+}
+
+.slg-about-brands-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  color: #8d620a;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.slg-about-brands-label span {
+  width: 24px;
+  height: 1px;
+  background: var(--about-gold);
+}
+
+.slg-about-brand-list {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex: 1;
+  flex-wrap: wrap;
+  gap: 13px 22px;
+}
+
+.slg-about-brand-list span {
+  color: #51483d;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.slg-about-brand-list span:nth-child(2n) {
+  font-style: italic;
+}
+
+/* =========================================
+   CUSTOMER TESTIMONIALS
+========================================= */
+
+.slg-about-testimonials {
+  display: grid;
+  grid-template-columns:
+    minmax(190px, 0.85fr)
+    minmax(0, 2.3fr);
+  align-items: center;
+  gap: 30px;
+  padding: 35px clamp(24px, 4vw, 65px);
+  background: #fffdf9;
+}
+
+.slg-about-testimonials-heading h2 {
+  font-size: clamp(24px, 2.5vw, 32px);
+}
+
+.slg-about-testimonials-heading p {
+  margin: 0;
+  color: #171513;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.slg-about-testimonial-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+  min-width: 0;
+}
+
+.slg-about-testimonial {
+  min-width: 0;
+  padding: 17px;
+  border: 1px solid #f0e6d9;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 4px 15px rgba(42, 30, 14, 0.045);
+}
+
+.slg-about-reviewer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.slg-about-reviewer > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 36px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #f0d99f;
+  border-radius: 50%;
+  background: #fbf0d7;
+  color: #7f5300;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.slg-about-reviewer div {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.slg-about-reviewer strong {
+  color: #29221a;
+  font-size: 14px;
+}
+
+.slg-about-reviewer small {
+  color: #0d0c0b;
+  font-size: 13px;
+}
+
+.slg-about-stars {
+  margin: 10px 0 6px;
+  color: #d99c08;
+  font-size: 22px;
+  letter-spacing: 2px;
+}
+
+.slg-about-testimonial > p {
+  margin: 0;
+  color: #181614;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+/* =========================================
+   FINAL SHOPPING CTA
+========================================= */
+
+.slg-about-cta {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 190px;
+  isolation: isolate;
+  overflow: hidden;
+  background: #18120a;
+  color: #fff;
+}
+
+.slg-about-cta-image {
+  position: absolute;
+  z-index: -2;
+  inset: 0 0 0 43%;
+  background-image: url(
+    "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1500&q=85"
+  );
+  background-position: center 55%;
+  background-size: cover;
+}
+
+.slg-about-cta::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    #100e0a 0%,
+    #17120b 36%,
+    rgba(23, 18, 11, 0.94) 47%,
+    rgba(23, 18, 11, 0.25) 80%,
+    rgba(23, 18, 11, 0.15) 100%
+  );
+  content: "";
+}
+
+.slg-about-cta-copy {
+  width: min(650px, 65%);
+  padding: 28px clamp(24px, 6vw, 90px);
+}
+
+.slg-about-cta-copy .slg-about-eyebrow {
+  color: #f2ce67;
+}
+
+.slg-about-cta-copy h2 {
+  margin: 8px 0;
+  color: #fff8eb;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(24px, 3vw, 36px);
+  line-height: 1.2;
+}
+
+.slg-about-cta-copy p {
+  max-width: 440px;
+  margin: 0 0 17px;
+  color: #c5bba9;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* =========================================
+   TABLET RESPONSIVENESS
+========================================= */
+
+@media (max-width: 1100px) {
+  .slg-about-story {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .slg-about-stats {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .slg-about-why {
+    grid-template-columns: 1fr;
+  }
+
+  .slg-about-why-intro {
+    max-width: 600px;
+  }
+
+  .slg-about-brands {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 17px;
+  }
+
+  .slg-about-brand-list {
+    width: 100%;
+  }
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS
+========================================= */
+
+@media (max-width: 760px) {
+  .slg-about-hero {
+    min-height: 310px;
+  }
+
+  .slg-about-hero-content {
+    width: 75%;
+    padding: 35px 20px;
+  }
+
+  .slg-about-hero-content h1 {
+    font-size: clamp(34px, 7vw, 47px);
+  }
+
+  .slg-about-hero-note {
+    display: none;
+  }
+
+  .slg-about-hero::before {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 249, 240, 0.97),
+      rgba(255, 249, 240, 0.88) 57%,
+      rgba(255, 249, 240, 0.25)
+    );
+  }
+
+  /* Benefits */
+
+  .slg-about-benefits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 0;
+    width: calc(100% - 24px);
+    padding: 12px 7px;
+  }
+
+  .slg-about-benefit {
+    gap: 8px;
+    padding: 8px;
+    border-right: 0;
+  }
+
+  .slg-about-benefit:nth-child(odd) {
+    border-right: 1px solid #ebdeca;
+  }
+
+  .slg-about-benefit-icon {
+    flex-basis: 37px;
+    width: 37px;
+    height: 37px;
+    font-size: 16px;
+  }
+
+  .slg-about-benefit h3 {
+    font-size: 13px;
+  }
+
+  .slg-about-benefit p {
+    font-size: 13px;
+  }
+
+  /* Story */
+
+  .slg-about-story {
+    grid-template-columns: 1fr;
+    gap: 25px;
+    width: calc(100% - 32px);
+    padding: 30px 0;
+  }
+
+  .slg-about-story-main-image {
+    height: 260px;
+  }
+
+  .slg-about-story-copy h2 {
+    font-size: 30px;
+  }
+
+  .slg-about-story-copy p {
+    font-size: 15px;
+  }
+
+  .slg-about-stats {
+    grid-column: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* Values */
+
+  .slg-about-values {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 0;
+    padding: 24px 16px;
+  }
+
+  .slg-about-value {
+    gap: 8px;
+    padding: 4px 10px;
+    border-right: 0;
+  }
+
+  .slg-about-value:nth-child(odd) {
+    border-right: 1px solid #e8d9c3;
+  }
+
+  .slg-about-value:first-child {
+    padding-left: 10px;
+  }
+
+  .slg-about-value:last-child {
+    padding-right: 10px;
+  }
+
+  .slg-about-value-icon {
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
+  }
+
+  /* Why Choose Us */
+
+  .slg-about-why {
+    gap: 23px;
+    padding: 29px 16px;
+  }
+
+  .slg-about-reasons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .slg-about-reason-image {
+    height: 130px;
+  }
+
+  /* Brands */
+
+  .slg-about-brands {
+    padding: 23px 18px;
+  }
+
+  .slg-about-brand-list {
+    justify-content: flex-start;
+    gap: 15px 23px;
+  }
+
+  .slg-about-brand-list span {
+    font-size: 14px;
+  }
+
+  /* Testimonials */
+
+  .slg-about-testimonials {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 30px 16px;
+  }
+
+  .slg-about-testimonials-heading h2 {
+    font-size: 29px;
+  }
+
+  .slg-about-testimonial-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .slg-about-testimonial {
+    padding: 16px;
+  }
+
+  /* CTA */
+
+  .slg-about-cta {
+    min-height: 245px;
+  }
+
+  .slg-about-cta-image {
+    left: 20%;
+  }
+
+  .slg-about-cta::before {
+    background: linear-gradient(
+      90deg,
+      rgba(16, 14, 10, 0.98),
+      rgba(16, 14, 10, 0.89) 60%,
+      rgba(16, 14, 10, 0.48)
+    );
+  }
+
+  .slg-about-cta-copy {
+    width: 100%;
+    padding: 30px 22px;
+  }
+
+  .slg-about-cta-copy h2 {
+    font-size: 29px;
+  }
+}
+
+/* =========================================
+   SMALL PHONES
+========================================= */
+
+@media (max-width: 420px) {
+  .slg-about-hero {
+    min-height: 295px;
+  }
+
+  .slg-about-hero-content {
+    width: 92%;
+    padding: 30px 17px;
+  }
+
+  .slg-about-hero-content h1 {
+    font-size: 35px;
+    letter-spacing: -0.8px;
+  }
+
+  .slg-about-hero-content p {
+    font-size: 16px;
+  }
+
+  .slg-about-benefit {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .slg-about-benefit-icon {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .slg-about-stats article {
+    gap: 8px;
+    padding: 7px;
+  }
+
+  .slg-about-stats article > span {
+    flex-basis: 32px;
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .slg-about-stats strong {
+    font-size: 12px;
+  }
+
+  .slg-about-values {
+    padding-right: 9px;
+    padding-left: 9px;
+  }
+
+  .slg-about-value {
+    padding-right: 6px;
+    padding-left: 6px;
+  }
+
+  .slg-about-value:first-child {
+    padding-left: 6px;
+  }
+
+  .slg-about-value:last-child {
+    padding-right: 6px;
+  }
+
+  .slg-about-value-icon {
+    flex-basis: 34px;
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+
+  .slg-about-value h3 {
+    font-size: 14px;
+  }
+
+  .slg-about-value p {
+    font-size: 14px;
+  }
+
+  .slg-about-reason-image {
+    height: 105px;
+  }
+
+  .slg-about-reason-copy {
+    padding: 13px 9px;
+  }
+
+  .slg-about-reason-copy h3 {
+    font-size: 10px;
+  }
+
+  .slg-about-reason-copy p {
+    font-size: 9px;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION ACCESSIBILITY
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .slg-about-page *,
+  .slg-about-page *::before,
+  .slg-about-page *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

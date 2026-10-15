@@ -1,0 +1,494 @@
+/* =========================================================
+   USER KYC PAGE
+   Black & Gold Theme (Matched to Admin Dashboard)
+========================================================= */
+
+.kyc-page {
+  color: #f5f5f5;
+}
+
+.kyc-page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 24px;
+}
+
+.kyc-eyebrow {
+  color: #ffd044;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.kyc-page-heading h1 {
+  margin: 6px 0;
+  color: #ffffff;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 31px;
+}
+
+.kyc-page-heading p {
+  margin: 0;
+  color: #b5aba0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.kyc-status-badge {
+  padding: 8px 16px;
+  color: #a89f91;
+  background: rgba(168, 159, 145, 0.12);
+  border: 1px solid rgba(168, 159, 145, 0.3);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.kyc-status-badge.submitted {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.kyc-status-badge.pending {
+  color: #ffd044;
+  background: rgba(255, 199, 45, 0.15);
+  border-color: rgba(255, 199, 45, 0.4);
+}
+
+.kyc-status-badge.rejected {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+/* Alert Notification */
+.user-kyc-alert {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 18px;
+  border-radius: 9px;
+  margin-bottom: 22px;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.user-kyc-alert.success {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.user-kyc-alert.error {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+.alert-close-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+}
+
+.kyc-status-banner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 24px;
+  padding: 22px 24px;
+  background: linear-gradient(135deg, #18150f 0%, #0d0b07 100%);
+  border: 1px solid rgba(255, 199, 45, 0.35);
+  border-radius: 14px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+.kyc-banner-icon,
+.kyc-form-title-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  color: #ffd044;
+  background: rgba(255, 199, 45, 0.12);
+  border: 1px solid rgba(255, 199, 45, 0.25);
+  border-radius: 12px;
+  font-size: 22px;
+}
+
+.kyc-banner-icon.active-green {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.35);
+}
+
+.kyc-banner-icon.active-yellow {
+  color: #ffd044;
+  background: rgba(255, 199, 45, 0.15);
+  border-color: rgba(255, 199, 45, 0.35);
+}
+
+.kyc-banner-icon.active-red {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.kyc-status-banner h2 {
+  margin: 0 0 6px;
+  color: #ffffff;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 19px;
+}
+
+.kyc-status-banner p {
+  margin: 0;
+  color: #d1b777;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+/* Details Card (Submitted review) */
+.kyc-details-card,
+.kyc-form-card {
+  padding: 26px;
+  background: #111111;
+  border: 1px solid rgba(255, 199, 45, 0.22);
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  margin-bottom: 24px;
+}
+
+.kyc-card-header,
+.kyc-form-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 199, 45, 0.18);
+  flex-wrap: wrap;
+}
+
+.kyc-card-header h3,
+.kyc-form-title h2 {
+  margin: 0 0 6px;
+  color: #ffffff;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 20px;
+}
+
+.kyc-card-header p,
+.kyc-form-title p {
+  margin: 0;
+  color: #b5aba0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.kyc-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.kyc-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  background: #181818;
+  border: 1px solid rgba(255, 199, 45, 0.16);
+  border-radius: 10px;
+}
+
+.kyc-info-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffd044;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.kyc-info-val {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  word-break: break-word;
+}
+
+.kyc-doc-file-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.kyc-file-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #e5e5e5;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.kyc-view-doc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  color: #080808;
+  border: 1px solid #f6c635;
+  font-size: 12.5px;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(255, 196, 34, 0.25);
+  transition: all 0.2s ease;
+}
+
+.kyc-view-doc-btn:hover {
+  background: linear-gradient(135deg, #ffea9f, #f0b71b);
+  transform: translateY(-2px);
+}
+
+.rejection-box {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.kyc-remarks-text {
+  margin: 0;
+  font-size: 13.5px;
+  color: #fca5a5;
+  line-height: 1.5;
+}
+
+/* Form Styles */
+.kyc-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.kyc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.kyc-full-width {
+  grid-column: 1 / -1;
+}
+
+.kyc-field > label:not(.kyc-upload-area) {
+  color: #ffd044;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.kyc-field input,
+.kyc-field select,
+.kyc-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  color: #ffffff;
+  background: #141414;
+  border: 1px solid rgba(255, 199, 45, 0.35);
+  border-radius: 8px;
+  outline: none;
+  font-family: inherit;
+  font-size: 13.5px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.kyc-field input:focus,
+.kyc-field select:focus,
+.kyc-field textarea:focus {
+  border-color: #ffd044;
+  box-shadow: 0 0 0 3px rgba(255, 199, 45, 0.18);
+}
+
+.kyc-field textarea {
+  resize: vertical;
+  min-height: 85px;
+}
+
+.kyc-upload-area {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 9px;
+  padding: 25px 15px;
+  color: #ffd044;
+  background: #141414;
+  border: 1px dashed rgba(255, 199, 45, 0.4);
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.kyc-upload-area:hover {
+  background: #1c1c1c;
+  border-color: #ffd044;
+}
+
+.kyc-upload-icon {
+  color: #ffd044;
+  font-size: 32px;
+}
+
+.kyc-upload-area strong {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  font-size: 13.5px;
+  color: #ffffff;
+}
+
+.kyc-upload-area > span:last-of-type {
+  color: #a89f91;
+  font-size: 11.5px;
+}
+
+.kyc-upload-area input {
+  display: none;
+}
+
+.kyc-selected-preview {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: #181818;
+  border: 1px solid rgba(255, 199, 45, 0.2);
+  border-radius: 8px;
+}
+
+.kyc-selected-preview img {
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.kyc-selected-preview span {
+  font-size: 12px;
+  color: #d1b777;
+}
+
+.kyc-privacy-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 24px;
+  padding: 15px 18px;
+  color: #ffd044;
+  background: #181818;
+  border: 1px solid rgba(255, 199, 45, 0.25);
+  border-radius: 8px;
+}
+
+.kyc-privacy-note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  font-size: 18px;
+}
+
+.kyc-privacy-note p {
+  margin: 0;
+  font-size: 12.5px;
+  color: #d1b777;
+  line-height: 1.6;
+}
+
+.kyc-submit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 24px;
+  padding: 12px 24px;
+  color: #080808;
+  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  border: 1px solid #f6c635;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14.5px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(255, 196, 34, 0.25);
+  transition: all 0.2s ease;
+}
+
+.kyc-submit-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ffea9f, #f0b71b);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 196, 34, 0.4);
+}
+
+.kyc-submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 650px) {
+  .kyc-page-heading h1 {
+    font-size: 26px;
+  }
+
+  .kyc-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .kyc-info-item[style*="span 2"] {
+    grid-column: span 1 !important;
+  }
+
+  .kyc-form-card,
+  .kyc-details-card {
+    padding: 18px;
+  }
+
+  .kyc-form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .kyc-full-width {
+    grid-column: auto;
+  }
+
+  .kyc-status-banner {
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .kyc-submit-button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,475 @@
+/* =========================================================
+   USER DASHBOARD PAGE
+   Black & Gold Theme (Matched to Admin Dashboard)
+========================================================= */
+
+.user-dashboard-page {
+  width: 100%;
+  color: #f5f5f5;
+}
+
+.user-page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-bottom: 25px;
+}
+
+.user-eyebrow {
+  color: #ffd044;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+.user-page-heading h1 {
+  margin: 6px 0;
+  color: #ffffff;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(24px, 3vw, 32px);
+  letter-spacing: -0.5px;
+}
+
+.user-page-heading p,
+.user-panel-heading p {
+  margin: 0;
+  color: #b5aba0;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+/* =========================================================
+   BUTTONS (ADMIN MATCHED)
+========================================================= */
+
+.user-primary-button,
+.user-outline-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 40px;
+  padding: 0 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 800;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.user-primary-button {
+  color: #080808;
+  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  border: 1px solid #f6c635;
+  box-shadow: 0 4px 14px rgba(255, 196, 34, 0.25);
+}
+
+.user-primary-button:hover {
+  background: linear-gradient(135deg, #ffea9f, #f0b71b);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 196, 34, 0.4);
+}
+
+.user-outline-button {
+  color: #ffd044;
+  background: #141414;
+  border: 1px solid rgba(255, 199, 45, 0.35);
+}
+
+.user-outline-button:hover {
+  background: #1c1c1c;
+  border-color: #ffd044;
+  color: #ffe58a;
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   WELCOME BANNER (LUXURY BLACK & GOLD)
+========================================================= */
+
+.user-welcome-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 190px;
+  margin-bottom: 25px;
+  padding: 32px 36px;
+  overflow: hidden;
+  color: #ffffff;
+  background: linear-gradient(135deg, #18150f 0%, #0d0b07 100%);
+  border: 1px solid rgba(255, 199, 45, 0.35);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+
+.user-welcome-banner::after {
+  content: "";
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(229, 170, 10, 0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.user-banner-tag {
+  color: #ffd044;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+}
+
+.user-welcome-banner h2 {
+  position: relative;
+  z-index: 1;
+  margin: 10px 0 8px;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(22px, 3vw, 29px);
+  color: #ffffff;
+}
+
+.user-welcome-banner p {
+  position: relative;
+  z-index: 1;
+  max-width: 480px;
+  margin: 0 0 18px;
+  color: #d1b777;
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.user-banner-link {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 18px;
+  color: #080808;
+  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  border: 1px solid #f6c635;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-weight: 800;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(255, 196, 34, 0.25);
+  transition: all 0.2s ease;
+}
+
+.user-banner-link:hover {
+  background: linear-gradient(135deg, #ffea9f, #f0b71b);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(255, 196, 34, 0.4);
+}
+
+.user-banner-decoration {
+  position: absolute;
+  right: 45px;
+  top: -48px;
+  color: rgba(255, 199, 45, 0.04);
+  font-size: 240px;
+  font-weight: 900;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* =========================================================
+   STATS KPI GRID
+========================================================= */
+
+.user-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 25px;
+}
+
+.user-stat-card {
+  padding: 22px;
+  background: #111111;
+  border: 1px solid rgba(255, 199, 45, 0.22);
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  transition: all 0.25s ease;
+}
+
+.user-stat-card:hover {
+  border-color: rgba(255, 199, 45, 0.45);
+  transform: translateY(-2px);
+}
+
+.user-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 16px;
+  border-radius: 12px;
+  font-size: 20px;
+}
+
+.wallet-icon {
+  color: #ffd044;
+  background: rgba(255, 199, 45, 0.12);
+  border: 1px solid rgba(255, 199, 45, 0.25);
+}
+
+.orders-icon {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.kyc-icon {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.user-stat-label {
+  color: #a89f91;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.user-stat-card h3 {
+  margin: 8px 0 14px;
+  color: #ffffff;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.user-stat-card h3.user-stat-status {
+  color: #ffd044;
+  font-size: 21px;
+}
+
+.user-stat-card a,
+.user-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #ffd044;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.user-stat-card a:hover,
+.user-text-link:hover {
+  color: #ffe58a;
+  transform: translateX(2px);
+}
+
+/* =========================================================
+   PANELS & CARDS
+========================================================= */
+
+.user-dashboard-panel {
+  margin-bottom: 22px;
+  padding: 24px;
+  background: #111111;
+  border: 1px solid rgba(255, 199, 45, 0.22);
+  border-radius: 14px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.user-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 21px;
+}
+
+.user-panel-heading h2 {
+  margin: 0 0 6px;
+  color: #ffffff;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 20px;
+}
+
+/* Vendor Info Grid */
+.vendor-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.vendor-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 14px 16px;
+  background: #181818;
+  border: 1px solid rgba(255, 199, 45, 0.16);
+  border-radius: 10px;
+}
+
+.vendor-info-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffd044;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.vendor-info-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  word-break: break-word;
+}
+
+/* =========================================================
+   DATA TABLE (ADMIN MATCHED)
+========================================================= */
+
+.user-table-container {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 199, 45, 0.18);
+}
+
+.user-data-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.user-data-table th {
+  padding: 14px 16px;
+  background: #181818;
+  color: #ffd044;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid rgba(255, 199, 45, 0.25);
+}
+
+.user-data-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: #e5e5e5;
+  font-size: 13.5px;
+}
+
+.user-data-table tbody tr:hover {
+  background: #191919;
+}
+
+.user-order-id {
+  font-weight: 700;
+  color: #ffd044;
+}
+
+.user-amount {
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* Status Pills */
+.user-status-pill {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 14px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.user-status-pill.delivered {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.user-status-pill.processing {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.user-status-pill.shipped {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.user-status-pill.cancelled {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Activity Panel */
+.user-activity-panel {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: #141414;
+  border: 1px solid rgba(255, 199, 45, 0.25);
+}
+
+.user-activity-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  color: #ffd044;
+  background: rgba(255, 199, 45, 0.12);
+  border: 1px solid rgba(255, 199, 45, 0.25);
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.user-activity-panel div {
+  flex: 1;
+}
+
+.user-activity-panel h3 {
+  margin: 0 0 5px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.user-activity-panel p {
+  margin: 0;
+  color: #b5aba0;
+  font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .user-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vendor-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vendor-info-item[style*="span 2"] {
+    grid-column: span 1 !important;
+  }
+
+  .user-activity-panel {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

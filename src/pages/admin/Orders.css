@@ -1,0 +1,119 @@
+.orders-page {
+  width: 100%;
+}
+
+.orders-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.orders-summary .admin-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.orders-summary span {
+  color: #a89d8d;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.orders-summary strong {
+  color: #ffffff;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: 28px;
+}
+
+.orders-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(340px, 100%);
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 199, 45, 0.25);
+  border-radius: 8px;
+  color: #ffd044;
+  background: #161616;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.orders-search:focus-within {
+  border-color: #ffd044;
+  box-shadow: 0 0 0 3px rgba(255, 199, 45, 0.18);
+}
+
+.orders-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  color: #ffffff;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+}
+
+.orders-search input::placeholder {
+  color: #8c8376;
+}
+
+.orders-status-select {
+  min-height: 30px;
+  padding: 4px 10px;
+  border: 1px solid transparent;
+  border-radius: 20px;
+  outline: none;
+  font-size: 12px;
+  font-weight: 750;
+  cursor: pointer;
+}
+
+.orders-status-select.success {
+  color: #4ade80;
+  background: rgba(74, 222, 128, 0.15);
+  border-color: rgba(74, 222, 128, 0.3);
+}
+
+.orders-status-select.warning {
+  color: #ffd044;
+  background: rgba(255, 208, 68, 0.15);
+  border-color: rgba(255, 208, 68, 0.3);
+}
+
+.orders-status-select.danger {
+  color: #f87171;
+  background: rgba(248, 113, 113, 0.15);
+  border-color: rgba(248, 113, 113, 0.3);
+}
+
+.orders-status-select.neutral {
+  color: #cccccc;
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+@media (max-width: 650px) {
+  .orders-summary {
+    gap: 8px;
+  }
+
+  .orders-summary .admin-panel {
+    padding: 12px;
+  }
+
+  .orders-summary span {
+    font-size: 10px;
+  }
+
+  .orders-summary strong {
+    font-size: 20px;
+  }
+
+  .orders-search {
+    width: 100%;
+  }
+}
