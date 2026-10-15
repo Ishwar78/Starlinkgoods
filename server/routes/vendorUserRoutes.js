@@ -260,4 +260,82 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+/**
+ * POST /api/vendor-users/:id/wallet
+ * Add or deduct wallet funds for a vendor user (Admin Action)
+ */
+router.post("/:id/wallet", async (req, res) => {
+  try {
+    const { amount, type = "Credit", description = "Admin Wallet Adjustment" } = req.body;
+    const numAmount = Number(amount);
+
+    if (isNaN(numAmount) || numAmount <= 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid amount greater than 0.",
+      });
+    }
+
+    const user = await VendorUser.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    if (!Array.isArray(user.walletTransactions)) {
+      user.walletTransactions = [];
+    }
+    if (typeof user.walletBalance !== "number") {
+      user.walletBalance = 0;
+    }
+
+    if (type === "Debit" && user.walletBalance < numAmount) {
+      return res.status(400).json({
+        success: false,
+        message: `Insufficient balance! Current wallet balance is ₹${user.walletBalance.toLocaleString("en-IN")}.`,
+      });
+    }
+
+    if (type === "Debit") {
+      user.walletBalance -= numAmount;
+    } else {
+      user.walletBalance += numAmount;
+    }
+
+    const txnId = `TXN${Date.now()}${Math.floor(100 + Math.random() * 900)}`;
+    const newTxn = {
+      transactionId: txnId,
+      amount: numAmount,
+      type: type === "Debit" ? "Debit" : "Credit",
+      title: type === "Debit" ? "Admin Wallet Debit" : "Admin Wallet Topup",
+      description: description.trim() || (type === "Debit" ? "Deducted by Admin" : "Added by Admin"),
+      addedBy: "Admin",
+      status: "Completed",
+      createdAt: new Date(),
+    };
+
+    user.walletTransactions.unshift(newTxn);
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `₹${numAmount.toLocaleString("en-IN")} ${
+        type === "Debit" ? "deducted from" : "credited to"
+      } ${user.name}'s wallet successfully!`,
+      walletBalance: user.walletBalance,
+      transaction: newTxn,
+      user,
+    });
+  } catch (error) {
+    console.error("Vendor user wallet update error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update user wallet.",
+      error: error.message,
+    });
+  }
+});
+
 module.exports = router;

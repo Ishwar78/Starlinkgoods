@@ -61,6 +61,23 @@ const vendorUserSchema = new mongoose.Schema(
       enum: ["Active", "Inactive"],
       default: "Active",
     },
+    walletBalance: {
+      type: Number,
+      default: 0,
+      min: [0, "Wallet balance cannot be negative"],
+    },
+    walletTransactions: [
+      {
+        transactionId: { type: String, required: true },
+        amount: { type: Number, required: true },
+        type: { type: String, enum: ["Credit", "Debit"], default: "Credit" },
+        title: { type: String, default: "Wallet Credit" },
+        description: { type: String, default: "" },
+        addedBy: { type: String, default: "Admin" },
+        status: { type: String, default: "Completed" },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
   },
   {
     timestamps: true,

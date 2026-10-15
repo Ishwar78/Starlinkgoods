@@ -36,7 +36,7 @@ const sidebarItems = [
     path: "/admin/contact-details",
     icon: FiMapPin,
   },
-  { label: "Settings", path: "/admin/settings", icon: FiSettings },
+  // { label: "Settings", path: "/admin/settings", icon: FiSettings },
 ];
 
 export default function AdminSidebar({ open, onClose }) {

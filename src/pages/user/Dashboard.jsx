@@ -17,7 +17,7 @@ import {
   FiRefreshCw,
 } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import { getMyKYCStatus, getMyVendorUsers } from "../../lib/api";
+import { getMyKYCStatus, getMyVendorUsers, getMyWalletBalance } from "../../lib/api";
 import "./Dashboard.css";
 
 const recentOrders = [
@@ -37,6 +37,7 @@ export default function Dashboard() {
 
   const [kycStatus, setKycStatus] = useState("Loading...");
   const [myUsersCount, setMyUsersCount] = useState(0);
+  const [walletBalance, setWalletBalance] = useState(() => (userData?.walletBalance || 0));
   const [loadingStats, setLoadingStats] = useState(true);
 
   const fetchDashboardStats = async () => {
@@ -54,13 +55,29 @@ export default function Dashboard() {
           if (meRes.success && meRes.user) {
             localStorage.setItem("userData", JSON.stringify(meRes.user));
             setUserData(meRes.user);
+            if (typeof meRes.user.walletBalance === "number") {
+              setWalletBalance(meRes.user.walletBalance);
+            }
           }
         } catch {
           // ignore profile sync network error
         }
       }
 
-      // 2. Fetch logged-in user's KYC status
+      // 2. Fetch logged-in user's wallet balance directly
+      try {
+        const walletRes = await getMyWalletBalance({
+          email: userData.email,
+          userId: userData._id || userData.id,
+        });
+        if (walletRes.success && typeof walletRes.walletBalance === "number") {
+          setWalletBalance(walletRes.walletBalance);
+        }
+      } catch {
+        // fallback to existing walletBalance
+      }
+
+      // 3. Fetch logged-in user's KYC status
       const kycRes = await getMyKYCStatus({
         email: userData.email,
         userId: userData._id || userData.id,
@@ -72,7 +89,7 @@ export default function Dashboard() {
         setKycStatus("Not Submitted");
       }
 
-      // 3. Fetch count of users added by this logged-in vendor
+      // 4. Fetch count of users added by this logged-in vendor
       const usersRes = await getMyVendorUsers({
         vendorId: userData._id || userData.id,
         vendorEmail: userData.email,
@@ -225,7 +242,7 @@ export default function Dashboard() {
         <article className="user-stat-card">
           <div className="user-stat-icon wallet-icon"><FiCreditCard /></div>
           <span className="user-stat-label">Wallet Balance</span>
-          <h3>₹2,450.00</h3>
+          <h3>₹{(walletBalance || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
           <Link to="/user/wallet">Manage wallet <FiArrowRight /></Link>
         </article>
 

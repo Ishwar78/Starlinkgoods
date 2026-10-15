@@ -11,11 +11,16 @@ import {
   FiRefreshCw,
   FiShield,
   FiLoader,
+  FiCreditCard,
+  FiArrowDownLeft,
+  FiArrowUpRight,
+  FiX,
 } from "react-icons/fi";
 import {
   getAllVendorUsers,
   deleteVendorUser,
   toggleVendorUserStatus,
+  addVendorUserWalletMoney,
 } from "../../lib/api.js";
 import "./VendorUsers.css";
 
@@ -23,6 +28,11 @@ export default function VendorUsers() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [walletUser, setWalletUser] = useState(null);
+  const [walletAmount, setWalletAmount] = useState("");
+  const [walletType, setWalletType] = useState("Credit");
+  const [walletDesc, setWalletDesc] = useState("Admin Topup");
+  const [walletSubmitting, setWalletSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("success");
 
@@ -79,6 +89,51 @@ export default function VendorUsers() {
       console.error("Toggle status error:", err);
       setMessage(err.message || "Failed to update status.");
       setMessageType("error");
+    }
+  };
+
+  const handleOpenWallet = (user) => {
+    setWalletUser(user);
+    setWalletAmount("");
+    setWalletType("Credit");
+    setWalletDesc("Admin Wallet Topup");
+    setMessage("");
+  };
+
+  const handleWalletSubmit = async (e) => {
+    e.preventDefault();
+    if (!walletUser) return;
+
+    const num = Number(walletAmount);
+    if (isNaN(num) || num <= 0) {
+      setMessage("Please enter a valid amount greater than 0.");
+      setMessageType("error");
+      return;
+    }
+
+    try {
+      setWalletSubmitting(true);
+      const res = await addVendorUserWalletMoney(walletUser._id, {
+        amount: num,
+        type: walletType,
+        description: walletDesc,
+      });
+
+      if (res.success) {
+        setMessage(res.message || `Wallet updated for ${walletUser.name}`);
+        setMessageType("success");
+        setWalletUser(null);
+        fetchAllUsers();
+      } else {
+        setMessage(res.message || "Failed to update wallet balance.");
+        setMessageType("error");
+      }
+    } catch (err) {
+      console.error("Wallet topup error:", err);
+      setMessage(err.message || "Failed to update wallet.");
+      setMessageType("error");
+    } finally {
+      setWalletSubmitting(false);
     }
   };
 
@@ -304,15 +359,27 @@ export default function VendorUsers() {
 
                       {/* Actions */}
                       <td>
-                        <button
-                          type="button"
-                          className="vu-delete-btn"
-                          title={`Delete ${u.name}`}
-                          onClick={() => handleDelete(u._id, u.name)}
-                          aria-label={`Delete ${u.name}`}
-                        >
-                          <FiTrash2 />
-                        </button>
+                        <div style={{ display: "inline-flex", gap: "6px", alignItems: "center" }}>
+                          {/* <button
+                            type="button"
+                            className="admin-wallet-action-btn"
+                            style={{ padding: "5px 10px", fontSize: "11.5px" }}
+                            title={`Add money to ${u.name}'s wallet`}
+                            onClick={() => handleOpenWallet(u)}
+                          >
+                            <FiCreditCard />
+                            <span>Wallet</span>
+                          </button> */}
+                          <button
+                            type="button"
+                            className="vu-delete-btn"
+                            title={`Delete ${u.name}`}
+                            onClick={() => handleDelete(u._id, u.name)}
+                            aria-label={`Delete ${u.name}`}
+                          >
+                            <FiTrash2 />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -330,6 +397,127 @@ export default function VendorUsers() {
           </table>
         </div>
       </div>
+
+      {/* Wallet Management Modal */}
+      {walletUser && (
+        <div className="admin-modal-backdrop" onClick={() => !walletSubmitting && setWalletUser(null)}>
+          <div className="admin-modal-card wallet-modal-card" onClick={(e) => e.stopPropagation()}>
+            <div className="admin-modal-header">
+              <div>
+                <span className="admin-eyebrow">USER WALLET TOPUP</span>
+                <h3>Manage Wallet Balance</h3>
+              </div>
+              <button
+                type="button"
+                className="admin-modal-close-btn"
+                onClick={() => !walletSubmitting && setWalletUser(null)}
+              >
+                <FiX />
+              </button>
+            </div>
+
+            <div className="wallet-modal-user-info">
+              <div className="wallet-user-details">
+                <strong>{walletUser.name}</strong>
+                <span>{walletUser.email} &bull; {walletUser.mobile}</span>
+              </div>
+              <div className="wallet-current-bal-box">
+                <span className="bal-lbl">Current Balance</span>
+                <span className="bal-val">₹{(walletUser.walletBalance || 0).toLocaleString("en-IN")}</span>
+              </div>
+            </div>
+
+            <form onSubmit={handleWalletSubmit} className="admin-wallet-form">
+              {/* Type Switcher */}
+              <div className="wallet-type-toggle">
+                <button
+                  type="button"
+                  className={`wallet-type-btn ${walletType === "Credit" ? "active credit" : ""}`}
+                  onClick={() => setWalletType("Credit")}
+                >
+                  <FiArrowDownLeft /> Add Money (Credit)
+                </button>
+                <button
+                  type="button"
+                  className={`wallet-type-btn ${walletType === "Debit" ? "active debit" : ""}`}
+                  onClick={() => setWalletType("Debit")}
+                >
+                  <FiArrowUpRight /> Deduct (Debit)
+                </button>
+              </div>
+
+              {/* Amount Input */}
+              <div className="admin-form-group">
+                <label>Amount to {walletType === "Credit" ? "Add" : "Deduct"} (₹) *</label>
+                <div className="input-with-currency">
+                  <span>₹</span>
+                  <input
+                    type="number"
+                    min="1"
+                    step="1"
+                    required
+                    placeholder="e.g. 500"
+                    value={walletAmount}
+                    onChange={(e) => setWalletAmount(e.target.value)}
+                    autoFocus
+                  />
+                </div>
+              </div>
+
+              {/* Quick Amount Chips */}
+              <div className="wallet-quick-chips">
+                {[500, 1000, 2000, 5000, 10000].map((amt) => (
+                  <button
+                    key={amt}
+                    type="button"
+                    className="quick-chip-btn"
+                    onClick={() => setWalletAmount(String(amt))}
+                  >
+                    +₹{amt.toLocaleString("en-IN")}
+                  </button>
+                ))}
+              </div>
+
+              {/* Description / Note */}
+              <div className="admin-form-group">
+                <label>Transaction Note / Reason</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Bonus, Advance, Payment Topup..."
+                  value={walletDesc}
+                  onChange={(e) => setWalletDesc(e.target.value)}
+                />
+              </div>
+
+              {/* Footer Buttons */}
+              <div className="admin-modal-footer">
+                <button
+                  type="button"
+                  className="admin-secondary-button"
+                  onClick={() => setWalletUser(null)}
+                  disabled={walletSubmitting}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className={`admin-primary-button ${walletType === "Debit" ? "debit-submit" : ""}`}
+                  disabled={walletSubmitting || !walletAmount}
+                >
+                  {walletSubmitting ? (
+                    "Processing..."
+                  ) : (
+                    <>
+                      <FiCreditCard />
+                      <span>{walletType === "Credit" ? "Add to Wallet" : "Deduct Balance"}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

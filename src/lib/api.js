@@ -25,7 +25,8 @@ export async function apiFetch(endpoint, options = {}) {
     endpoint.includes("/api/vendor-users/my-users") ||
     endpoint.includes("/api/kyc/my-status") ||
     endpoint.includes("/api/kyc/submit") ||
-    endpoint.includes("/api/vendors/me");
+    endpoint.includes("/api/vendors/me") ||
+    endpoint.includes("/api/vendors/my-wallet");
 
   const authToken = isUserContext
     ? (userToken || adminToken)
@@ -110,9 +111,31 @@ export async function getCurrentVendor() {
   return apiFetch("/api/vendors/me");
 }
 
+export async function addVendorWalletMoney(vendorId, walletData) {
+  return apiFetch(`/api/vendors/${vendorId}/wallet`, {
+    method: "POST",
+    body: JSON.stringify(walletData),
+  });
+}
+
+export async function getMyWalletBalance(params = {}) {
+  const query = new URLSearchParams();
+  if (params.userId) query.append("userId", params.userId);
+  if (params.email) query.append("email", params.email);
+  const qs = query.toString();
+  return apiFetch(`/api/vendors/my-wallet${qs ? `?${qs}` : ""}`);
+}
+
 /* =======================================
    Vendor Users (Users added by Vendors)
 ======================================= */
+
+export async function addVendorUserWalletMoney(userId, walletData) {
+  return apiFetch(`/api/vendor-users/${userId}/wallet`, {
+    method: "POST",
+    body: JSON.stringify(walletData),
+  });
+}
 
 export async function createVendorUser(userData) {
   return apiFetch("/api/vendor-users", {
