@@ -1,0 +1,791 @@
+
+/* ==========================================
+   EKAM NYAAY FOUNDATION
+   WHAT WE DO PAGE
+   Yellow | Cream | White
+========================================== */
+
+.ekam-whatwedo-page {
+  --work-yellow: #ffb900;
+  --work-yellow-dark: #e4a300;
+  --work-cream: #fffaf0;
+  --work-black: #151515;
+  --work-grey: #626262;
+
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  overflow: hidden;
+  background: #fff;
+  color: var(--work-black);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.ekam-whatwedo-page *,
+.ekam-whatwedo-page *::before,
+.ekam-whatwedo-page *::after {
+  box-sizing: border-box;
+}
+
+.ekam-whatwedo-page img {
+  display: block;
+  max-width: 100%;
+}
+
+.ekam-whatwedo-page a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.ekam-whatwedo-page a:focus-visible {
+  outline: 3px solid #a77900;
+  outline-offset: 4px;
+}
+
+/* ==========================================
+   FOUR NAVIGATION BUTTONS
+========================================== */
+
+.ekam-work-subnav {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: min(calc(100% - 48px), 1360px);
+  margin: 0 auto;
+  padding: 34px 0 0;
+}
+
+.ekam-work-subnav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 47px;
+  padding: 8px 19px;
+  border: 1px solid var(--work-yellow);
+  border-radius: 7px;
+  background: var(--work-cream);
+  color: #777;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.5;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.ekam-work-subnav-link:hover {
+  background: #ffedb8;
+  border-color: var(--work-yellow-dark);
+  color: #111;
+}
+
+.ekam-work-subnav-link.active {
+  background: var(--work-yellow);
+  border-color: var(--work-yellow);
+  color: #111;
+}
+
+/* ==========================================
+   INTRODUCTION
+========================================== */
+
+.ekam-work-intro {
+  position: relative;
+  z-index: 1;
+  width: min(calc(100% - 48px), 1360px);
+  margin: 0 auto;
+  padding: 34px 0 20px;
+}
+
+.ekam-work-main-heading {
+  margin: 0 0 17px;
+  color: #111;
+  font-size: clamp(30px, 2.4vw, 36px);
+  font-weight: 750;
+  letter-spacing: -0.7px;
+  line-height: 1.4;
+}
+
+.ekam-work-main-heading span {
+  display: inline-block;
+  padding: 0 10px 3px;
+  border-radius: 5px;
+  background: var(--work-yellow);
+  color: #080808;
+}
+
+.ekam-work-intro > p {
+  max-width: 1350px;
+  margin: 0;
+  color: #161616;
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+/* ==========================================
+   BACKGROUND DECORATIONS
+========================================== */
+
+.ekam-work-sections {
+  position: relative;
+  isolation: isolate;
+}
+
+.ekam-work-sections::before,
+.ekam-work-sections::after {
+  position: absolute;
+  z-index: -1;
+  width: 110px;
+  height: 170px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 208, 88, 0.16),
+    rgba(255, 185, 0, 0.08)
+  );
+  content: "";
+  pointer-events: none;
+}
+
+.ekam-work-sections::before {
+  top: 45px;
+  left: 0;
+}
+
+.ekam-work-sections::after {
+  top: 530px;
+  right: 0;
+}
+
+/* ==========================================
+   INITIATIVE SECTIONS
+========================================== */
+
+.ekam-work-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.22fr);
+  align-items: center;
+  gap: clamp(45px, 5vw, 90px);
+  width: min(calc(100% - 48px), 1360px);
+  min-height: 510px;
+  margin: 0 auto;
+  padding: 55px 0;
+}
+
+.ekam-work-row:nth-child(even) {
+  background: transparent;
+}
+
+/* Image left, content right */
+
+.ekam-work-image-left .ekam-work-visual {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.ekam-work-image-left .ekam-work-copy {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* Content left, image right */
+
+.ekam-work-image-right .ekam-work-visual {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.ekam-work-image-right .ekam-work-copy {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+/* ==========================================
+   CIRCULAR IMAGE AND ORBIT
+========================================== */
+
+.ekam-work-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  width: 100%;
+}
+
+.ekam-work-orbit {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(100%, 490px);
+  aspect-ratio: 1;
+  isolation: isolate;
+}
+
+.ekam-work-orbit::before {
+  position: absolute;
+  z-index: -1;
+  inset: 3%;
+  border: 4px solid transparent;
+  border-top-color: #d7c28c;
+  border-right-color: #d7c28c;
+  border-radius: 50%;
+  transform: rotate(-34deg);
+  content: "";
+}
+
+.ekam-work-orbit::after {
+  position: absolute;
+  z-index: -1;
+  inset: 6% 0 0 5%;
+  border: 4px solid transparent;
+  border-bottom-color: #565656;
+  border-left-color: #d7d0be;
+  border-radius: 50%;
+  transform: rotate(-32deg);
+  content: "";
+}
+
+.ekam-work-image {
+  position: relative;
+  width: 84%;
+  height: 84%;
+  overflow: hidden;
+  border: 5px solid #fff;
+  border-radius: 50%;
+  background: #f5ead1;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.04);
+}
+
+.ekam-work-image img {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.55s ease;
+}
+
+.ekam-work-row:hover .ekam-work-image img {
+  transform: scale(1.045);
+}
+
+/* Glowing orbit dot */
+
+.ekam-work-orbit-dot {
+  position: absolute;
+  z-index: 2;
+  top: 4%;
+  right: 30%;
+  width: 39px;
+  height: 39px;
+  border: 7px solid var(--work-yellow);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 0 3px rgba(255, 185, 0, 0.15),
+    0 0 16px rgba(255, 185, 0, 0.8);
+}
+
+.ekam-work-image-right .ekam-work-orbit-dot {
+  right: auto;
+  left: 30%;
+}
+
+/* ==========================================
+   SECTION CONTENT
+========================================== */
+
+.ekam-work-copy {
+  min-width: 0;
+  padding: 10px 0;
+}
+
+.ekam-work-title-row {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 18px;
+}
+
+.ekam-work-title-icon {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--work-yellow);
+  color: #111;
+  font-size: 20px;
+}
+
+.ekam-work-title-row h2 {
+  margin: 0;
+  color: #111;
+  font-size: clamp(27px, 2.15vw, 34px);
+  font-weight: 750;
+  letter-spacing: -0.5px;
+  line-height: 1.35;
+}
+
+.ekam-work-description p {
+  margin: 0 0 3px;
+  color: #171717;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.72;
+  text-align: left;
+}
+
+.ekam-work-description p:last-child {
+  margin-bottom: 0;
+}
+
+/* ==========================================
+   CLOSING CTA
+========================================== */
+
+.ekam-work-cta {
+  display: flex;
+  align-items: center;
+  gap: 23px;
+  width: min(calc(100% - 48px), 1360px);
+  margin: 35px auto 65px;
+  padding: 30px 35px;
+  border: 1px solid #f0dca7;
+  border-radius: 12px;
+  background: var(--work-cream);
+}
+
+.ekam-work-cta-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 60px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--work-yellow);
+  color: #111;
+  font-size: 26px;
+}
+
+.ekam-work-cta-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.ekam-work-cta-content > span {
+  color: #886000;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.4px;
+}
+
+.ekam-work-cta-content h2 {
+  margin: 5px 0;
+  color: #111;
+  font-size: clamp(23px, 2.3vw, 32px);
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.ekam-work-cta-content p {
+  margin: 0;
+  color: #514b42;
+  font-size: 15px;
+  line-height: 1.7;
+}
+
+.ekam-work-cta-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-shrink: 0;
+  min-height: 46px;
+  padding: 11px 18px;
+  border: 1px solid var(--work-yellow);
+  border-radius: 7px;
+  background: var(--work-yellow);
+  color: #111;
+  font-size: 15px;
+  font-weight: 750;
+  transition:
+    transform 0.2s ease,
+    background 0.2s ease;
+}
+
+.ekam-work-cta-link:hover {
+  background: #ffd15c;
+  transform: translateY(-2px);
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 1000px) {
+  .ekam-work-subnav,
+  .ekam-work-intro,
+  .ekam-work-row,
+  .ekam-work-cta {
+    width: calc(100% - 40px);
+  }
+
+  .ekam-work-row {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 35px;
+    min-height: 420px;
+    padding: 45px 0;
+  }
+
+  .ekam-work-orbit {
+    width: 100%;
+    max-width: 390px;
+  }
+
+  .ekam-work-orbit-dot {
+    width: 32px;
+    height: 32px;
+    border-width: 6px;
+  }
+
+  .ekam-work-description p {
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .ekam-work-title-row h2 {
+    font-size: 27px;
+  }
+
+  .ekam-work-cta {
+    padding: 25px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 700px) {
+  .ekam-work-subnav {
+    width: calc(100% - 30px);
+    gap: 8px;
+    padding-top: 22px;
+  }
+
+  .ekam-work-subnav-link {
+    min-height: 39px;
+    padding: 7px 11px;
+    font-size: 13px;
+  }
+
+  .ekam-work-intro {
+    width: calc(100% - 30px);
+    padding: 26px 0 15px;
+  }
+
+  .ekam-work-main-heading {
+    margin-bottom: 14px;
+    font-size: 29px;
+  }
+
+  .ekam-work-intro > p {
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .ekam-work-sections::before,
+  .ekam-work-sections::after {
+    width: 55px;
+    height: 100px;
+    opacity: 0.7;
+  }
+
+  .ekam-work-row {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 25px;
+    width: calc(100% - 30px);
+    min-height: auto;
+    padding: 35px 0 40px;
+  }
+
+  /* Image above text on mobile */
+
+  .ekam-work-image-left .ekam-work-visual,
+  .ekam-work-image-left .ekam-work-copy,
+  .ekam-work-image-right .ekam-work-visual,
+  .ekam-work-image-right .ekam-work-copy {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .ekam-work-visual {
+    order: 0;
+  }
+
+  .ekam-work-copy {
+    order: 1;
+    padding: 0 2px;
+  }
+
+  .ekam-work-orbit {
+    width: min(86vw, 370px);
+    max-width: 100%;
+  }
+
+  .ekam-work-image {
+    border-width: 4px;
+  }
+
+  .ekam-work-orbit::before,
+  .ekam-work-orbit::after {
+    border-width: 3px;
+  }
+
+  .ekam-work-orbit-dot {
+    width: 30px;
+    height: 30px;
+    border-width: 5px;
+  }
+
+  .ekam-work-title-row {
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .ekam-work-title-row h2 {
+    font-size: 27px;
+  }
+
+  .ekam-work-description p {
+    margin-bottom: 10px;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .ekam-work-cta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    width: calc(100% - 30px);
+    margin: 20px auto 35px;
+    padding: 24px 20px;
+  }
+
+  .ekam-work-cta-icon {
+    flex-basis: 52px;
+    width: 52px;
+    height: 52px;
+    font-size: 23px;
+  }
+
+  .ekam-work-cta-content h2 {
+    font-size: 25px;
+  }
+
+  .ekam-work-cta-content p {
+    font-size: 14px;
+  }
+
+  .ekam-work-cta-link {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+}
+
+/* ==========================================
+   SMALL MOBILE
+========================================== */
+
+@media (max-width: 380px) {
+  .ekam-work-subnav,
+  .ekam-work-intro,
+  .ekam-work-row,
+  .ekam-work-cta {
+    width: calc(100% - 24px);
+  }
+
+  .ekam-work-subnav {
+    gap: 6px;
+  }
+
+  .ekam-work-subnav-link {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .ekam-work-main-heading {
+    font-size: 26px;
+  }
+
+  .ekam-work-row {
+    gap: 21px;
+    padding: 28px 0 32px;
+  }
+
+  .ekam-work-title-row h2 {
+    font-size: 24px;
+  }
+
+  .ekam-work-description p {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .ekam-work-orbit-dot {
+    width: 25px;
+    height: 25px;
+    border-width: 4px;
+  }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .ekam-whatwedo-page *,
+  .ekam-whatwedo-page *::before,
+  .ekam-whatwedo-page *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================
+   WHAT WE DO HERO IMAGE SLIDER
+========================================= */
+
+.ekam-whatwedo-page .ekam-work-hero-slider {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: clamp(240px, 32vw, 470px);
+  overflow: hidden;
+  background: #fffaf0;
+}
+
+.ekam-whatwedo-page .ekam-work-hero-slide {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.03);
+  transition:
+    opacity 1s ease,
+    transform 4.5s ease,
+    visibility 1s ease;
+}
+
+.ekam-whatwedo-page .ekam-work-hero-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
+.ekam-whatwedo-page .ekam-work-hero-dots {
+  position: absolute;
+  z-index: 2;
+  bottom: 16px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  transform: translateX(-50%);
+}
+
+.ekam-whatwedo-page .ekam-work-hero-dot {
+  display: block;
+  width: 9px;
+  height: 9px;
+  flex: 0 0 9px;
+  padding: 0;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.ekam-whatwedo-page .ekam-work-hero-dot.is-active {
+  width: 25px;
+  flex-basis: 25px;
+  border-color: #ffb900;
+  border-radius: 20px;
+  background: #ffb900;
+}
+
+.ekam-whatwedo-page .ekam-work-hero-dot:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 4px;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .ekam-whatwedo-page .ekam-work-hero-slider {
+    height: 290px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .ekam-whatwedo-page .ekam-work-hero-slider {
+    height: 205px;
+  }
+
+  .ekam-whatwedo-page .ekam-work-hero-dots {
+    bottom: 12px;
+  }
+
+  .ekam-whatwedo-page .ekam-work-hero-dot {
+    width: 8px;
+    height: 8px;
+    flex-basis: 8px;
+  }
+
+  .ekam-whatwedo-page .ekam-work-hero-dot.is-active {
+    width: 21px;
+    flex-basis: 21px;
+  }
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .ekam-whatwedo-page .ekam-work-hero-slide,
+  .ekam-whatwedo-page .ekam-work-hero-dot {
+    transition: none;
+  }
+}

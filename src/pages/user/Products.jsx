@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
 import {
   FiSearch,
   FiPackage,
@@ -19,9 +20,15 @@ import {
   FiCheck,
 } from "react-icons/fi";
 import { getProducts, getCategories, formatImageUrl } from "../../lib/api";
+import {
+  getUserCart,
+  addToUserCart,
+  getLoggedInUser,
+} from "../../lib/cart";
 import "./Products.css";
 
 export default function UserProducts() {
+  const [userData] = useState(() => getLoggedInUser() || {});
   const [products, setProducts] = useState([]);
   const [dbCategories, setDbCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,14 +43,8 @@ export default function UserProducts() {
   const [viewMode, setViewMode] = useState("grid"); // 'grid' | 'table'
   const [sortBy, setSortBy] = useState("default");
 
-  // Cart State & Toast
-  const [cart, setCart] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem("userCart") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  // Isolated Cart State & Toast
+  const [cart, setCart] = useState(() => getUserCart(userData));
   const [cartToast, setCartToast] = useState("");
 
   const fetchCatalogData = async () => {
@@ -77,6 +78,16 @@ export default function UserProducts() {
   useEffect(() => {
     fetchCatalogData();
   }, []);
+
+  // Sync isolated user cart
+  useEffect(() => {
+    setCart(getUserCart(userData));
+    const handleCartSync = () => {
+      setCart(getUserCart(userData));
+    };
+    window.addEventListener("slg-cart-updated", handleCartSync);
+    return () => window.removeEventListener("slg-cart-updated", handleCartSync);
+  }, [userData?._id, userData?.id, userData?.email]);
 
   // Compute category list from database & products
   const categoryList = useMemo(() => {
@@ -137,25 +148,12 @@ export default function UserProducts() {
     (p) => p.status === "Low Stock" || (p.stock > 0 && p.stock <= 5)
   ).length;
 
-  // Add to cart handler
+  // Add to cart handler with strict user isolation
   const handleAddToCart = (item) => {
-    setCart((prev) => {
-      const id = item._id || item.id;
-      const existing = prev.find((x) => (x._id || x.id) === id);
-      let updated;
-      if (existing) {
-        updated = prev.map((x) =>
-          (x._id || x.id) === id ? { ...x, quantity: (x.quantity || 1) + 1 } : x
-        );
-      } else {
-        updated = [...prev, { ...item, quantity: 1 }];
-      }
-      localStorage.setItem("userCart", JSON.stringify(updated));
-      return updated;
-    });
-
-    setCartToast(`"${item.name}" added to cart!`);
-    setTimeout(() => setCartToast(""), 3500);
+    const updated = addToUserCart(item, 1, userData);
+    setCart(updated);
+    setCartToast(`"${item.name}" added to your cart!`);
+    setTimeout(() => setCartToast(""), 4500);
   };
 
   // Open modal with default main image
@@ -164,18 +162,36 @@ export default function UserProducts() {
     setModalActiveImage(product.image || "");
   };
 
-  const totalCartUnits = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  const totalCartUnits = cart.reduce((sum, item) => sum + (Number(item.quantity) || 1), 0);
 
   return (
     <div className="user-products-container">
-      {/* Floating Add to Cart Toast Notification */}
+      {/* Floating Add to Cart Toast Notification with Direct Link */}
       {cartToast && (
         <div className="cart-toast-banner">
           <FiShoppingCart />
           <span>{cartToast}</span>
-          <span style={{ color: "#ffd044", marginLeft: "6px" }}>
+          <span style={{ color: "#ffd044", marginLeft: "6px", fontWeight: "700" }}>
             ({totalCartUnits} in cart)
           </span>
+          <Link
+            to="/user/cart"
+            style={{
+              marginLeft: "12px",
+              padding: "4px 10px",
+              background: "#ffd044",
+              color: "#080808",
+              borderRadius: "6px",
+              fontWeight: "800",
+              fontSize: "12px",
+              textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "4px",
+            }}
+          >
+            View Cart &rarr;
+          </Link>
         </div>
       )}
 
@@ -189,10 +205,15 @@ export default function UserProducts() {
           </p>
         </div>
         <div className="hero-action-col">
-          <div className="cart-counter-chip" title={`${totalCartUnits} items in cart`}>
+          <Link
+            to="/user/cart"
+            className="cart-counter-chip"
+            title={`View ${totalCartUnits} items in your isolated cart`}
+            style={{ textDecoration: "none", cursor: "pointer" }}
+          >
             <FiShoppingCart />
             <span>Cart: {totalCartUnits}</span>
-          </div>
+          </Link>
           <button
             type="button"
             className="hero-refresh-btn"

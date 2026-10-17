@@ -302,6 +302,205 @@
   font-size: 20px;
 }
 
+/* =========================================================
+   USER PROFILE PHOTO & AVATAR UPLOAD SECTION
+========================================================= */
+
+.user-profile-header-wrap {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 20px;
+  margin-bottom: 24px;
+  background: linear-gradient(145deg, #181818, #121212);
+  border: 1px solid rgba(255, 199, 45, 0.22);
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+}
+
+.profile-avatar-container {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: 2px solid #ffd044;
+  box-shadow: 0 0 16px rgba(255, 199, 45, 0.28);
+  overflow: visible;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-avatar-container:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 22px rgba(255, 199, 45, 0.45);
+}
+
+.profile-avatar-large-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.profile-avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffe58a, #d49a07);
+  color: #080808;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  font-weight: 800;
+  font-family: "Playfair Display", Georgia, serif;
+}
+
+.profile-avatar-camera-badge {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  color: #080808;
+  border: 2px solid #141414;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  transition: background 0.2s ease;
+}
+
+.profile-avatar-container:hover .profile-avatar-camera-badge {
+  background: #ffffff;
+  color: #080808;
+}
+
+.profile-avatar-uploading-overlay {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffd044;
+  font-size: 24px;
+}
+
+.profile-avatar-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-avatar-meta-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+}
+
+.profile-avatar-meta-top h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.profile-badge-tag {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  background: rgba(255, 199, 45, 0.15);
+  color: #ffd044;
+  border: 1px solid rgba(255, 199, 45, 0.3);
+}
+
+.profile-avatar-hint {
+  margin: 0 0 14px;
+  color: #b5aba0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.profile-avatar-btn-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.profile-upload-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #202020;
+  color: #ffd044;
+  border: 1px solid rgba(255, 199, 45, 0.4);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.profile-upload-trigger-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  color: #080808;
+  border-color: #ffd044;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 196, 34, 0.25);
+}
+
+.profile-upload-trigger-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.profile-upload-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.profile-upload-status.success {
+  color: #4ade80;
+}
+
+.profile-upload-status.error {
+  color: #f87171;
+}
+
+@media (max-width: 640px) {
+  .user-profile-header-wrap {
+    flex-direction: column;
+    text-align: center;
+    align-items: center;
+  }
+
+  .profile-avatar-meta-top {
+    justify-content: center;
+  }
+
+  .profile-avatar-btn-row {
+    justify-content: center;
+  }
+}
+
 /* Vendor Info Grid */
 .vendor-info-grid {
   display: grid;

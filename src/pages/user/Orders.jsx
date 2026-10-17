@@ -51,7 +51,33 @@ const initialOrders = [
 ];
 
 const Orders = () => {
-  const [orders] = useState(initialOrders);
+  const [orders] = useState(() => {
+    try {
+      const u = JSON.parse(localStorage.getItem("userData") || "{}");
+      const userOrdersKey = `slg_orders_${u._id || u.id || u.email || "guest"}`;
+      const saved = JSON.parse(localStorage.getItem(userOrdersKey) || "[]");
+      if (Array.isArray(saved) && saved.length > 0) {
+        const formatted = saved.map((o) => ({
+          id: o.id.startsWith("#") ? o.id : `#${o.id}`,
+          product: o.items?.[0]?.name
+            ? `${o.items[0].name}${o.items.length > 1 ? ` (+${o.items.length - 1} more)` : ""}`
+            : "Furniture Procurement",
+          category: o.items?.[0]?.category || "Furniture",
+          date: o.date,
+          amount: o.amount,
+          status: o.status || "Processing",
+          quantity: o.items?.reduce((s, it) => s + (it.quantity || 1), 0) || 1,
+          items: o.items,
+          shippingInfo: o.shippingInfo,
+          paymentMethod: o.paymentMethod,
+        }));
+        return [...formatted, ...initialOrders];
+      }
+    } catch {
+      // fallback
+    }
+    return initialOrders;
+  });
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [selectedOrder, setSelectedOrder] = useState(null);

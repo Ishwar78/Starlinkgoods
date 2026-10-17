@@ -93,6 +93,45 @@
   color: #8c8376;
 }
 
+.user-cart-topbar-btn {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(255, 199, 45, 0.3);
+  border-radius: 10px;
+  color: #ffd044;
+  background: #141414;
+  font-size: 18px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: 0.2s ease;
+}
+
+.user-cart-topbar-btn:hover {
+  background: #1c1c1c;
+  border-color: #ffd044;
+  transform: translateY(-1px);
+}
+
+.user-cart-topbar-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  display: grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  color: #080808;
+  font-size: 10px;
+  font-weight: 800;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
 .user-notification {
   position: relative;
   display: grid;

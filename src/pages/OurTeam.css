@@ -1,0 +1,686 @@
+
+/* ==========================================
+   EKAM NYAAY FOUNDATION - OUR TEAM
+   Gold, Black & White
+========================================== */
+
+.our-team-page {
+  --team-gold: #ffb900;
+  --team-black: #191919;
+  --team-white: #ffffff;
+  --team-text: #111111;
+
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #ffffff;
+  color: var(--team-text);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.our-team-page *,
+.our-team-page *::before,
+.our-team-page *::after {
+  box-sizing: border-box;
+}
+
+.our-team-page a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ==========================================
+   TOP FOUR BUTTONS
+========================================== */
+
+.team-subnav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: min(calc(100% - 48px), 1416px);
+  margin: 0 auto;
+  padding: 34px 0 0;
+}
+
+.team-subnav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 47px;
+  padding: 8px 19px;
+  border: 1px solid #f0aa00;
+  border-radius: 7px;
+  background: #fffaf0;
+  color: #777777;
+  font-size: 17px;
+  line-height: 1.5;
+  white-space: nowrap;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.team-subnav-link:hover {
+  background: #ffedb8;
+  color: #111111;
+  transform: translateY(-1px);
+}
+
+.team-subnav-link.active {
+  border-color: var(--team-gold);
+  background: var(--team-gold);
+  color: #111111;
+}
+
+.team-subnav-link:focus-visible,
+.team-read-more:focus-visible,
+.team-linkedin:focus-visible {
+  outline: 3px solid #b27e00;
+  outline-offset: 4px;
+}
+
+/* ==========================================
+   PAGE HEADING
+========================================== */
+
+.team-page-heading {
+  width: min(calc(100% - 48px), 1416px);
+  margin: 35px auto 28px;
+}
+
+.team-page-heading h1 {
+  margin: 0 0 12px;
+  color: #111111;
+  font-size: clamp(28px, 2.5vw, 36px);
+  font-weight: 750;
+  line-height: 1.4;
+}
+
+.team-page-heading h1 span {
+  display: inline-block;
+  padding: 0 10px 3px;
+  border-radius: 5px;
+  background: var(--team-gold);
+}
+
+.team-page-heading > p {
+  max-width: 1100px;
+  margin: 0;
+  color: #303030;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+/* ==========================================
+   TEAM MEMBER LIST
+========================================== */
+
+.team-members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 68px;
+  width: min(calc(100% - 48px), 1416px);
+  margin: 35px auto 65px;
+}
+
+/* ==========================================
+   TEAM MEMBER CARD
+========================================== */
+
+.team-member-card {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  align-items: center;
+  gap: 38px;
+  min-height: 345px;
+  padding: 30px 38px 30px 42px;
+  overflow: hidden;
+  border-radius: 9px;
+}
+
+/* Gold card */
+
+.team-card-gold {
+  background-color: var(--team-gold);
+  color: #101010;
+}
+
+/* Black card */
+
+.team-card-dark {
+  background:
+    radial-gradient(
+      ellipse at 95% 20%,
+      rgba(180, 133, 16, 0.24),
+      transparent 36%
+    ),
+    #191919;
+  color: #ffffff;
+}
+
+/* Geometric grid pattern */
+
+.team-member-card::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image:
+    linear-gradient(
+      to right,
+      transparent calc(100% - 1px),
+      rgba(255, 255, 255, 0.13) calc(100% - 1px)
+    ),
+    linear-gradient(
+      to bottom,
+      transparent calc(100% - 1px),
+      rgba(255, 255, 255, 0.13) calc(100% - 1px)
+    );
+  background-size: 100px 105px;
+  content: "";
+  pointer-events: none;
+}
+
+/* Gold square accents */
+
+.team-member-card::after {
+  position: absolute;
+  z-index: -1;
+  right: 6%;
+  bottom: 0;
+  width: 100px;
+  height: 105px;
+  background: rgba(255, 226, 0, 0.28);
+  content: "";
+  pointer-events: none;
+}
+
+.team-card-dark::before {
+  background-image:
+    linear-gradient(
+      to right,
+      transparent calc(100% - 1px),
+      rgba(255, 255, 255, 0.055) calc(100% - 1px)
+    ),
+    linear-gradient(
+      to bottom,
+      transparent calc(100% - 1px),
+      rgba(255, 255, 255, 0.055) calc(100% - 1px)
+    );
+}
+
+/* ==========================================
+   MEMBER PHOTO
+========================================== */
+
+.team-member-photo-column {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 0 0 10px;
+}
+
+.team-member-photo-frame {
+  width: 100%;
+  max-width: 300px;
+  aspect-ratio: 0.88;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  background: #e7d5b8;
+  box-shadow: 14px 14px 0 #fffaf0;
+}
+
+.team-card-dark .team-member-photo-frame {
+  box-shadow: 14px 14px 0 rgba(255, 185, 0, 0.17);
+}
+
+.team-member-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 0.4s ease;
+}
+
+.team-member-card:hover .team-member-photo {
+  transform: scale(1.035);
+}
+
+/* ==========================================
+   MEMBER CONTENT
+========================================== */
+
+.team-member-information {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  padding: 0;
+}
+
+.team-member-biography p {
+  margin: 0 0 8px;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.team-card-dark .team-member-biography p {
+  color: #f5f5f5;
+  font-weight: 500;
+}
+
+.team-card-gold .team-member-biography p {
+  color: #101010;
+}
+
+.team-member-extra-description {
+  margin-top: 10px !important;
+}
+
+/* ==========================================
+   READ MORE / READ LESS
+========================================== */
+
+.team-read-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 1px 0 13px;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.6;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.team-read-more:hover {
+  opacity: 0.7;
+}
+
+.team-read-more svg {
+  width: 15px;
+  height: 15px;
+  stroke-width: 1.8;
+}
+
+/* ==========================================
+   MEMBER NAME AND DESIGNATION
+========================================== */
+
+.team-member-identity {
+  margin-top: 0;
+}
+
+.team-member-identity h2 {
+  margin: 0;
+  color: inherit;
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.team-member-identity > p {
+  margin: 0;
+  color: inherit;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.65;
+}
+
+/* ==========================================
+   LINKEDIN ICON
+========================================== */
+
+.team-linkedin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 23px;
+  height: 23px;
+  margin-top: 15px;
+  border-radius: 3px;
+  background: #ffffff;
+  color: #171717;
+  font-size: 19px;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.team-linkedin:hover {
+  transform: translateY(-2px);
+  opacity: 0.8;
+}
+
+.team-card-dark .team-linkedin {
+  background: #ffffff;
+  color: #191919;
+}
+
+.team-card-gold .team-linkedin {
+  background: #ffffff;
+  color: #111111;
+}
+
+/* ==========================================
+   ALTERNATING CARD ALIGNMENT
+========================================== */
+
+.team-card-reverse {
+  grid-template-columns: 300px minmax(0, 1fr);
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 1000px) {
+  .team-subnav,
+  .team-page-heading,
+  .team-members-list {
+    width: calc(100% - 40px);
+  }
+
+  .team-member-card,
+  .team-card-reverse {
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: 30px;
+    padding: 28px;
+  }
+
+  .team-member-photo-frame {
+    max-width: 240px;
+  }
+
+  .team-member-biography p {
+    font-size: 15px;
+    line-height: 1.75;
+  }
+
+  .team-member-identity h2 {
+    font-size: 17px;
+  }
+
+  .team-member-identity > p {
+    font-size: 15px;
+  }
+
+  .team-members-list {
+    gap: 45px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 700px) {
+  .team-subnav,
+  .team-page-heading,
+  .team-members-list {
+    width: calc(100% - 24px);
+  }
+
+  .team-subnav {
+    gap: 8px;
+    padding-top: 22px;
+  }
+
+  .team-subnav-link {
+    min-height: 39px;
+    padding: 7px 11px;
+    font-size: 13px;
+  }
+
+  .team-page-heading {
+    margin: 30px auto 22px;
+  }
+
+  .team-page-heading h1 {
+    font-size: 29px;
+  }
+
+  .team-page-heading > p {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .team-members-list {
+    gap: 32px;
+    margin: 25px auto 40px;
+  }
+
+  .team-member-card,
+  .team-card-reverse {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 25px;
+    min-height: auto;
+    padding: 25px 20px 28px;
+    border-radius: 9px;
+  }
+
+  .team-member-photo-column {
+    justify-content: flex-start;
+    padding: 0 12px 12px 0;
+  }
+
+  .team-member-photo-frame {
+    width: min(100%, 300px);
+    max-width: 300px;
+    aspect-ratio: 0.9;
+    box-shadow: 10px 10px 0 #fffaf0;
+  }
+
+  .team-card-dark .team-member-photo-frame {
+    box-shadow: 10px 10px 0 rgba(255, 185, 0, 0.2);
+  }
+
+  .team-member-biography p {
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .team-read-more {
+    margin: 4px 0 13px;
+    font-size: 13px;
+  }
+
+  .team-member-identity h2 {
+    font-size: 18px;
+  }
+
+  .team-member-identity > p {
+    font-size: 15px;
+  }
+
+  .team-linkedin {
+    margin-top: 13px;
+  }
+
+  .team-member-card::before {
+    background-size: 70px 75px;
+  }
+
+  .team-member-card::after {
+    width: 60px;
+    height: 65px;
+  }
+}
+
+/* ==========================================
+   SMALL PHONES
+========================================== */
+
+@media (max-width: 390px) {
+  .team-subnav {
+    gap: 6px;
+  }
+
+  .team-subnav-link {
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .team-member-card,
+  .team-card-reverse {
+    padding: 20px 15px 24px;
+  }
+
+  .team-member-biography p {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .team-member-identity h2 {
+    font-size: 17px;
+  }
+
+  .team-member-identity > p {
+    font-size: 14px;
+  }
+}
+
+/* ==========================================
+   ACCESSIBILITY
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .our-team-page *,
+  .our-team-page *::before,
+  .our-team-page *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+
+
+
+
+/* ==========================================
+   OUR TEAM - COMPACT HERO IMAGE SLIDER
+========================================== */
+
+.our-team-page .team-hero-slider {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: clamp(150px, 19vw, 240px);
+  overflow: hidden;
+  background: #fffaf0;
+}
+
+.our-team-page .team-hero-slide {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  object-fit: contain;
+  object-position: center;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.8s ease,
+    visibility 0.8s ease;
+}
+
+.our-team-page .team-hero-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Slider dots */
+
+.our-team-page .team-hero-dots {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  transform: translateX(-50%);
+}
+
+.our-team-page .team-hero-dot {
+  width: 9px;
+  height: 9px;
+  padding: 0;
+  border: 1px solid #191919;
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  transition:
+    width 0.25s ease,
+    background 0.25s ease;
+}
+
+.our-team-page .team-hero-dot.is-active {
+  width: 24px;
+  border-color: #ffb900;
+  border-radius: 10px;
+  background: #ffb900;
+}
+
+.our-team-page .team-hero-dot:focus-visible {
+  outline: 2px solid #191919;
+  outline-offset: 4px;
+}
+
+/* Tablet */
+
+@media (max-width: 768px) {
+  .our-team-page .team-hero-slider {
+    height: 175px;
+  }
+
+  .our-team-page .team-hero-dots {
+    bottom: 8px;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 480px) {
+  .our-team-page .team-hero-slider {
+    height: 135px;
+  }
+
+  .our-team-page .team-hero-dot {
+    width: 7px;
+    height: 7px;
+  }
+
+  .our-team-page .team-hero-dot.is-active {
+    width: 19px;
+  }
+}
+
+/* Reduced motion accessibility */
+
+@media (prefers-reduced-motion: reduce) {
+  .our-team-page .team-hero-slide,
+  .our-team-page .team-hero-dot {
+    transition: none;
+  }
+}

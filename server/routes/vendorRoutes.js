@@ -1,9 +1,43 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 const Vendor = require("../models/Vendor");
 const VendorUser = require("../models/VendorUser");
 
 const router = express.Router();
+
+// Profile images upload directory
+const profileUploadDir = path.join(__dirname, "../uploads/profiles");
+if (!fs.existsSync(profileUploadDir)) {
+  fs.mkdirSync(profileUploadDir, { recursive: true });
+}
+
+const profileStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, profileUploadDir);
+  },
+  filename: function (req, file, cb) {
+    const cleanName = file.originalname.replace(/[^a-zA-Z0-9.]/g, "-");
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e6);
+    const ext = path.extname(cleanName);
+    const base = path.basename(cleanName, ext).substring(0, 20);
+    cb(null, `avatar-${base}-${uniqueSuffix}${ext}`);
+  },
+});
+
+const profileUpload = multer({
+  storage: profileStorage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith("image/")) {
+      cb(null, true);
+    } else {
+      cb(new Error("Please upload a valid image file (JPG, PNG, WEBP, etc.)"), false);
+    }
+  },
+});
 
 /**
  * POST /api/vendors/login
@@ -118,6 +152,76 @@ router.get("/me", async (req, res) => {
     return res.status(401).json({
       success: false,
       message: "Invalid or expired token.",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * POST /api/vendors/profile-image
+ * Upload profile photo for logged-in vendor or user
+ */
+router.post("/profile-image", profileUpload.single("profileImage"), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No image file provided. Please select a photo to upload.",
+      });
+    }
+
+    let user = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      try {
+        const token = authHeader.split(" ")[1];
+        const decoded = jwt.verify(
+          token,
+          process.env.JWT_SECRET || "starlink_super_secret_admin_jwt_key_2026"
+        );
+        if (decoded && decoded.id) {
+          user = await Vendor.findById(decoded.id);
+          if (!user) user = await VendorUser.findById(decoded.id);
+        }
+      } catch (e) {}
+    }
+
+    // Fallback: check userId or email from req.body or req.query
+    if (!user) {
+      const qId = req.body.userId || req.query.userId;
+      const qEmail = (req.body.email || req.query.email || "").toLowerCase().trim();
+      if (qId) {
+        user = await Vendor.findById(qId);
+        if (!user) user = await VendorUser.findById(qId);
+      }
+      if (!user && qEmail) {
+        user = await Vendor.findOne({ email: qEmail });
+        if (!user) user = await VendorUser.findOne({ email: qEmail });
+      }
+    }
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        message: "Authenticated account not found.",
+      });
+    }
+
+    const relativePath = `/uploads/profiles/${req.file.filename}`;
+    user.profileImage = relativePath;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile photo uploaded successfully!",
+      profileImage: relativePath,
+      user: user.toJSON ? user.toJSON() : user,
+    });
+  } catch (error) {
+    console.error("Profile image upload error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to upload profile photo.",
       error: error.message,
     });
   }

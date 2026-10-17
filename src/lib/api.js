@@ -26,6 +26,7 @@ export async function apiFetch(endpoint, options = {}) {
     endpoint.includes("/api/kyc/my-status") ||
     endpoint.includes("/api/kyc/submit") ||
     endpoint.includes("/api/vendors/me") ||
+    endpoint.includes("/api/vendors/profile-image") ||
     endpoint.includes("/api/vendors/my-wallet");
 
   const authToken = isUserContext
@@ -109,6 +110,13 @@ export async function vendorLogin(identifier, password) {
 
 export async function getCurrentVendor() {
   return apiFetch("/api/vendors/me");
+}
+
+export async function uploadUserProfilePhoto(formData) {
+  return apiFetch("/api/vendors/profile-image", {
+    method: "POST",
+    body: formData,
+  });
 }
 
 export async function addVendorWalletMoney(vendorId, walletData) {

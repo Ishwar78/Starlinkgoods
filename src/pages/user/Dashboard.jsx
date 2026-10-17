@@ -15,9 +15,16 @@ import {
   FiAlertCircle,
   FiXCircle,
   FiRefreshCw,
+  FiCamera,
 } from "react-icons/fi";
 import { Link } from "react-router-dom";
-import { getMyKYCStatus, getMyVendorUsers, getMyWalletBalance } from "../../lib/api";
+import {
+  getMyKYCStatus,
+  getMyVendorUsers,
+  getMyWalletBalance,
+  uploadUserProfilePhoto,
+  formatImageUrl,
+} from "../../lib/api";
 import "./Dashboard.css";
 
 const recentOrders = [
@@ -39,6 +46,60 @@ export default function Dashboard() {
   const [myUsersCount, setMyUsersCount] = useState(0);
   const [walletBalance, setWalletBalance] = useState(() => (userData?.walletBalance || 0));
   const [loadingStats, setLoadingStats] = useState(true);
+
+  // Profile Photo Upload State
+  const fileInputRef = React.useRef(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoMsg, setPhotoMsg] = useState("");
+  const [photoError, setPhotoError] = useState("");
+
+  const handlePhotoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setPhotoError("Please select a valid image file (JPG, PNG, WEBP).");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setPhotoError("File size exceeds 10MB limit.");
+      return;
+    }
+
+    try {
+      setUploadingPhoto(true);
+      setPhotoError("");
+      setPhotoMsg("");
+
+      const formData = new FormData();
+      formData.append("profileImage", file);
+      if (userData._id || userData.id) {
+        formData.append("userId", userData._id || userData.id);
+      }
+      if (userData.email) {
+        formData.append("email", userData.email);
+      }
+
+      const res = await uploadUserProfilePhoto(formData);
+      if (res && res.success && res.user) {
+        localStorage.setItem("userData", JSON.stringify(res.user));
+        setUserData(res.user);
+        setPhotoMsg("Profile photo updated successfully!");
+        window.dispatchEvent(
+          new CustomEvent("slg-profile-updated", { detail: { user: res.user } })
+        );
+        setTimeout(() => setPhotoMsg(""), 4000);
+      } else {
+        setPhotoError(res?.message || "Failed to upload profile photo.");
+      }
+    } catch (err) {
+      setPhotoError(err.message || "Network error while uploading photo.");
+    } finally {
+      setUploadingPhoto(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
 
   const fetchDashboardStats = async () => {
     try {
@@ -164,6 +225,76 @@ export default function Dashboard() {
           >
             ● {userData.status || "Active"}
           </span>
+        </div>
+
+        {/* Profile Avatar & Upload Section */}
+        <div className="user-profile-header-wrap">
+          <div
+            className="profile-avatar-container"
+            onClick={() => fileInputRef.current?.click()}
+            title="Click to upload or change profile photo"
+          >
+            {userData.profileImage ? (
+              <img
+                src={formatImageUrl(userData.profileImage)}
+                alt={userData.name || "Profile"}
+                className="profile-avatar-large-img"
+                onError={(e) => {
+                  e.target.style.display = "none";
+                }}
+              />
+            ) : (
+              <div className="profile-avatar-placeholder">
+                {(userData.name || "V").charAt(0).toUpperCase()}
+              </div>
+            )}
+            <div className="profile-avatar-camera-badge" title="Upload new photo">
+              <FiCamera />
+            </div>
+            {uploadingPhoto && (
+              <div className="profile-avatar-uploading-overlay">
+                <FiRefreshCw className="spin-icon" />
+              </div>
+            )}
+          </div>
+
+          <div className="profile-avatar-meta">
+            <div className="profile-avatar-meta-top">
+              <h3>{userData.name || "Vendor User"}</h3>
+              <span className="profile-badge-tag">{userData.role || "Vendor Account"}</span>
+            </div>
+            <p className="profile-avatar-hint">
+              Upload your personal photo or store logo (JPG, PNG, WEBP). This photo is displayed in your sidebar and portal header.
+            </p>
+
+            <div className="profile-avatar-btn-row">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={handlePhotoUpload}
+              />
+              <button
+                type="button"
+                className="profile-upload-trigger-btn"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingPhoto}
+              >
+                <FiCamera /> {uploadingPhoto ? "Uploading Photo..." : "Upload Profile Photo"}
+              </button>
+              {photoMsg && (
+                <span className="profile-upload-status success">
+                  <FiCheckCircle /> {photoMsg}
+                </span>
+              )}
+              {photoError && (
+                <span className="profile-upload-status error">
+                  <FiAlertCircle /> {photoError}
+                </span>
+              )}
+            </div>
+          </div>
         </div>
 
         <div className="vendor-info-grid">

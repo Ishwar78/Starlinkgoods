@@ -1,0 +1,485 @@
+
+/* =========================================
+   EKAM NYAAY FOUNDATION - FOUNDER PAGE
+   Golden Yellow | White | Black
+========================================= */
+
+.founder-page {
+  --founder-yellow: #ffb900;
+  --founder-text: #101010;
+
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #ffffff;
+  color: var(--founder-text);
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.founder-page *,
+.founder-page *::before,
+.founder-page *::after {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   FOUR BUTTON NAVIGATION
+========================================= */
+
+.founder-subnav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: min(calc(100% - 48px), 1344px);
+  margin: 0 auto;
+  padding: 34px 0 0;
+}
+
+.founder-subnav-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 47px;
+  padding: 8px 19px;
+  border: 1px solid #f0a900;
+  border-radius: 7px;
+  background: #fffaf0;
+  color: #777777;
+  font-size: 17px;
+  font-weight: 400;
+  line-height: 1.5;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.founder-subnav-link:hover {
+  background: #ffedb8;
+  color: #111111;
+  transform: translateY(-1px);
+}
+
+.founder-subnav-link.active {
+  border-color: var(--founder-yellow);
+  background: var(--founder-yellow);
+  color: #080808;
+}
+
+.founder-subnav-link:focus-visible {
+  outline: 3px solid #9b7000;
+  outline-offset: 3px;
+}
+
+/* =========================================
+   MAIN FOUNDER PROFILE CARD
+========================================= */
+
+.founder-profile {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(300px, 0.72fr) minmax(0, 1.65fr);
+  align-items: center;
+  gap: clamp(30px, 3vw, 55px);
+  width: min(calc(100% - 48px), 1536px);
+  margin: 94px auto 55px;
+  padding: 48px 36px;
+  overflow: hidden;
+  border-radius: 13px;
+  background: var(--founder-yellow);
+}
+
+/* Subtle square pattern like the reference */
+
+.founder-profile::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image:
+    linear-gradient(
+      to right,
+      transparent calc(100% - 1px),
+      rgba(255, 255, 255, 0.18) calc(100% - 1px)
+    ),
+    linear-gradient(
+      to bottom,
+      transparent calc(100% - 1px),
+      rgba(255, 255, 255, 0.18) calc(100% - 1px)
+    );
+  background-size: 135px 115px;
+  content: "";
+  pointer-events: none;
+}
+
+/* Decorative glowing squares */
+
+.founder-profile::after {
+  position: absolute;
+  z-index: -1;
+  right: 8%;
+  bottom: 0;
+  width: 105px;
+  height: 105px;
+  background: rgba(255, 230, 0, 0.52);
+  content: "";
+  pointer-events: none;
+}
+
+/* =========================================
+   FOUNDER IMAGE
+========================================= */
+
+.founder-profile-image-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  padding: 0 0 22px 0;
+}
+
+.founder-profile-image-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 0.91;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #e9d6b7;
+  box-shadow: 23px 22px 0 #fffaf0;
+}
+
+.founder-profile-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 0.45s ease;
+}
+
+.founder-profile-image-frame:hover .founder-profile-image {
+  transform: scale(1.035);
+}
+
+/* =========================================
+   FOUNDER DESCRIPTION
+========================================= */
+
+.founder-profile-content {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  padding: 0 0 0 0;
+}
+
+.founder-profile-content > p {
+  margin: 0 0 11px;
+  color: #101010;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
+}
+
+.founder-profile-identity {
+  margin-top: 10px;
+}
+
+.founder-profile-identity h1 {
+  margin: 0;
+  color: #090909;
+  font-size: clamp(24px, 1.8vw, 29px);
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  line-height: 1.45;
+}
+
+.founder-profile-identity .founder-designation {
+  margin: 0;
+  color: #111111;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1050px) {
+  .founder-subnav {
+    width: calc(100% - 40px);
+    padding-top: 28px;
+  }
+
+  .founder-profile {
+    grid-template-columns: minmax(250px, 0.75fr) minmax(0, 1.25fr);
+    gap: 32px;
+    width: calc(100% - 40px);
+    margin-top: 65px;
+    padding: 35px 28px;
+  }
+
+  .founder-profile-image-wrap {
+    max-width: 340px;
+  }
+
+  .founder-profile-content > p {
+    font-size: 16px;
+    line-height: 1.75;
+  }
+
+  .founder-profile-identity h1 {
+    font-size: 25px;
+  }
+
+  .founder-profile-identity .founder-designation {
+    font-size: 18px;
+  }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+  .founder-subnav {
+    width: calc(100% - 24px);
+    gap: 8px;
+    padding-top: 22px;
+  }
+
+  .founder-subnav-link {
+    min-height: 40px;
+    padding: 7px 12px;
+    font-size: 14px;
+  }
+
+  .founder-profile {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    width: calc(100% - 24px);
+    margin: 40px auto 35px;
+    padding: 27px 20px 30px;
+    border-radius: 11px;
+  }
+
+  .founder-profile-image-wrap {
+    width: min(100%, 360px);
+    max-width: none;
+    padding: 0 14px 14px 0;
+  }
+
+  .founder-profile-image-frame {
+    aspect-ratio: 0.95;
+    border-radius: 9px;
+    box-shadow: 12px 12px 0 #fffaf0;
+  }
+
+  .founder-profile-content {
+    padding: 0;
+  }
+
+  .founder-profile-content > p {
+    margin-bottom: 13px;
+    font-size: 15px;
+    line-height: 1.8;
+  }
+
+  .founder-profile-identity {
+    margin-top: 17px;
+  }
+
+  .founder-profile-identity h1 {
+    font-size: 23px;
+    line-height: 1.4;
+  }
+
+  .founder-profile-identity .founder-designation {
+    font-size: 17px;
+  }
+
+  .founder-profile::before {
+    background-size: 75px 75px;
+  }
+
+  .founder-profile::after {
+    width: 65px;
+    height: 65px;
+  }
+}
+
+/* =========================================
+   SMALL MOBILE
+========================================= */
+
+@media (max-width: 390px) {
+  .founder-subnav {
+    gap: 7px;
+  }
+
+  .founder-subnav-link {
+    min-height: 37px;
+    padding: 6px 9px;
+    font-size: 12px;
+  }
+
+  .founder-profile {
+    gap: 23px;
+    padding: 22px 15px 25px;
+  }
+
+  .founder-profile-content > p {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .founder-profile-identity h1 {
+    font-size: 21px;
+  }
+}
+
+/* =========================================
+   REDUCED MOTION
+========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .founder-page *,
+  .founder-page *::before,
+  .founder-page *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+
+
+
+
+
+
+
+/* =========================================
+   FOUNDER PAGE - COMPACT IMAGE HERO SLIDER
+========================================= */
+
+.founder-page .founder-hero-slider {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  height: clamp(180px, 19vw, 270px);
+  overflow: hidden;
+  background: #fffaf0;
+}
+
+.founder-page .founder-hero-slide {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  visibility: hidden;
+  transform: scale(1.015);
+  transition:
+    opacity 0.8s ease,
+    transform 4.5s ease,
+    visibility 0.8s ease;
+}
+
+.founder-page .founder-hero-slide.is-active {
+  opacity: 1;
+  visibility: visible;
+  transform: scale(1);
+}
+
+/* Slider dots */
+
+.founder-page .founder-hero-dots {
+  position: absolute;
+  z-index: 2;
+  bottom: 11px;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transform: translateX(-50%);
+}
+
+.founder-page .founder-hero-dot {
+  display: block;
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  padding: 0;
+  border: 1px solid #fff;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.founder-page .founder-hero-dot.is-active {
+  width: 22px;
+  flex-basis: 22px;
+  border-color: #ffb900;
+  border-radius: 20px;
+  background: #ffb900;
+}
+
+.founder-page .founder-hero-dot:focus-visible {
+  outline: 2px solid #111;
+  outline-offset: 4px;
+}
+
+/* Tablet */
+
+@media (max-width: 768px) {
+  .founder-page .founder-hero-slider {
+    height: 200px;
+  }
+
+  .founder-page .founder-hero-slide {
+    object-position: center;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 480px) {
+  .founder-page .founder-hero-slider {
+    height: 155px;
+  }
+
+  .founder-page .founder-hero-dots {
+    bottom: 8px;
+  }
+
+  .founder-page .founder-hero-dot {
+    width: 7px;
+    height: 7px;
+    flex-basis: 7px;
+  }
+
+  .founder-page .founder-hero-dot.is-active {
+    width: 19px;
+    flex-basis: 19px;
+  }
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .founder-page .founder-hero-slide,
+  .founder-page .founder-hero-dot {
+    transition: none;
+  }
+}

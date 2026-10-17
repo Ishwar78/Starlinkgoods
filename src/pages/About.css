@@ -1,1153 +1,809 @@
-/* =========================================
-   STAR LINK GOODS - ABOUT PAGE
-   Dedicated stylesheet: About.css
-   Theme: Black, Gold & Cream
-========================================= */
 
-.slg-about-page {
-  --about-gold: #e9ad12;
-  --about-gold-light: #ffdc72;
-  --about-ink: #211b16;
-  --about-muted: #766d63;
-  --about-cream: #fffaf4;
+/* ==========================================
+   EKAM NYAAY FOUNDATION - ABOUT PAGE
+   Theme: Yellow, White & Cream
+========================================== */
+
+.ekam-about-page {
+  --ekam-yellow: #ffb900;
+  --ekam-yellow-dark: #e6a400;
+  --ekam-cream: #fcf5e5;
+  --ekam-black: #111111;
+  --ekam-white: #ffffff;
 
   width: 100%;
   overflow: hidden;
-  background: var(--about-cream);
-  color: var(--about-ink);
+  color: var(--ekam-black);
+  background: var(--ekam-white);
   font-family: inherit;
-  font-size: 14px;
-  line-height: 1.65;
+  font-size: 16px;
+  line-height: 1.8;
 }
 
-.slg-about-page *,
-.slg-about-page *::before,
-.slg-about-page *::after {
+.ekam-about-page *,
+.ekam-about-page *::before,
+.ekam-about-page *::after {
   box-sizing: border-box;
 }
 
-.slg-about-page img {
+.ekam-about-page img {
   display: block;
   max-width: 100%;
 }
 
-.slg-about-page a {
+.ekam-about-page a {
   color: inherit;
   text-decoration: none;
 }
 
-.slg-about-page a:focus-visible {
-  outline: 2px solid var(--about-gold);
+.ekam-about-page a:focus-visible {
+  outline: 3px solid #9c7000;
   outline-offset: 4px;
 }
 
-/* =========================================
-   SECTION LABEL
-========================================= */
+/* ==========================================
+   FOUR NAVIGATION BUTTONS
+========================================== */
 
-.slg-about-eyebrow {
-  display: inline-flex;
+.ekam-page-tabs {
+  display: flex;
   align-items: center;
-  gap: 10px;
-  color: #b87b00;
-  font-size: 14px;
-  font-weight: 800;
-  letter-spacing: 1.55px;
-  line-height: 1.5;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: min(100% - 48px, 1520px);
+  margin: 0 auto;
+  padding: 38px 0 30px;
 }
 
-.slg-about-eyebrow::before {
-  display: inline-block;
-  width: 27px;
-  height: 1px;
-  background: var(--about-gold);
-  content: "";
-}
-
-/* =========================================
-   BUTTON
-========================================= */
-
-.slg-about-button {
+.ekam-page-tab {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  min-height: 43px;
-  padding: 11px 17px;
-  border: 1px solid transparent;
+  min-width: 115px;
+  min-height: 48px;
+  padding: 10px 20px;
+  border: 1px solid var(--ekam-yellow);
   border-radius: 7px;
-  background: linear-gradient(
-    135deg,
-    #ffdf79,
-    #e9ad0b
-  );
-  color: #19140a;
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1.2;
-  box-shadow: 0 5px 14px rgba(211, 151, 0, 0.12);
+  color: #777777;
+  background: #fffaf0;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: center;
   transition:
+    color 0.2s ease,
+    background 0.2s ease,
     transform 0.2s ease,
     box-shadow 0.2s ease;
 }
 
-.slg-about-button:hover {
+.ekam-page-tab:hover {
+  color: #111111;
+  background: #ffe5a0;
   transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
 }
 
-.slg-about-button svg {
-  width: 15px;
-  height: 15px;
-  flex-shrink: 0;
+.ekam-page-tab.is-active {
+  color: #080808;
+  background: var(--ekam-yellow);
+  border-color: var(--ekam-yellow);
 }
 
-/* =========================================
-   HERO SECTION
-========================================= */
-
-.slg-about-hero {
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-height: 300px;
-  isolation: isolate;
-  overflow: hidden;
-  background: #eee0cd;
+.ekam-page-tab:focus-visible {
+  outline: 3px solid #9c7000;
+  outline-offset: 3px;
 }
 
-.slg-about-hero-image {
-  position: absolute;
-  z-index: -2;
-  inset: 0;
-  background-image: url(
-    "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=2200&q=90"
-  );
-  background-position: center 54%;
-  background-size: cover;
-}
+/* ==========================================
+   COMMON SECTION HEADING
+========================================== */
 
-.slg-about-hero::before {
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 249, 240, 0.98) 0%,
-    rgba(255, 249, 240, 0.93) 27%,
-    rgba(255, 249, 240, 0.68) 43%,
-    rgba(255, 249, 240, 0.08) 72%,
-    rgba(255, 249, 240, 0.05) 100%
-  );
-  content: "";
-}
-
-.slg-about-hero-content {
-  width: min(510px, 49%);
-  padding: 43px 0 43px clamp(25px, 6vw, 92px);
-}
-
-.slg-about-hero-content h1 {
-  margin: 12px 0 11px;
-  color: #211b16;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(36px, 4vw, 57px);
+.ekam-section-heading {
+  margin: 0;
+  color: #111111;
+  font-family: inherit;
+  font-size: clamp(28px, 2.3vw, 36px);
   font-weight: 700;
-  letter-spacing: -1.5px;
-  line-height: 0.99;
+  letter-spacing: -0.7px;
+  line-height: 1.4;
 }
 
-.slg-about-hero-content h1 span {
-  display: block;
-  color: #a9740a;
+.ekam-section-heading span {
+  display: inline-block;
+  padding: 0 10px 3px;
+  border-radius: 5px;
+  background: var(--ekam-yellow);
+  color: #080808;
 }
 
-.slg-about-hero-content p {
-  max-width: 390px;
-  margin: 0 0 19px;
-  color: #0b0a09;
-  font-size: 16px;
-  line-height: 1.9;
-}
+/* ==========================================
+   ABOUT INTRODUCTION
+========================================== */
 
-.slg-about-hero-note {
-  position: absolute;
-  top: 50%;
-  right: clamp(20px, 4vw, 65px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  color: #282019;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(17px, 2vw, 27px);
-  font-style: italic;
-  line-height: 1.18;
-  transform: translateY(-50%) rotate(-5deg);
-  text-align: center;
-  text-shadow: 0 1px 12px rgba(255, 250, 240, 0.8);
-}
-
-.slg-about-hero-note i {
-  width: 78px;
-  height: 3px;
-  margin-top: 12px;
-  background: var(--about-gold);
-  transform: rotate(-9deg);
-}
-
-/* =========================================
-   BENEFITS SECTION
-========================================= */
-
-.slg-about-benefits {
-  position: relative;
-  z-index: 2;
+.ekam-about-intro {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  width: calc(100% - clamp(28px, 5vw, 76px));
-  max-width: 1500px;
-  margin: -1px auto 0;
-  padding: 15px 12px;
-  border: 1px solid #ead8c1;
-  border-radius: 12px;
-  background: rgba(255, 253, 249, 0.97);
-  box-shadow: 0 8px 25px rgba(56, 40, 22, 0.08);
+  grid-template-columns: minmax(0, 2fr) minmax(300px, 0.9fr);
+  align-items: center;
+  gap: clamp(35px, 4vw, 70px);
+  width: min(100% - 48px, 1520px);
+  margin: 0 auto;
+  padding: 12px 0 65px;
 }
 
-.slg-about-benefit {
+.ekam-about-copy {
+  min-width: 0;
+}
+
+.ekam-about-copy > .ekam-section-heading {
+  margin-bottom: 22px;
+}
+
+.ekam-about-copy > p {
+  margin: 0 0 13px;
+  color: #111111;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+.ekam-about-feature-list {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-width: 0;
-  padding: 5px clamp(8px, 2vw, 27px);
-  border-right: 1px solid #ebdeca;
+  flex-wrap: wrap;
+  gap: 13px;
+  margin-top: 25px;
 }
 
-.slg-about-benefit:last-child {
-  border-right: 0;
+.ekam-about-feature {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 13px;
+  border: 1px solid #f1d58b;
+  border-radius: 30px;
+  background: #fffaf0;
+  font-size: 14px;
+  font-weight: 700;
 }
 
-.slg-about-benefit-icon {
+.ekam-about-feature-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 45px;
-  width: 45px;
-  height: 45px;
-  border: 1px solid var(--about-gold);
-  border-radius: 50%;
-  background: #14120e;
-  color: var(--about-gold-light);
-  font-size: 19px;
+  color: #a67500;
+  font-size: 18px;
 }
 
-.slg-about-benefit h3 {
-  margin: 0 0 3px;
-  color: #211b16;
-  font-size: 15px;
-  font-weight: 800;
-  line-height: 1.5;
-}
+/* ==========================================
+   ABOUT CIRCULAR IMAGE
+========================================== */
 
-.slg-about-benefit p {
-  margin: 0;
-  color: var(--about-muted);
-  font-size: 14px;
-  line-height: 1.55;
-}
-
-/* =========================================
-   OUR STORY SECTION
-========================================= */
-
-.slg-about-story {
-  display: grid;
-  grid-template-columns:
-    minmax(0, 1.08fr)
-    minmax(0, 1.12fr)
-    minmax(160px, 0.5fr);
-  align-items: center;
-  gap: clamp(22px, 3vw, 42px);
-  width: min(
-    calc(100% - 2 * clamp(24px, 4vw, 60px)),
-    1500px
-  );
-  margin: 0 auto;
-  padding: 39px 0 35px;
-}
-
-.slg-about-story-visual {
+.ekam-about-visual {
   position: relative;
-  min-width: 0;
-  padding-bottom: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 455px;
+  aspect-ratio: 1;
+  margin: 0 auto;
 }
 
-.slg-about-story-main-image {
+.ekam-about-image-ring {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  height: 265px;
-  border-radius: 9px;
+  aspect-ratio: 1;
+  padding: 12%;
+  border: 3px solid #ffe6a6;
+  border-radius: 50%;
+  background: #fffdf8;
+  box-shadow: 0 0 25px rgba(255, 185, 0, 0.08);
+}
+
+.ekam-about-image-ring img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
   object-fit: cover;
   object-position: center;
 }
 
-.slg-about-story-small-image {
+.ekam-about-floating-icon {
   position: absolute;
-  right: -13px;
-  bottom: 0;
-  width: 42%;
-  height: 120px;
-  border: 5px solid var(--about-cream);
-  border-radius: 11px;
-  object-fit: cover;
-  box-shadow: 0 5px 18px rgba(36, 24, 10, 0.15);
-}
-
-.slg-about-image-caption {
-  position: absolute;
-  bottom: 25px;
-  left: 12px;
+  z-index: 2;
   display: flex;
-  flex-direction: column;
-  max-width: 57%;
-  padding: 10px 12px;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  border-radius: 6px;
-  background: rgba(20, 17, 13, 0.75);
-  color: #fff;
-  backdrop-filter: blur(6px);
-}
-
-.slg-about-image-caption span {
-  color: #f2d18a;
-  font-size: 9px;
-}
-
-.slg-about-image-caption strong {
-  font-size: 11px;
-  line-height: 1.5;
-}
-
-.slg-about-story-copy {
-  min-width: 0;
-}
-
-.slg-about-story-copy h2,
-.slg-about-testimonials-heading h2 {
-  margin: 9px 0 10px;
-  color: #211b16;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(25px, 2.6vw, 35px);
-  font-weight: 700;
-  letter-spacing: -0.5px;
-  line-height: 1.13;
-}
-
-.slg-about-story-copy p {
-  margin: 0 0 11px;
-  color: #090908;
-  font-size: 16px;
-  line-height: 1.9;
-}
-
-.slg-about-story-copy .slg-about-button {
-  margin-top: 6px;
-}
-
-/* Story statistics cards */
-
-.slg-about-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-.slg-about-stat {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  min-height: 59px;
-  padding: 8px 10px;
-  border: 1px solid #f0e5d5;
-  border-radius: 8px;
-  background: #fffdf9;
-}
-
-.slg-about-stat > span {
-  display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex: 0 0 39px;
-  width: 39px;
-  height: 39px;
+  width: 72px;
+  height: 72px;
+  border: 3px solid #ffffff;
   border-radius: 50%;
-  background: #fbf0d7;
-  color: #956000;
-  font-size: 17px;
+  color: #ffffff;
+  background: var(--ekam-yellow);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+  font-size: 30px;
 }
 
-.slg-about-stat div {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+.ekam-icon-top {
+  top: 8%;
+  left: 7%;
 }
 
-.slg-about-stat strong {
-  color: #282019;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 15px;
-  line-height: 1.4;
+.ekam-icon-left {
+  top: 43%;
+  left: -5%;
 }
 
-.slg-about-stat small {
-  color: #1b1a18;
-  font-size: 15px;
-  line-height: 1.5;
+.ekam-icon-bottom {
+  bottom: 7%;
+  left: 12%;
 }
 
-/* =========================================
-   MISSION, VISION AND VALUES
-========================================= */
+/* ==========================================
+   VISION & MISSION COMMON STRUCTURE
+========================================== */
 
-.slg-about-values {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0;
-  padding: 20px clamp(24px, 4vw, 65px);
-  border-top: 1px solid #f2e7d9;
-  border-bottom: 1px solid #f2e7d9;
-  background: #fffdf9;
-}
-
-.slg-about-value {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  min-width: 0;
-  padding: 4px clamp(8px, 2vw, 27px);
-  border-right: 1px solid #e8d9c3;
-}
-
-.slg-about-value:first-child {
-  padding-left: 0;
-}
-
-.slg-about-value:last-child {
-  padding-right: 0;
-  border-right: 0;
-}
-
-.slg-about-value-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 43px;
-  width: 43px;
-  height: 43px;
-  border-radius: 50%;
-  background: #fbf0d7;
-  color: #986000;
-  font-size: 19px;
-}
-
-.slg-about-value h3 {
-  margin: 0 0 4px;
-  color: #2b241d;
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.slg-about-value p {
-  margin: 0;
-  color: #1a1817;
-  font-size: 16px;
-  line-height: 1.65;
-}
-
-/* =========================================
-   WHY CHOOSE STAR LINK GOODS
-========================================= */
-
-.slg-about-why {
-  display: grid;
-  grid-template-columns:
-    minmax(205px, 0.92fr)
-    minmax(0, 2.8fr);
-  gap: clamp(20px, 3vw, 38px);
-  padding: 32px clamp(24px, 4vw, 65px);
-  background:
-    radial-gradient(
-      ellipse at top left,
-      rgba(224, 167, 28, 0.08),
-      transparent 38%
-    ),
-    #0b0b0a;
-  color: #fff;
-}
-
-.slg-about-why-intro {
-  align-self: center;
-  min-width: 0;
-}
-
-.slg-about-why-intro .slg-about-eyebrow {
-  color: #f0c653;
-}
-
-.slg-about-why-intro h2 {
-  margin: 10px 0;
-  color: #fffaf0;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(26px, 2.5vw, 35px);
-  letter-spacing: -0.5px;
-  line-height: 1.08;
-}
-
-.slg-about-why-intro p {
-  margin: 0 0 18px;
-  color: #b8b0a2;
-  font-size: 16px;
-  line-height: 1.85;
-}
-
-/* Feature cards */
-
-.slg-about-reasons {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
-  min-width: 0;
-}
-
-.slg-about-reason-card {
-  min-width: 0;
-  overflow: hidden;
-  border: 1px solid #302b22;
-  border-radius: 9px;
-  background: #121211;
-  transition:
-    border-color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.slg-about-reason-card:hover {
-  transform: translateY(-3px);
-  border-color: #8e6c20;
-}
-
-.slg-about-reason-image {
-  position: relative;
-  height: 118px;
-  overflow: hidden;
-}
-
-.slg-about-reason-image img {
+.ekam-purpose-section {
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.35s ease;
+  padding: 0;
 }
 
-.slg-about-reason-card:hover
-.slg-about-reason-image img {
-  transform: scale(1.05);
+.ekam-purpose-heading {
+  width: min(100% - 48px, 1520px);
+  margin: 0 auto;
+  padding: 0 0 28px;
 }
 
-.slg-about-reason-image > span {
-  position: absolute;
-  bottom: -1px;
-  left: 12px;
-  display: inline-flex;
+.ekam-purpose-heading .ekam-section-heading {
+  font-size: clamp(29px, 2.3vw, 36px);
+}
+
+.ekam-purpose-panel {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 2.15fr);
+  align-items: center;
+  gap: clamp(30px, 3vw, 55px);
+  min-height: 440px;
+  padding: 50px max(24px, calc((100vw - 1520px) / 2));
+  background: var(--ekam-cream);
+}
+
+.ekam-purpose-copy {
+  min-width: 0;
+}
+
+.ekam-purpose-copy p {
+  margin: 0 0 18px;
+  color: #111111;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.62;
+  text-align: justify;
+}
+
+.ekam-purpose-copy p:last-child {
+  margin-bottom: 0;
+}
+
+/* ==========================================
+   CIRCULAR VISION / MISSION IMAGES
+========================================== */
+
+.ekam-purpose-visual {
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 39px;
-  height: 39px;
-  border: 2px solid var(--about-gold);
-  border-radius: 50%;
-  background: #0e0e0d;
-  color: var(--about-gold-light);
-  font-size: 16px;
-}
-
-.slg-about-reason-copy {
-  padding: 14px 12px 16px;
-}
-
-.slg-about-reason-copy h3 {
-  margin: 0 0 5px;
-  color: #fff8e8;
-  font-size: 16px;
-  font-weight: 800;
-  line-height: 1.5;
-}
-
-.slg-about-reason-copy p {
-  margin: 0;
-  color: #e8e2d9;
-  font-size: 15px;
-  line-height: 1.7;
-}
-
-/* =========================================
-   BRAND SHOWCASE
-========================================= */
-
-.slg-about-brands {
-  display: flex;
-  align-items: center;
-  gap: 26px;
-  padding: 21px clamp(24px, 4vw, 65px);
-  border-bottom: 1px solid #efe2d0;
-  background: #fffaf3;
-}
-
-.slg-about-brands-label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 0 0 auto;
-  color: #8d620a;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 1px;
-}
-
-.slg-about-brands-label span {
-  width: 24px;
-  height: 1px;
-  background: var(--about-gold);
-}
-
-.slg-about-brand-list {
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  flex: 1;
-  flex-wrap: wrap;
-  gap: 13px 22px;
-}
-
-.slg-about-brand-list span {
-  color: #51483d;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 15px;
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.slg-about-brand-list span:nth-child(2n) {
-  font-style: italic;
-}
-
-/* =========================================
-   CUSTOMER TESTIMONIALS
-========================================= */
-
-.slg-about-testimonials {
-  display: grid;
-  grid-template-columns:
-    minmax(190px, 0.85fr)
-    minmax(0, 2.3fr);
-  align-items: center;
-  gap: 30px;
-  padding: 35px clamp(24px, 4vw, 65px);
-  background: #fffdf9;
-}
-
-.slg-about-testimonials-heading h2 {
-  font-size: clamp(24px, 2.5vw, 32px);
-}
-
-.slg-about-testimonials-heading p {
-  margin: 0;
-  color: #171513;
-  font-size: 15px;
-  line-height: 1.8;
-}
-
-.slg-about-testimonial-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 13px;
+  width: 100%;
   min-width: 0;
 }
 
-.slg-about-testimonial {
-  min-width: 0;
-  padding: 17px;
-  border: 1px solid #f0e6d9;
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 4px 15px rgba(42, 30, 14, 0.045);
-}
-
-.slg-about-reviewer {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.slg-about-reviewer > span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 36px;
-  width: 36px;
-  height: 36px;
-  border: 1px solid #f0d99f;
-  border-radius: 50%;
-  background: #fbf0d7;
-  color: #7f5300;
-  font-size: 11px;
-  font-weight: 800;
-}
-
-.slg-about-reviewer div {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-.slg-about-reviewer strong {
-  color: #29221a;
-  font-size: 14px;
-}
-
-.slg-about-reviewer small {
-  color: #0d0c0b;
-  font-size: 13px;
-}
-
-.slg-about-stars {
-  margin: 10px 0 6px;
-  color: #d99c08;
-  font-size: 22px;
-  letter-spacing: 2px;
-}
-
-.slg-about-testimonial > p {
-  margin: 0;
-  color: #181614;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: 15px;
-  line-height: 1.75;
-}
-
-/* =========================================
-   FINAL SHOPPING CTA
-========================================= */
-
-.slg-about-cta {
+.ekam-purpose-image {
   position: relative;
   display: flex;
   align-items: center;
-  min-height: 190px;
-  isolation: isolate;
+  justify-content: center;
+  width: min(100%, 385px);
+  aspect-ratio: 1;
   overflow: hidden;
-  background: #18120a;
-  color: #fff;
+  border-radius: 50%;
+  background: var(--ekam-yellow);
+  isolation: isolate;
 }
 
-.slg-about-cta-image {
+.ekam-purpose-image img {
   position: absolute;
   z-index: -2;
-  inset: 0 0 0 43%;
-  background-image: url(
-    "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1500&q=85"
-  );
-  background-position: center 55%;
-  background-size: cover;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+  object-position: center;
 }
 
-.slg-about-cta::before {
+.ekam-purpose-image-overlay {
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    #100e0a 0%,
-    #17120b 36%,
-    rgba(23, 18, 11, 0.94) 47%,
-    rgba(23, 18, 11, 0.25) 80%,
-    rgba(23, 18, 11, 0.15) 100%
-  );
-  content: "";
+  border-radius: inherit;
+  background: rgba(255, 185, 0, 0.68);
 }
 
-.slg-about-cta-copy {
-  width: min(650px, 65%);
-  padding: 28px clamp(24px, 6vw, 90px);
+.ekam-purpose-image h3 {
+  margin: 0;
+  padding: 12px;
+  color: #080808;
+  font-size: clamp(26px, 2.4vw, 36px);
+  font-weight: 800;
+  line-height: 1.3;
+  text-align: center;
 }
 
-.slg-about-cta-copy .slg-about-eyebrow {
-  color: #f2ce67;
+/* ==========================================
+   VISION SECTION
+   Image left, text right
+========================================== */
+
+.ekam-vision-section {
+  padding-top: 0;
 }
 
-.slg-about-cta-copy h2 {
-  margin: 8px 0;
-  color: #fff8eb;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(24px, 3vw, 36px);
-  line-height: 1.2;
+.ekam-vision-panel {
+  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 2.15fr);
+  margin-left: max(0px, calc((100vw - 1520px) / 2));
+  padding-left: clamp(30px, 4vw, 65px);
+  padding-right: max(24px, calc((100vw - 1520px) / 2));
+  border-radius: 220px 0 0 220px;
 }
 
-.slg-about-cta-copy p {
-  max-width: 440px;
-  margin: 0 0 17px;
-  color: #c5bba9;
+.ekam-vision-panel .ekam-purpose-visual {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.ekam-vision-panel .ekam-purpose-copy {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* ==========================================
+   MISSION SECTION
+   Text left, image right
+========================================== */
+
+.ekam-mission-section {
+  padding-top: 0;
+}
+
+.ekam-mission-section .ekam-purpose-heading {
+  padding-top: 38px;
+}
+
+.ekam-mission-panel {
+  grid-template-columns: minmax(0, 2.15fr) minmax(280px, 0.85fr);
+  margin-right: max(0px, calc((100vw - 1520px) / 2));
+  padding-left: max(24px, calc((100vw - 1520px) / 2));
+  padding-right: clamp(30px, 4vw, 65px);
+  border-radius: 0 220px 220px 0;
+}
+
+.ekam-mission-panel .ekam-purpose-copy {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.ekam-mission-panel .ekam-purpose-visual {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+/* ==========================================
+   GET INVOLVED CTA
+========================================== */
+
+.ekam-involvement {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  width: min(100% - 48px, 1520px);
+  margin: 65px auto;
+  padding: 35px 38px;
+  border: 1px solid #f0dca9;
+  border-radius: 14px;
+  background: #fffaf0;
+}
+
+.ekam-involvement-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 65px;
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  color: #111111;
+  background: var(--ekam-yellow);
+  font-size: 28px;
+}
+
+.ekam-involvement-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.ekam-involvement-label {
+  color: #916800;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.6px;
+}
+
+.ekam-involvement-copy h2 {
+  margin: 4px 0 5px;
+  color: #111111;
+  font-size: clamp(24px, 2.5vw, 34px);
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.ekam-involvement-copy p {
+  margin: 0;
+  color: #514b42;
   font-size: 16px;
-  line-height: 1.8;
+  line-height: 1.7;
 }
 
-/* =========================================
-   TABLET RESPONSIVENESS
-========================================= */
-
-@media (max-width: 1100px) {
-  .slg-about-story {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .slg-about-stats {
-    grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .slg-about-why {
-    grid-template-columns: 1fr;
-  }
-
-  .slg-about-why-intro {
-    max-width: 600px;
-  }
-
-  .slg-about-brands {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 17px;
-  }
-
-  .slg-about-brand-list {
-    width: 100%;
-  }
+.ekam-involvement-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex: 0 0 auto;
+  min-height: 48px;
+  padding: 12px 20px;
+  border: 1px solid var(--ekam-yellow);
+  border-radius: 7px;
+  color: #111111;
+  background: var(--ekam-yellow);
+  font-size: 15px;
+  font-weight: 800;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
-/* =========================================
-   MOBILE RESPONSIVENESS
-========================================= */
+.ekam-involvement-button:hover {
+  background: #ffd15c;
+  transform: translateY(-2px);
+}
 
-@media (max-width: 760px) {
-  .slg-about-hero {
-    min-height: 310px;
+/* ==========================================
+   TABLET RESPONSIVE
+========================================== */
+
+@media (max-width: 1000px) {
+  .ekam-about-intro {
+    grid-template-columns: minmax(0, 1.6fr) minmax(240px, 0.9fr);
+    gap: 30px;
   }
 
-  .slg-about-hero-content {
-    width: 75%;
-    padding: 35px 20px;
-  }
-
-  .slg-about-hero-content h1 {
-    font-size: clamp(34px, 7vw, 47px);
-  }
-
-  .slg-about-hero-note {
-    display: none;
-  }
-
-  .slg-about-hero::before {
-    background: linear-gradient(
-      90deg,
-      rgba(255, 249, 240, 0.97),
-      rgba(255, 249, 240, 0.88) 57%,
-      rgba(255, 249, 240, 0.25)
-    );
-  }
-
-  /* Benefits */
-
-  .slg-about-benefits {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px 0;
-    width: calc(100% - 24px);
-    padding: 12px 7px;
-  }
-
-  .slg-about-benefit {
-    gap: 8px;
-    padding: 8px;
-    border-right: 0;
-  }
-
-  .slg-about-benefit:nth-child(odd) {
-    border-right: 1px solid #ebdeca;
-  }
-
-  .slg-about-benefit-icon {
-    flex-basis: 37px;
-    width: 37px;
-    height: 37px;
+  .ekam-about-copy > p,
+  .ekam-purpose-copy p {
     font-size: 16px;
   }
 
-  .slg-about-benefit h3 {
-    font-size: 13px;
+  .ekam-about-floating-icon {
+    width: 58px;
+    height: 58px;
+    font-size: 24px;
   }
 
-  .slg-about-benefit p {
-    font-size: 13px;
+  .ekam-purpose-panel,
+  .ekam-vision-panel {
+    gap: 28px;
   }
 
-  /* Story */
-
-  .slg-about-story {
-    grid-template-columns: 1fr;
-    gap: 25px;
-    width: calc(100% - 32px);
-    padding: 30px 0;
+  .ekam-purpose-image {
+    width: min(100%, 310px);
   }
 
-  .slg-about-story-main-image {
-    height: 260px;
+  .ekam-vision-panel,
+  .ekam-mission-panel {
+    border-radius: 130px 0 0 130px;
   }
 
-  .slg-about-story-copy h2 {
-    font-size: 30px;
+  .ekam-mission-panel {
+    border-radius: 0 130px 130px 0;
   }
 
-  .slg-about-story-copy p {
+  .ekam-involvement {
+    gap: 17px;
+    padding: 27px;
+  }
+}
+
+/* ==========================================
+   MOBILE RESPONSIVE
+========================================== */
+
+@media (max-width: 700px) {
+  .ekam-page-tabs {
+    width: calc(100% - 28px);
+    gap: 9px;
+    padding: 25px 0 24px;
+  }
+
+  .ekam-page-tab {
+    flex: 1 1 calc(50% - 9px);
+    min-width: 0;
+    min-height: 45px;
+    padding: 9px 8px;
     font-size: 15px;
   }
 
-  .slg-about-stats {
-    grid-column: auto;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .ekam-section-heading,
+  .ekam-purpose-heading .ekam-section-heading {
+    font-size: 29px;
+    letter-spacing: -0.5px;
   }
 
-  /* Values */
+  /* About */
 
-  .slg-about-values {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 20px 0;
-    padding: 24px 16px;
+  .ekam-about-intro {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 35px;
+    width: calc(100% - 30px);
+    padding: 0 0 40px;
   }
 
-  .slg-about-value {
-    gap: 8px;
-    padding: 4px 10px;
-    border-right: 0;
+  .ekam-about-copy > .ekam-section-heading {
+    margin-bottom: 18px;
   }
 
-  .slg-about-value:nth-child(odd) {
-    border-right: 1px solid #e8d9c3;
+  .ekam-about-copy > p {
+    margin-bottom: 13px;
+    font-size: 16px;
+    line-height: 1.75;
+    text-align: left;
   }
 
-  .slg-about-value:first-child {
-    padding-left: 10px;
+  .ekam-about-feature-list {
+    gap: 9px;
+    margin-top: 20px;
   }
 
-  .slg-about-value:last-child {
-    padding-right: 10px;
+  .ekam-about-feature {
+    gap: 6px;
+    padding: 7px 10px;
+    font-size: 13px;
   }
 
-  .slg-about-value-icon {
-    flex-basis: 38px;
-    width: 38px;
-    height: 38px;
-    font-size: 17px;
+  .ekam-about-visual {
+    width: min(78vw, 360px);
   }
 
-  /* Why Choose Us */
-
-  .slg-about-why {
-    gap: 23px;
-    padding: 29px 16px;
+  .ekam-about-image-ring {
+    padding: 11%;
   }
 
-  .slg-about-reasons {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+  .ekam-about-floating-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 21px;
   }
 
-  .slg-about-reason-image {
-    height: 130px;
+  .ekam-icon-left {
+    left: -4%;
   }
 
-  /* Brands */
+  /* Section headings */
 
-  .slg-about-brands {
-    padding: 23px 18px;
+  .ekam-purpose-heading {
+    width: calc(100% - 30px);
+    padding-bottom: 20px;
   }
 
-  .slg-about-brand-list {
-    justify-content: flex-start;
-    gap: 15px 23px;
+  .ekam-mission-section .ekam-purpose-heading {
+    padding-top: 32px;
   }
 
-  .slg-about-brand-list span {
-    font-size: 14px;
+  /* Vision and Mission panels */
+
+  .ekam-purpose-panel,
+  .ekam-vision-panel,
+  .ekam-mission-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+    min-height: auto;
+    margin: 0;
+    padding: 30px 18px;
+    border-radius: 0;
   }
 
-  /* Testimonials */
-
-  .slg-about-testimonials {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 30px 16px;
+  .ekam-vision-panel .ekam-purpose-visual {
+    order: 0;
   }
 
-  .slg-about-testimonials-heading h2 {
+  .ekam-vision-panel .ekam-purpose-copy {
+    order: 1;
+  }
+
+  .ekam-mission-panel .ekam-purpose-copy {
+    order: 1;
+  }
+
+  .ekam-mission-panel .ekam-purpose-visual {
+    order: 0;
+  }
+
+  .ekam-purpose-visual {
+    width: 100%;
+  }
+
+  .ekam-purpose-image {
+    width: min(76vw, 330px);
+  }
+
+  .ekam-purpose-image h3 {
     font-size: 29px;
   }
 
-  .slg-about-testimonial-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .slg-about-testimonial {
-    padding: 16px;
+  .ekam-purpose-copy p {
+    margin-bottom: 17px;
+    font-size: 16px;
+    line-height: 1.75;
+    text-align: left;
   }
 
   /* CTA */
 
-  .slg-about-cta {
-    min-height: 245px;
-  }
-
-  .slg-about-cta-image {
-    left: 20%;
-  }
-
-  .slg-about-cta::before {
-    background: linear-gradient(
-      90deg,
-      rgba(16, 14, 10, 0.98),
-      rgba(16, 14, 10, 0.89) 60%,
-      rgba(16, 14, 10, 0.48)
-    );
-  }
-
-  .slg-about-cta-copy {
-    width: 100%;
-    padding: 30px 22px;
-  }
-
-  .slg-about-cta-copy h2 {
-    font-size: 29px;
-  }
-}
-
-/* =========================================
-   SMALL PHONES
-========================================= */
-
-@media (max-width: 420px) {
-  .slg-about-hero {
-    min-height: 295px;
-  }
-
-  .slg-about-hero-content {
-    width: 92%;
-    padding: 30px 17px;
-  }
-
-  .slg-about-hero-content h1 {
-    font-size: 35px;
-    letter-spacing: -0.8px;
-  }
-
-  .slg-about-hero-content p {
-    font-size: 16px;
-  }
-
-  .slg-about-benefit {
+  .ekam-involvement {
     align-items: flex-start;
-    gap: 8px;
+    flex-direction: column;
+    gap: 18px;
+    width: calc(100% - 30px);
+    margin: 35px auto;
+    padding: 24px 20px;
   }
 
-  .slg-about-benefit-icon {
-    flex-basis: 32px;
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
+  .ekam-involvement-icon {
+    flex-basis: 53px;
+    width: 53px;
+    height: 53px;
+    font-size: 23px;
   }
 
-  .slg-about-stats article {
-    gap: 8px;
-    padding: 7px;
+  .ekam-involvement-copy h2 {
+    font-size: 26px;
   }
 
-  .slg-about-stats article > span {
-    flex-basis: 32px;
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-  }
-
-  .slg-about-stats strong {
-    font-size: 12px;
-  }
-
-  .slg-about-values {
-    padding-right: 9px;
-    padding-left: 9px;
-  }
-
-  .slg-about-value {
-    padding-right: 6px;
-    padding-left: 6px;
-  }
-
-  .slg-about-value:first-child {
-    padding-left: 6px;
-  }
-
-  .slg-about-value:last-child {
-    padding-right: 6px;
-  }
-
-  .slg-about-value-icon {
-    flex-basis: 34px;
-    width: 34px;
-    height: 34px;
+  .ekam-involvement-copy p {
     font-size: 15px;
   }
 
-  .slg-about-value h3 {
+  .ekam-involvement-button {
+    align-self: flex-start;
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+}
+
+/* ==========================================
+   SMALL MOBILE
+========================================== */
+
+@media (max-width: 380px) {
+  .ekam-page-tabs {
+    gap: 7px;
+  }
+
+  .ekam-page-tab {
+    padding: 8px 5px;
     font-size: 14px;
   }
 
-  .slg-about-value p {
-    font-size: 14px;
+  .ekam-section-heading,
+  .ekam-purpose-heading .ekam-section-heading {
+    font-size: 26px;
   }
 
-  .slg-about-reason-image {
-    height: 105px;
+  .ekam-about-copy > p,
+  .ekam-purpose-copy p {
+    font-size: 15px;
   }
 
-  .slg-about-reason-copy {
-    padding: 13px 9px;
+  .ekam-purpose-panel,
+  .ekam-vision-panel,
+  .ekam-mission-panel {
+    padding: 25px 14px;
   }
 
-  .slg-about-reason-copy h3 {
-    font-size: 10px;
+  .ekam-about-floating-icon {
+    width: 42px;
+    height: 42px;
+    font-size: 18px;
   }
 
-  .slg-about-reason-copy p {
-    font-size: 9px;
+  .ekam-involvement {
+    padding: 20px 16px;
+  }
+}
+
+/* ==========================================
+   REDUCED MOTION
+========================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .ekam-about-page *,
+  .ekam-about-page *::before,
+  .ekam-about-page *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
 /* =========================================
-   REDUCED MOTION ACCESSIBILITY
+   HOMESTYLE IMAGE-ONLY HERO BANNER
 ========================================= */
 
+.hs-image-hero {
+  position: relative;
+  width: min(94%, 1500px);
+  height: clamp(220px, 30vw, 410px);
+  margin: 12px auto 30px;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #f5eee7;
+  isolation: isolate;
+}
+
+.hs-image-hero-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border: none;
+  opacity: 1;
+  transition: transform 0.6s ease;
+}
+
+.hs-image-hero:hover .hs-image-hero-img {
+  transform: scale(1.025);
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .hs-image-hero {
+    width: 94%;
+    height: 260px;
+    margin: 8px auto 24px;
+    border-radius: 12px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .hs-image-hero {
+    width: 94%;
+    height: 175px;
+    margin: 6px auto 20px;
+    border-radius: 9px;
+  }
+
+  .hs-image-hero-img {
+    object-position: center;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .slg-about-page *,
-  .slg-about-page *::before,
-  .slg-about-page *::after {
-    transition-duration: 0.01ms !important;
-    animation-duration: 0.01ms !important;
+  .hs-image-hero-img {
+    transition: none;
   }
 }

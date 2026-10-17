@@ -6,6 +6,12 @@ import Home from "./pages/Home.jsx";
 import Login from "./pages/Login.jsx";
 import Contact from "./pages/Contact.jsx";
 import About from "./pages/About.jsx";
+import WhatWeDo from "./pages/WhatWeDo";
+import Founder from "./pages/Founder";
+import OurTeam from "./pages/OurTeam";
+import Blog from "./pages/Blog";
+
+
 import MemberRegister from "./pages/MemberRegister.jsx";
 
 
@@ -31,6 +37,7 @@ import UserWallet from "./pages/user/Wallet.jsx";
 import UserKYC from "./pages/user/KYC.jsx";
 import UserAddUser from "./pages/user/AddUser.jsx";
 import UserOrders from "./pages/user/Orders.jsx";
+import UserCart from "./pages/user/Cart.jsx";
 
 export default function App() {
   const location = useLocation();
@@ -47,6 +54,12 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/about" element={<About />} />
+        <Route path="/what-we-do" element={<WhatWeDo />} />
+        <Route path="/founder" element={<Founder />} />
+        <Route path="/our-team" element={<OurTeam />} />
+        <Route path="/blog" element={<Blog />} />
+
+
         <Route path="/member-register" element={<MemberRegister />} />
         <Route path="/footer" element={<Footer />} />
        
@@ -54,9 +67,11 @@ export default function App() {
         {/* Protected User Dashboard Routes */}
         <Route element={<UserProtectedRoute />}>
           <Route path="/user" element={<UserDashboardLayout />}>
-            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route index element={<Navigate to="profile" replace />} />
+            <Route path="profile" element={<UserDashboard />} />
             <Route path="dashboard" element={<UserDashboard />} />
             <Route path="products" element={<UserProducts />} />
+            <Route path="cart" element={<UserCart />} />
             <Route path="wallet" element={<UserWallet />} />
             <Route path="kyc" element={<UserKYC />} />
             <Route path="add-user" element={<UserAddUser />} />

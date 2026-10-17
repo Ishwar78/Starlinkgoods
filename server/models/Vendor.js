@@ -84,6 +84,10 @@ const vendorSchema = new mongoose.Schema(
       enum: ["Active", "Inactive", "Pending"],
       default: "Active",
     },
+    profileImage: {
+      type: String,
+      default: "",
+    },
     walletBalance: {
       type: Number,
       default: 0,

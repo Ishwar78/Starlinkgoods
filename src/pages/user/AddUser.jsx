@@ -12,6 +12,7 @@ import {
   FiFileText,
   FiExternalLink,
   FiShield,
+  FiCalendar,
 } from "react-icons/fi";
 
 import {
@@ -26,6 +27,8 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const EMPTY_FORM = {
   name: "",
+  lastName: "",
+  dob: "",
   email: "",
   mobile: "",
   city: "",
@@ -48,33 +51,20 @@ const EMPTY_DOCUMENTS = {
 };
 
 const DOCUMENT_FIELDS = [
-  {
-    key: "aadhaar",
-    label: "Aadhaar Card",
-  },
-  {
-    key: "pan",
-    label: "PAN Card",
-  },
-  {
-    key: "familyId",
-    label: "Family ID",
-  },
-  {
-    key: "bankProof",
-    label: "Bank Passbook / Cancelled Cheque",
-  },
+  { key: "aadhaar", label: "Aadhaar Card" },
+  { key: "pan", label: "PAN Card" },
+  { key: "familyId", label: "Family ID" },
+  { key: "bankProof", label: "Bank Passbook / Cancelled Cheque" },
 ];
 
 const SAVED_DOCUMENT_FIELDS = [
   { key: "aadhaar", label: "Aadhaar Card" },
   { key: "pan", label: "PAN Card" },
   { key: "familyId", label: "Family ID" },
-  { key: "bankProof", label: "Bank Proof" },
+  { key: "bankProof", label: "Bank Passbook / Cancelled Cheque" },
   { key: "ownerCertificate", label: "House Owner Certificate" },
 ];
 
-/* Safely read the logged-in user */
 const getLoggedInUser = () => {
   try {
     return JSON.parse(localStorage.getItem("userData") || "{}");
@@ -83,7 +73,20 @@ const getLoggedInUser = () => {
   }
 };
 
-/* Safely read a document URL */
+const getFullName = (user) => {
+  if (!user) return "Unnamed";
+
+  const first = String(user.name || "").trim();
+  const last = String(user.lastName || "").trim();
+
+  // Avoid repeating the surname if name already stores the full name.
+  if (last && first.toLowerCase().endsWith(` ${last.toLowerCase()}`)) {
+    return first;
+  }
+
+  return [first, last].filter(Boolean).join(" ") || "Unnamed";
+};
+
 const getDocumentUrl = (document) => {
   if (!document) return "";
 
@@ -104,7 +107,6 @@ const getDocumentUrl = (document) => {
   );
 };
 
-/* Safely read a user's document */
 const getDocument = (user, key) => {
   if (!user || !key) return null;
 
@@ -113,25 +115,22 @@ const getDocument = (user, key) => {
       ? user.documents
       : {};
 
-  const nestedDocument = documents[key];
-
-  // Never access properties on null or undefined.
-  if (nestedDocument) return nestedDocument;
-
-  const directDocument = user[key];
-
-  return directDocument || null;
+  return documents[key] || user[key] || null;
 };
 
-/* Safely format dates */
 const formatDate = (value) => {
   if (!value) return "—";
 
-  const date = new Date(value);
+  // Avoid timezone shifting for date-only values such as YYYY-MM-DD.
+  const dateOnly =
+    typeof value === "string" &&
+    /^\d{4}-\d{2}-\d{2}$/.test(value);
 
-  if (Number.isNaN(date.getTime())) {
-    return "—";
-  }
+  const date = dateOnly
+    ? new Date(`${value}T00:00:00`)
+    : new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "—";
 
   return date.toLocaleDateString("en-IN", {
     day: "numeric",
@@ -140,15 +139,72 @@ const formatDate = (value) => {
   });
 };
 
-/* Mask sensitive identification and bank numbers */
+const calculateAge = (dob) => {
+  if (!dob) return null;
+
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dob);
+
+  if (!match) return null;
+
+  const year = Number(match[1]);
+  const month = Number(match[2]) - 1;
+  const day = Number(match[3]);
+
+  const birthDate = new Date(year, month, day);
+  const today = new Date();
+
+  // Reject invalid dates, including impossible calendar dates.
+  if (
+    birthDate.getFullYear() !== year ||
+    birthDate.getMonth() !== month ||
+    birthDate.getDate() !== day ||
+    birthDate > today
+  ) {
+    return null;
+  }
+
+  let years = today.getFullYear() - year;
+  let months = today.getMonth() - month;
+  let days = today.getDate() - day;
+
+  if (days < 0) {
+    months--;
+
+    const daysInPreviousMonth = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      0
+    ).getDate();
+
+    days += daysInPreviousMonth;
+  }
+
+  if (months < 0) {
+    years--;
+    months += 12;
+  }
+
+  return { years, months, days };
+};
+
+const formatAge = (dob) => {
+  const age = calculateAge(dob);
+
+  if (!age) return "—";
+
+  return [
+    `${age.years} ${age.years === 1 ? "year" : "years"}`,
+    `${age.months} ${age.months === 1 ? "month" : "months"}`,
+    `${age.days} ${age.days === 1 ? "day" : "days"}`,
+  ].join(", ");
+};
+
 const maskValue = (value, visibleDigits = 4) => {
   if (!value) return "—";
 
   const text = String(value);
 
-  if (text.length <= visibleDigits) {
-    return "••••";
-  }
+  if (text.length <= visibleDigits) return "••••";
 
   return (
     "•".repeat(Math.min(text.length - visibleDigits, 8)) +
@@ -156,7 +212,6 @@ const maskValue = (value, visibleDigits = 4) => {
   );
 };
 
-/* Safely convert a selected file into a data URL */
 const readFileAsDataUrl = (file) =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -183,30 +238,19 @@ const AddUser = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("success");
 
   const [form, setForm] = useState({ ...EMPTY_FORM });
-  const [documents, setDocuments] = useState({
-    ...EMPTY_DOCUMENTS,
-  });
+  const [documents, setDocuments] = useState({ ...EMPTY_DOCUMENTS });
 
   const vendorId = userData._id || userData.id || "";
-
-  /* ------------------------------------------
-     Notifications
-  ------------------------------------------ */
 
   const showMessage = (text, type = "success") => {
     setMessage(text);
     setMessageType(type);
   };
-
-  /* ------------------------------------------
-     Fetch registered users
-  ------------------------------------------ */
 
   const fetchUsers = async () => {
     try {
@@ -224,7 +268,6 @@ const AddUser = () => {
       }
     } catch (error) {
       console.error("Fetch users error:", error);
-
       showMessage(
         error?.message || "Unable to load registered users.",
         "error"
@@ -236,21 +279,18 @@ const AddUser = () => {
 
   useEffect(() => {
     fetchUsers();
-
-    // Fetch when the logged-in vendor changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [vendorId, userData.email]);
-
-  /* ------------------------------------------
-     Form input handling
-  ------------------------------------------ */
 
   const handleChange = (event) => {
     const { name, value } = event.target;
 
     setForm((previous) => ({
       ...previous,
-      [name]: value,
+      [name]:
+        name === "panNumber" || name === "ifscCode"
+          ? value.toUpperCase()
+          : value,
       ...(name === "houseOwnerCertificate" && value === "No"
         ? { certificateAuthority: "" }
         : {}),
@@ -259,15 +299,11 @@ const AddUser = () => {
     setMessage("");
   };
 
-  /* ------------------------------------------
-     Document upload
-  ------------------------------------------ */
-
   const handleDocumentChange = async (event, key) => {
     const input = event.target;
     const file = input.files?.[0];
 
-    // Reset so the same file can be selected again.
+    // Allows the same file to be selected again.
     input.value = "";
 
     if (!file) return;
@@ -279,18 +315,12 @@ const AddUser = () => {
     ];
 
     if (!allowedTypes.includes(file.type)) {
-      showMessage(
-        "Please upload a PDF, JPG, JPEG or PNG document.",
-        "error"
-      );
+      showMessage("Upload a PDF, JPG, JPEG or PNG document.", "error");
       return;
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      showMessage(
-        "Each document must be 5 MB or smaller.",
-        "error"
-      );
+      showMessage("Each document must be 5 MB or smaller.", "error");
       return;
     }
 
@@ -309,10 +339,7 @@ const AddUser = () => {
 
       setMessage("");
     } catch (error) {
-      showMessage(
-        error?.message || "Unable to read document.",
-        "error"
-      );
+      showMessage(error?.message || "Unable to read document.", "error");
     }
   };
 
@@ -323,19 +350,21 @@ const AddUser = () => {
     }));
   };
 
-  /* ------------------------------------------
-     Validation
-  ------------------------------------------ */
-
   const validateForm = () => {
     if (
       !form.name.trim() ||
+      !form.lastName.trim() ||
+      !form.dob ||
       !form.email.trim() ||
       !form.mobile.trim() ||
       !form.city.trim() ||
       !form.state.trim()
     ) {
-      return "Name, email, mobile, city and state are required.";
+      return "First name, last name, DOB, email, mobile, city and state are required.";
+    }
+
+    if (!calculateAge(form.dob)) {
+      return "Please select a valid date of birth that is not in the future.";
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
@@ -384,10 +413,6 @@ const AddUser = () => {
     return "";
   };
 
-  /* ------------------------------------------
-     Add user
-  ------------------------------------------ */
-
   const handleSubmit = async (event) => {
     event.preventDefault();
     setMessage("");
@@ -402,10 +427,20 @@ const AddUser = () => {
     try {
       setSubmitting(true);
 
+      const fullName =
+        `${form.name.trim()} ${form.lastName.trim()}`.trim();
+
       const payload = {
         ...form,
 
-        name: form.name.trim(),
+        // Keep name as the full name for compatibility with existing
+        // code that expects a single "name" field.
+        name: fullName,
+        firstName: form.name.trim(),
+        lastName: form.lastName.trim(),
+        dob: form.dob,
+        age: calculateAge(form.dob),
+
         email: form.email.trim(),
         mobile: form.mobile.trim(),
         city: form.city.trim(),
@@ -427,7 +462,6 @@ const AddUser = () => {
           pan: documents.pan,
           familyId: documents.familyId,
           bankProof: documents.bankProof,
-
           ownerCertificate:
             form.houseOwnerCertificate === "Yes"
               ? documents.ownerCertificate
@@ -443,10 +477,7 @@ const AddUser = () => {
         );
       }
 
-      showMessage(
-        `User "${form.name.trim()}" added successfully.`,
-        "success"
-      );
+      showMessage(`User "${fullName}" added successfully.`, "success");
 
       setForm({ ...EMPTY_FORM });
       setDocuments({ ...EMPTY_DOCUMENTS });
@@ -455,7 +486,6 @@ const AddUser = () => {
       await fetchUsers();
     } catch (error) {
       console.error("Add user error:", error);
-
       showMessage(
         error?.message || "Unable to register user.",
         "error"
@@ -464,10 +494,6 @@ const AddUser = () => {
       setSubmitting(false);
     }
   };
-
-  /* ------------------------------------------
-     Delete user
-  ------------------------------------------ */
 
   const handleDeleteUser = async (user) => {
     const userId = user?._id || user?.id;
@@ -478,7 +504,7 @@ const AddUser = () => {
     }
 
     const confirmed = window.confirm(
-      `Are you sure you want to delete "${user.name || "this user"}"?`
+      `Are you sure you want to delete "${getFullName(user)}"?`
     );
 
     if (!confirmed) return;
@@ -493,11 +519,9 @@ const AddUser = () => {
       }
 
       showMessage("User deleted successfully.", "success");
-
       await fetchUsers();
     } catch (error) {
       console.error("Delete user error:", error);
-
       showMessage(
         error?.message || "Unable to delete user.",
         "error"
@@ -505,15 +529,17 @@ const AddUser = () => {
     }
   };
 
-  /* ------------------------------------------
-     Search
-  ------------------------------------------ */
-
   const getSearchValues = (user) => {
     if (!user) return [];
 
     const values = [
       user.name,
+      user.firstName,
+      user.lastName,
+      getFullName(user),
+      user.dob,
+      formatDate(user.dob),
+      formatAge(user.dob),
       user.email,
       user.mobile,
       user.city,
@@ -538,10 +564,7 @@ const AddUser = () => {
       }
 
       if (typeof document === "object") {
-        values.push(
-          document.fileName,
-          document.name
-        );
+        values.push(document.fileName, document.name);
       }
     });
 
@@ -567,31 +590,16 @@ const AddUser = () => {
     );
   }, [users, search]);
 
-  /* ------------------------------------------
-     Open saved document
-  ------------------------------------------ */
-
   const openDocument = (document) => {
-    // Handles null, undefined, strings and objects safely.
     const url = getDocumentUrl(document);
 
     if (!url) {
-      showMessage(
-        "This document has not been uploaded or has no saved URL.",
-        "error"
-      );
+      showMessage("This document has not been uploaded.", "error");
       return;
     }
 
-    // Avoid opening arbitrary protocols.
-    const isDataUrl = url.startsWith("data:");
-    const isHttpsUrl = url.startsWith("https://");
-
-    if (!isDataUrl && !isHttpsUrl) {
-      showMessage(
-        "This document URL is invalid or unsupported.",
-        "error"
-      );
+    if (!url.startsWith("data:") && !url.startsWith("https://")) {
+      showMessage("This document URL is invalid or unsupported.", "error");
       return;
     }
 
@@ -602,49 +610,31 @@ const AddUser = () => {
     );
 
     if (!newWindow) {
-      showMessage(
-        "Please allow pop-ups to open this document.",
-        "error"
-      );
+      showMessage("Please allow pop-ups to open this document.", "error");
     }
   };
 
-  /* ------------------------------------------
-     Upload field
-  ------------------------------------------ */
-
-  const renderUploadField = (
-    key,
-    label,
-    required = false
-  ) => {
+  const renderUploadField = (key, label, required = false) => {
     const file = documents[key];
+    const inputId = `document-${key}`;
 
     return (
-      <div
-        className="add-user-field add-user-document-field"
-        key={key}
-      >
-        <label htmlFor={`document-${key}`}>
-          {label}
-          {required ? " *" : ""}
+      <div className="add-user-field add-user-document-field" key={key}>
+        <label htmlFor={inputId}>
+          {label}{required ? " *" : ""}
         </label>
 
         <input
-          id={`document-${key}`}
+          id={inputId}
           className="add-user-file-input"
           type="file"
           accept=".pdf,.jpg,.jpeg,.png"
-          onChange={(event) =>
-            handleDocumentChange(event, key)
-          }
+          onChange={(event) => handleDocumentChange(event, key)}
         />
 
         <label
-          className={`add-user-upload-box ${
-            file ? "has-file" : ""
-          }`}
-          htmlFor={`document-${key}`}
+          className={`add-user-upload-box ${file ? "has-file" : ""}`}
+          htmlFor={inputId}
         >
           <FiUploadCloud className="add-user-upload-icon" />
 
@@ -652,7 +642,6 @@ const AddUser = () => {
             <strong>
               {file ? "Document selected" : "Choose document"}
             </strong>
-
             <small>
               {file
                 ? file.fileName
@@ -667,11 +656,7 @@ const AddUser = () => {
               <FiFileText />
               {file.fileName}
             </span>
-
-            <button
-              type="button"
-              onClick={() => removeDocument(key)}
-            >
+            <button type="button" onClick={() => removeDocument(key)}>
               Remove
             </button>
           </div>
@@ -680,15 +665,8 @@ const AddUser = () => {
     );
   };
 
-  /* ------------------------------------------
-     Saved document card
-     FIX: null documents never access fileName
-  ------------------------------------------ */
-
   const renderSavedDocument = (user, key, label) => {
     const document = getDocument(user, key);
-
-    // Safe for null, undefined and empty document values.
     const url = getDocumentUrl(document);
 
     const fileName =
@@ -697,20 +675,14 @@ const AddUser = () => {
         : label;
 
     return (
-      <div
-        className="add-user-saved-document"
-        key={key}
-      >
+      <div className="add-user-saved-document" key={key}>
         <div className="add-user-saved-document-icon">
           <FiFileText />
         </div>
 
         <div className="add-user-saved-document-info">
           <strong>{label}</strong>
-
-          <small>
-            {url ? fileName : "Not uploaded"}
-          </small>
+          <small>{url ? fileName : "Not uploaded"}</small>
         </div>
 
         {url ? (
@@ -724,28 +696,18 @@ const AddUser = () => {
             <span>View</span>
           </button>
         ) : (
-          <span className="add-user-document-missing">
-            Missing
-          </span>
+          <span className="add-user-document-missing">Missing</span>
         )}
       </div>
     );
   };
 
-  /* ------------------------------------------
-     Render
-  ------------------------------------------ */
-
   return (
     <div className="add-user-page">
       <div className="add-user-heading">
         <div>
-          <span className="add-user-eyebrow">
-            USER MANAGEMENT
-          </span>
-
+          <span className="add-user-eyebrow">USER MANAGEMENT</span>
           <h1>Add User</h1>
-
           <p>
             Register users and manage their personal details,
             banking information and supporting documents.
@@ -782,14 +744,11 @@ const AddUser = () => {
         </div>
       )}
 
-      {/* ADD USER FORM */}
-
       <section className="add-user-form-card">
         <div className="add-user-section-heading">
           <div className="add-user-heading-icon">
             <FiUserPlus />
           </div>
-
           <div>
             <h2>User Information</h2>
             <p>
@@ -800,37 +759,72 @@ const AddUser = () => {
 
         <form onSubmit={handleSubmit}>
           <div className="add-user-form-grid">
-            {/* 01: Personal information */}
-
             <div className="add-user-form-section-title">
               <span>01</span>
               <div>
                 <h3>Personal Information</h3>
-                <p>Basic contact and location details</p>
+                <p>Basic contact, date of birth and location details</p>
               </div>
             </div>
 
             <div className="add-user-field">
-              <label htmlFor="add-user-name">
-                Full Name *
-              </label>
-
+              <label htmlFor="add-user-name">First Name *</label>
               <input
                 id="add-user-name"
                 name="name"
                 value={form.name}
                 onChange={handleChange}
-                placeholder="Enter full name"
-                autoComplete="name"
+                placeholder="Enter first name"
+                autoComplete="given-name"
                 required
               />
             </div>
 
             <div className="add-user-field">
-              <label htmlFor="add-user-email">
-                Email Address *
-              </label>
+              <label htmlFor="add-user-last-name">Last Name *</label>
+              <input
+                id="add-user-last-name"
+                name="lastName"
+                value={form.lastName}
+                onChange={handleChange}
+                placeholder="Enter last name"
+                autoComplete="family-name"
+                required
+              />
+            </div>
 
+            <div className="add-user-field">
+              <label htmlFor="add-user-dob">Date of Birth *</label>
+              <div className="add-user-date-wrap">
+                <input
+                  id="add-user-dob"
+                  name="dob"
+                  type="date"
+                  value={form.dob}
+                  max={new Date().toLocaleDateString("en-CA")}
+                  onChange={handleChange}
+                  autoComplete="bday"
+                  required
+                />
+                <FiCalendar />
+              </div>
+
+              <span className="add-user-field-hint">
+                Select the user's date of birth.
+              </span>
+
+              {form.dob && calculateAge(form.dob) && (
+                <div className="add-user-age-preview">
+                  <span className="add-user-age-label">
+                    Calculated Age
+                  </span>
+                  <strong>{formatAge(form.dob)}</strong>
+                </div>
+              )}
+            </div>
+
+            <div className="add-user-field">
+              <label htmlFor="add-user-email">Email Address *</label>
               <input
                 id="add-user-email"
                 name="email"
@@ -844,10 +838,7 @@ const AddUser = () => {
             </div>
 
             <div className="add-user-field">
-              <label htmlFor="add-user-mobile">
-                Mobile Number *
-              </label>
-
+              <label htmlFor="add-user-mobile">Mobile Number *</label>
               <input
                 id="add-user-mobile"
                 name="mobile"
@@ -863,10 +854,7 @@ const AddUser = () => {
             </div>
 
             <div className="add-user-field">
-              <label htmlFor="add-user-city">
-                City / Village *
-              </label>
-
+              <label htmlFor="add-user-city">City / Village *</label>
               <input
                 id="add-user-city"
                 name="city"
@@ -878,10 +866,7 @@ const AddUser = () => {
             </div>
 
             <div className="add-user-field">
-              <label htmlFor="add-user-state">
-                State *
-              </label>
-
+              <label htmlFor="add-user-state">State *</label>
               <input
                 id="add-user-state"
                 name="state"
@@ -892,21 +877,16 @@ const AddUser = () => {
               />
             </div>
 
-            {/* 02: Identity */}
-
             <div className="add-user-form-section-title">
               <span>02</span>
               <div>
                 <h3>Identity Details</h3>
-                <p>Identification numbers</p>
+                <p>Identification numbers and documents</p>
               </div>
             </div>
 
             <div className="add-user-field">
-              <label htmlFor="add-user-aadhaar">
-                Aadhaar Card Number
-              </label>
-
+              <label htmlFor="add-user-aadhaar">Aadhaar Card Number</label>
               <input
                 id="add-user-aadhaar"
                 name="aadhaarNumber"
@@ -921,10 +901,7 @@ const AddUser = () => {
             </div>
 
             <div className="add-user-field">
-              <label htmlFor="add-user-family">
-                Family ID Number
-              </label>
-
+              <label htmlFor="add-user-family">Family ID Number</label>
               <input
                 id="add-user-family"
                 name="familyIdNumber"
@@ -936,10 +913,7 @@ const AddUser = () => {
             </div>
 
             <div className="add-user-field">
-              <label htmlFor="add-user-pan">
-                PAN Card Number
-              </label>
-
+              <label htmlFor="add-user-pan">PAN Card Number</label>
               <input
                 id="add-user-pan"
                 name="panNumber"
@@ -951,8 +925,6 @@ const AddUser = () => {
               />
             </div>
 
-            {/* 03: Bank details */}
-
             <div className="add-user-form-section-title">
               <span>03</span>
               <div>
@@ -962,10 +934,7 @@ const AddUser = () => {
             </div>
 
             <div className="add-user-field">
-              <label htmlFor="add-user-bank">
-                Bank Account Number
-              </label>
-
+              <label htmlFor="add-user-bank">Bank Account Number</label>
               <input
                 id="add-user-bank"
                 name="bankAccountNumber"
@@ -979,10 +948,7 @@ const AddUser = () => {
             </div>
 
             <div className="add-user-field">
-              <label htmlFor="add-user-ifsc">
-                IFSC Code
-              </label>
-
+              <label htmlFor="add-user-ifsc">IFSC Code</label>
               <input
                 id="add-user-ifsc"
                 name="ifscCode"
@@ -994,15 +960,13 @@ const AddUser = () => {
               />
             </div>
 
-            {/* 04: House owner certificate */}
-
             <div className="add-user-form-section-title">
               <span>04</span>
               <div>
                 <h3>House Owner Certificate</h3>
                 <p>
-                  Select Yes to provide the issuing authority
-                  and upload the certificate.
+                  If available, select the issuing authority and upload
+                  the certificate.
                 </p>
               </div>
             </div>
@@ -1011,7 +975,6 @@ const AddUser = () => {
               <label htmlFor="add-user-owner-certificate">
                 House Owner Certificate Available? *
               </label>
-
               <select
                 id="add-user-owner-certificate"
                 name="houseOwnerCertificate"
@@ -1029,7 +992,6 @@ const AddUser = () => {
                   <label htmlFor="add-user-authority">
                     Certificate Issued By *
                   </label>
-
                   <select
                     id="add-user-authority"
                     name="certificateAuthority"
@@ -1037,63 +999,60 @@ const AddUser = () => {
                     onChange={handleChange}
                     required
                   >
-                    <option value="">
-                      Select issuing authority
+                    <option value="">Select issuing authority</option>
+                    <option value="Sarpanch">Sarpanch</option>
+                    <option value="Municipal Council (MC)">
+                      Municipal Council (MC)
                     </option>
-
-                    <option value="Sarpanch">
-                      Sarpanch
-                    </option>
-
-                    <option value="MC">
-                      Municipal Committee (MC)
-                    </option>
-
-                    <option value="Registrar">
-                      Registrar
-                    </option>
-
-                    <option value="Other">
-                      Other Authorized Authority
-                    </option>
+                    <option value="Registrar">Registrar</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
 
-                {renderUploadField(
-                  "ownerCertificate",
-                  "House Owner Certificate",
-                  true
+                {form.certificateAuthority === "Other" && (
+                  <div className="add-user-field">
+                    <label htmlFor="add-user-other-authority">
+                      Other Authority Name *
+                    </label>
+                    <input
+                      id="add-user-other-authority"
+                      name="certificateAuthority"
+                      value={form.certificateAuthority === "Other" ? "" : form.certificateAuthority}
+                      onChange={handleChange}
+                      placeholder="Enter authority name"
+                    />
+                  </div>
                 )}
+
+                <div className="add-user-certificate-upload">
+                  {renderUploadField(
+                    "ownerCertificate",
+                    "Upload House Owner Certificate",
+                    true
+                  )}
+                </div>
               </>
             )}
-
-            {/* 05: Documents */}
 
             <div className="add-user-form-section-title">
               <span>05</span>
               <div>
-                <h3>Document Uploads</h3>
-                <p>
-                  PDF, JPG or PNG files · Maximum 5 MB per document
-                </p>
+                <h3>Upload Documents</h3>
+                <p>Upload PDF, JPG or PNG files up to 5 MB each.</p>
               </div>
             </div>
 
-            {DOCUMENT_FIELDS.map((document) =>
-              renderUploadField(
-                document.key,
-                document.label
-              )
+            {DOCUMENT_FIELDS.map(({ key, label }) =>
+              renderUploadField(key, label)
             )}
           </div>
 
           <div className="add-user-form-note">
             <FiShield />
-
             <p>
-              Upload only necessary documents. Identity and bank
-              information should be stored securely and accessible
-              only to authorized users.
+              Personal and banking details are sensitive. Only upload
+              documents required for registration and restrict access
+              to authorized users.
             </p>
           </div>
 
@@ -1105,42 +1064,34 @@ const AddUser = () => {
             {submitting ? (
               <>
                 <FiLoader className="spinning" />
-                Saving User...
+                Registering User...
               </>
             ) : (
               <>
                 <FiUserPlus />
-                Add User
+                Register User
               </>
             )}
           </button>
         </form>
       </section>
 
-      {/* REGISTERED USERS */}
-
       <section className="add-user-list-card">
         <div className="add-user-list-heading">
           <div>
-            <h2>My Registered Users</h2>
-            <p>
-              Search registered users and access their document records.
-            </p>
+            <h2>Registered Users</h2>
+            <p>View personal details and uploaded documents.</p>
           </div>
 
-          <div className="add-user-search">
+          <label className="add-user-search">
             <FiSearch />
-
             <input
               type="search"
               value={search}
-              onChange={(event) =>
-                setSearch(event.target.value)
-              }
-              placeholder="Search name, email, mobile, ID..."
+              onChange={(event) => setSearch(event.target.value)}
+              placeholder="Search name, DOB, email, mobile..."
               aria-label="Search registered users"
             />
-
             {search && (
               <button
                 type="button"
@@ -1151,29 +1102,31 @@ const AddUser = () => {
                 ×
               </button>
             )}
-          </div>
+          </label>
         </div>
 
-        <div className="add-user-search-summary">
+        <p className="add-user-search-summary">
           Showing {filteredUsers.length} of {users.length} users
-        </div>
+        </p>
 
         <div className="add-user-table-wrap">
           <table className="add-user-table">
             <thead>
               <tr>
                 <th>User</th>
+                <th>DOB</th>
+                <th>Age</th>
                 <th>Mobile</th>
-                <th>City &amp; State</th>
+                <th>City / State</th>
                 <th>Aadhaar</th>
                 <th>Family ID</th>
                 <th>PAN</th>
                 <th>Bank Account</th>
                 <th>IFSC</th>
-                <th>House Owner Certificate</th>
+                <th>Certificate</th>
                 <th>Documents</th>
                 <th>Status</th>
-                <th>Added Date</th>
+                <th>Created</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -1181,41 +1134,30 @@ const AddUser = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td
-                    colSpan={13}
-                    className="add-user-empty"
-                  >
+                  <td colSpan={15} className="add-user-empty">
                     <FiLoader className="spinning" />
-                    <span> Loading registered users...</span>
+                    Loading registered users...
                   </td>
                 </tr>
               ) : filteredUsers.length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={13}
-                    className="add-user-empty"
-                  >
-                    {users.length === 0
-                      ? "No registered users found. Add your first user above."
-                      : "No matching users found. Try another search."}
+                  <td colSpan={15} className="add-user-empty">
+                    {search
+                      ? "No users match your search."
+                      : "No registered users found."}
                   </td>
                 </tr>
               ) : (
                 filteredUsers.map((user) => {
                   const userId = user._id || user.id;
-
+                  const fullName = getFullName(user);
                   const certificateStatus =
                     user.houseOwnerCertificate || "No";
 
-                  const uploadedCount =
-                    SAVED_DOCUMENT_FIELDS.filter(
-                      ({ key }) =>
-                        Boolean(
-                          getDocumentUrl(
-                            getDocument(user, key)
-                          )
-                        )
-                    ).length;
+                  const uploadedCount = SAVED_DOCUMENT_FIELDS.filter(
+                    ({ key }) =>
+                      Boolean(getDocumentUrl(getDocument(user, key)))
+                  ).length;
 
                   return (
                     <React.Fragment key={userId}>
@@ -1223,50 +1165,32 @@ const AddUser = () => {
                         <td>
                           <div className="add-user-person">
                             <span>
-                              {(user.name || "U")
-                                .charAt(0)
-                                .toUpperCase()}
+                              {fullName.charAt(0).toUpperCase()}
                             </span>
-
                             <div>
-                              <strong>
-                                {user.name || "Unnamed"}
-                              </strong>
-
-                              <small>
-                                {user.email || "—"}
-                              </small>
+                              <strong>{fullName}</strong>
+                              <small>{user.email || "—"}</small>
                             </div>
                           </div>
                         </td>
 
+                        <td>{formatDate(user.dob)}</td>
+                        <td>
+                          <span className="add-user-age-table">
+                            {formatAge(user.dob)}
+                          </span>
+                        </td>
                         <td>{user.mobile || "—"}</td>
-
                         <td>
                           {[user.city, user.state]
                             .filter(Boolean)
                             .join(", ") || "—"}
                         </td>
-
-                        <td>
-                          {maskValue(user.aadhaarNumber)}
-                        </td>
-
-                        <td>
-                          {user.familyIdNumber || "—"}
-                        </td>
-
-                        <td>
-                          {maskValue(user.panNumber)}
-                        </td>
-
-                        <td>
-                          {maskValue(user.bankAccountNumber)}
-                        </td>
-
-                        <td>
-                          {user.ifscCode || "—"}
-                        </td>
+                        <td>{maskValue(user.aadhaarNumber)}</td>
+                        <td>{user.familyIdNumber || "—"}</td>
+                        <td>{maskValue(user.panNumber)}</td>
+                        <td>{maskValue(user.bankAccountNumber)}</td>
+                        <td>{user.ifscCode || "—"}</td>
 
                         <td>
                           <span
@@ -1278,7 +1202,6 @@ const AddUser = () => {
                           >
                             {certificateStatus}
                           </span>
-
                           {certificateStatus === "Yes" &&
                             user.certificateAuthority && (
                               <small className="add-user-authority">
@@ -1305,20 +1228,14 @@ const AddUser = () => {
                           </span>
                         </td>
 
-                        <td>
-                          {formatDate(user.createdAt)}
-                        </td>
+                        <td>{formatDate(user.createdAt)}</td>
 
                         <td>
                           <button
                             type="button"
                             className="add-user-delete"
-                            onClick={() =>
-                              handleDeleteUser(user)
-                            }
-                            aria-label={`Delete ${
-                              user.name || "user"
-                            }`}
+                            onClick={() => handleDeleteUser(user)}
+                            aria-label={`Delete ${fullName}`}
                             title="Delete user"
                           >
                             <FiTrash2 />
@@ -1326,31 +1243,20 @@ const AddUser = () => {
                         </td>
                       </tr>
 
-                      {/* Expandable document list */}
-
                       <tr className="add-user-documents-row">
-                        <td colSpan={13}>
+                        <td colSpan={15}>
                           <details className="add-user-documents-details">
                             <summary>
                               <FiFileText />
-
-                              <span>
-                                Documents — {user.name || "User"}
-                              </span>
-
+                              <span>Documents — {fullName}</span>
                               <span className="add-user-summary-hint">
-                                View document list
+                                View uploaded documents
                               </span>
                             </summary>
 
                             <div className="add-user-saved-documents-grid">
-                              {SAVED_DOCUMENT_FIELDS.map(
-                                ({ key, label }) =>
-                                  renderSavedDocument(
-                                    user,
-                                    key,
-                                    label
-                                  )
+                              {SAVED_DOCUMENT_FIELDS.map(({ key, label }) =>
+                                renderSavedDocument(user, key, label)
                               )}
                             </div>
                           </details>

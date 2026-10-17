@@ -1,18 +1,23 @@
-import React, { useState } from "react";
-import { Outlet, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Outlet, useLocation, Link } from "react-router-dom";
 import {
   FiMenu,
   FiBell,
   FiSearch,
   FiChevronDown,
+  FiShoppingCart,
 } from "react-icons/fi";
 
 import UserSidebar from "../components/UserSidebar.jsx";
+import { getUserCartCount } from "../lib/cart";
+import { formatImageUrl } from "../lib/api";
 import "./UserDashboardLayout.css";
 
 const pageNames = {
-  "/user/dashboard": "Dashboard",
+  "/user/dashboard": "My Profile",
+  "/user/profile": "My Profile",
   "/user/products": "My Products",
+  "/user/cart": "My Cart",
   "/user/wallet": "My Wallet",
   "/user/kyc": "KYC Verification",
   "/user/add-user": "Add User",
@@ -50,6 +55,31 @@ export default function UserDashboardLayout() {
       })
       .catch(() => {});
   }, [location.pathname]);
+
+  const [cartCount, setCartCount] = useState(() => getUserCartCount(userData));
+
+  useEffect(() => {
+    setCartCount(getUserCartCount(userData));
+
+    const onCartUpdate = () => {
+      setCartCount(getUserCartCount(userData));
+    };
+
+    window.addEventListener("slg-cart-updated", onCartUpdate);
+    return () => window.removeEventListener("slg-cart-updated", onCartUpdate);
+  }, [userData?._id, userData?.id, userData?.email]);
+
+  useEffect(() => {
+    const onProfileUpdate = (e) => {
+      try {
+        const updated = e?.detail?.user || JSON.parse(localStorage.getItem("userData") || "{}");
+        setUserData(updated);
+      } catch {}
+    };
+
+    window.addEventListener("slg-profile-updated", onProfileUpdate);
+    return () => window.removeEventListener("slg-profile-updated", onProfileUpdate);
+  }, []);
 
   const userName = userData.name || "Vendor User";
   const userInitial = userName.charAt(0).toUpperCase();
@@ -89,6 +119,16 @@ export default function UserDashboardLayout() {
               />
             </label>
 
+            <Link
+              to="/user/cart"
+              className="user-cart-topbar-btn"
+              title={`My Cart (${cartCount} items)`}
+              aria-label="View Shopping Cart"
+            >
+              <FiShoppingCart />
+              {cartCount > 0 && <span className="user-cart-topbar-badge">{cartCount}</span>}
+            </Link>
+
             <button
               type="button"
               className="user-notification"
@@ -99,7 +139,17 @@ export default function UserDashboardLayout() {
             </button>
 
             <div className="user-profile-chip" title={`${userName} (${userData.email || ""})`}>
-              <span className="user-avatar">{userInitial}</span>
+              <span className="user-avatar" style={{ overflow: "hidden", display: "grid", placeItems: "center" }}>
+                {userData.profileImage ? (
+                  <img
+                    src={formatImageUrl(userData.profileImage)}
+                    alt={userName}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
+                  />
+                ) : (
+                  userInitial
+                )}
+              </span>
               <span className="user-profile-copy">
                 <strong>{userName}</strong>
                 <small>{userSub}</small>
