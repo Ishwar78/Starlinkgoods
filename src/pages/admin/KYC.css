@@ -565,6 +565,52 @@
   flex-direction: column;
 }
 
+.admin-proof-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.admin-proof-tab {
+  padding: 7px 14px;
+  border-radius: 6px;
+  background: #141414;
+  border: 1px solid rgba(255, 199, 45, 0.25);
+  color: #a89f91;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-proof-tab:hover {
+  background: #202020;
+  color: #ffffff;
+}
+
+.admin-proof-tab.active {
+  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  color: #080808;
+  border-color: #ffd044;
+  box-shadow: 0 2px 8px rgba(255, 196, 34, 0.25);
+}
+
+.admin-bank-meta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: #60a5fa;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-top: 3px;
+}
+
 .modal-proof-container {
   flex: 1;
   min-height: 280px;

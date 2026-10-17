@@ -14,6 +14,7 @@ import {
   FiShield,
   FiUserCheck,
   FiMapPin,
+  FiCreditCard,
 } from "react-icons/fi";
 
 import "./AdminSidebar.css";
@@ -22,6 +23,7 @@ const sidebarItems = [
   { label: "Dashboard", path: "/admin/dashboard", icon: FiGrid },
   { label: "Vendor", path: "/admin/users", icon: FiUsers },
   { label: "Vendor Users", path: "/admin/vendor-users", icon: FiUserCheck },
+  { label: "Wallet Requests", path: "/admin/wallet-requests", icon: FiCreditCard },
   { label: "KYC Verification", path: "/admin/kyc", icon: FiShield },
   { label: "Products", path: "/admin/products", icon: FiPackage },
   { label: "Categories", path: "/admin/categories", icon: FiLayers },

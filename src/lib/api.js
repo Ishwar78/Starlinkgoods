@@ -27,7 +27,9 @@ export async function apiFetch(endpoint, options = {}) {
     endpoint.includes("/api/kyc/submit") ||
     endpoint.includes("/api/vendors/me") ||
     endpoint.includes("/api/vendors/profile-image") ||
-    endpoint.includes("/api/vendors/my-wallet");
+    endpoint.includes("/api/vendors/my-wallet") ||
+    endpoint.includes("/api/wallet-requests/my-requests") ||
+    (endpoint.includes("/api/wallet-requests") && !endpoint.includes("/api/wallet-requests/all"));
 
   const authToken = isUserContext
     ? (userToken || adminToken)
@@ -373,6 +375,46 @@ export async function verifyAndRegisterMember(paymentAndUserData) {
   return apiFetch("/api/membership/verify-and-register", {
     method: "POST",
     body: JSON.stringify(paymentAndUserData),
+  });
+}
+
+/* =======================================
+   Wallet Payout & Withdrawal Request API
+======================================= */
+
+export async function submitWalletRequest(requestData) {
+  return apiFetch("/api/wallet-requests", {
+    method: "POST",
+    body: JSON.stringify(requestData),
+  });
+}
+
+export async function getMyWalletRequests(params = {}) {
+  const query = new URLSearchParams();
+  if (params.userId) query.append("userId", params.userId);
+  if (params.email) query.append("email", params.email);
+  const qs = query.toString();
+  return apiFetch(`/api/wallet-requests/my-requests${qs ? `?${qs}` : ""}`);
+}
+
+export async function getAllWalletRequests(params = {}) {
+  const query = new URLSearchParams();
+  if (params.search) query.append("search", params.search);
+  if (params.status && params.status !== "All") query.append("status", params.status);
+  const qs = query.toString();
+  return apiFetch(`/api/wallet-requests/all${qs ? `?${qs}` : ""}`);
+}
+
+export async function updateWalletRequestStatus(requestId, { status, adminRemarks, adminTransactionId }) {
+  return apiFetch(`/api/wallet-requests/${requestId}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ status, adminRemarks, adminTransactionId }),
+  });
+}
+
+export async function deleteWalletRequest(requestId) {
+  return apiFetch(`/api/wallet-requests/${requestId}`, {
+    method: "DELETE",
   });
 }
 

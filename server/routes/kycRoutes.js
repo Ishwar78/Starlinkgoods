@@ -66,10 +66,15 @@ const getUserFromToken = (req) => {
 
 /**
  * POST /api/kyc/submit
- * User / Vendor submits their KYC document & personal details
+ * User / Vendor submits their KYC document & personal details along with bank account details and passbook photo
  */
+const kycUploadFields = upload.fields([
+  { name: "documentFile", maxCount: 1 },
+  { name: "passbookFile", maxCount: 1 },
+]);
+
 router.post("/submit", (req, res) => {
-  upload.single("documentFile")(req, res, async function (err) {
+  kycUploadFields(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
       return res.status(400).json({
         success: false,
@@ -93,6 +98,10 @@ router.post("/submit", (req, res) => {
         documentNumber,
         address,
         userId: formUserId,
+        accountHolderName,
+        accountNumber,
+        ifscCode,
+        bankName,
       } = req.body;
 
       const userTokenData = getUserFromToken(req);
@@ -114,11 +123,11 @@ router.post("/submit", (req, res) => {
       if (!address || !address.trim()) {
         return res.status(400).json({ success: false, message: "Address is required" });
       }
-      if (!req.file) {
-        return res.status(400).json({ success: false, message: "Please upload your identity document file." });
-      }
 
-      const documentPath = `/uploads/kyc/${req.file.filename}`;
+      // Check document file
+      const docFile = req.files?.["documentFile"]?.[0] || req.file;
+      const passbookFile = req.files?.["passbookFile"]?.[0];
+
       const userEmail = email.trim().toLowerCase();
 
       // Check if this user already submitted KYC
@@ -131,6 +140,16 @@ router.post("/submit", (req, res) => {
         existingKYC = await KYC.findOne({ email: userEmail });
       }
 
+      if (!existingKYC && !docFile) {
+        return res.status(400).json({
+          success: false,
+          message: "Please upload your identity document file (Aadhaar / PAN etc.).",
+        });
+      }
+
+      const documentPath = docFile ? `/uploads/kyc/${docFile.filename}` : "";
+      const passbookPath = passbookFile ? `/uploads/kyc/${passbookFile.filename}` : "";
+
       if (existingKYC) {
         // If already verified, prevent duplicate overwrite unless explicitly allowed
         if (existingKYC.status === "Verified") {
@@ -141,19 +160,31 @@ router.post("/submit", (req, res) => {
           });
         }
 
-        // Delete old uploaded file if local
-        if (existingKYC.documentFile && existingKYC.documentFile.startsWith("/uploads/kyc/")) {
+        // Delete old uploaded document file if replaced
+        if (docFile && existingKYC.documentFile && existingKYC.documentFile.startsWith("/uploads/kyc/")) {
           const oldFilePath = path.join(__dirname, "..", existingKYC.documentFile);
           if (fs.existsSync(oldFilePath)) {
             try {
               fs.unlinkSync(oldFilePath);
             } catch (unlinkErr) {
-              console.warn("Could not remove old KYC file:", unlinkErr.message);
+              console.warn("Could not remove old KYC document file:", unlinkErr.message);
             }
           }
         }
 
-        // Update existing record (e.g. resubmission after rejection or pending update)
+        // Delete old passbook file if replaced
+        if (passbookFile && existingKYC.passbookFile && existingKYC.passbookFile.startsWith("/uploads/kyc/")) {
+          const oldPassbookPath = path.join(__dirname, "..", existingKYC.passbookFile);
+          if (fs.existsSync(oldPassbookPath)) {
+            try {
+              fs.unlinkSync(oldPassbookPath);
+            } catch (unlinkErr) {
+              console.warn("Could not remove old passbook file:", unlinkErr.message);
+            }
+          }
+        }
+
+        // Update existing record
         existingKYC.fullName = fullName.trim();
         existingKYC.dob = dob ? dob.trim() : "";
         existingKYC.email = userEmail;
@@ -161,10 +192,26 @@ router.post("/submit", (req, res) => {
         existingKYC.businessName = businessName ? businessName.trim() : "";
         existingKYC.documentType = documentType || "Aadhaar Card";
         existingKYC.documentNumber = documentNumber.trim();
-        existingKYC.documentFile = documentPath;
-        existingKYC.documentOriginalName = req.file.originalname;
-        existingKYC.documentMimeType = req.file.mimetype;
         existingKYC.address = address.trim();
+
+        // Bank Account Details
+        if (accountHolderName !== undefined) existingKYC.accountHolderName = (accountHolderName || "").trim();
+        if (accountNumber !== undefined) existingKYC.accountNumber = (accountNumber || "").trim();
+        if (ifscCode !== undefined) existingKYC.ifscCode = (ifscCode || "").trim().toUpperCase();
+        if (bankName !== undefined) existingKYC.bankName = (bankName || "").trim();
+
+        if (docFile) {
+          existingKYC.documentFile = documentPath;
+          existingKYC.documentOriginalName = docFile.originalname;
+          existingKYC.documentMimeType = docFile.mimetype;
+        }
+
+        if (passbookFile) {
+          existingKYC.passbookFile = passbookPath;
+          existingKYC.passbookOriginalName = passbookFile.originalname;
+          existingKYC.passbookMimeType = passbookFile.mimetype;
+        }
+
         existingKYC.status = "Pending";
         existingKYC.remarks = ""; // Clear rejection remark on resubmission
         if (effectiveUserId) existingKYC.userId = effectiveUserId;
@@ -173,7 +220,7 @@ router.post("/submit", (req, res) => {
 
         return res.json({
           success: true,
-          message: "KYC documents updated and submitted for review successfully!",
+          message: "KYC documents and bank details updated and submitted for review successfully!",
           kyc: existingKYC,
         });
       }
@@ -189,9 +236,16 @@ router.post("/submit", (req, res) => {
         documentType: documentType || "Aadhaar Card",
         documentNumber: documentNumber.trim(),
         documentFile: documentPath,
-        documentOriginalName: req.file.originalname,
-        documentMimeType: req.file.mimetype,
+        documentOriginalName: docFile ? docFile.originalname : "",
+        documentMimeType: docFile ? docFile.mimetype : "",
         address: address.trim(),
+        accountHolderName: (accountHolderName || "").trim(),
+        accountNumber: (accountNumber || "").trim(),
+        ifscCode: (ifscCode || "").trim().toUpperCase(),
+        bankName: (bankName || "").trim(),
+        passbookFile: passbookPath,
+        passbookOriginalName: passbookFile ? passbookFile.originalname : "",
+        passbookMimeType: passbookFile ? passbookFile.mimetype : "",
         status: "Pending",
       });
 
@@ -199,7 +253,7 @@ router.post("/submit", (req, res) => {
 
       res.status(201).json({
         success: true,
-        message: "KYC verification submitted successfully! It is now under review.",
+        message: "KYC verification and bank details submitted successfully! It is now under review.",
         kyc: newKYC,
       });
     } catch (error) {
@@ -388,6 +442,18 @@ router.delete("/:id", async (req, res) => {
           fs.unlinkSync(filePath);
         } catch (unlinkErr) {
           console.warn("Could not unlink KYC file:", unlinkErr.message);
+        }
+      }
+    }
+
+    // Delete uploaded passbook file if present
+    if (kyc.passbookFile && kyc.passbookFile.startsWith("/uploads/kyc/")) {
+      const passbookPath = path.join(__dirname, "..", kyc.passbookFile);
+      if (fs.existsSync(passbookPath)) {
+        try {
+          fs.unlinkSync(passbookPath);
+        } catch (unlinkErr) {
+          console.warn("Could not unlink passbook file:", unlinkErr.message);
         }
       }
     }

@@ -17,6 +17,8 @@ import {
   FiBriefcase,
   FiCheck,
   FiX,
+  FiCreditCard,
+  FiCamera,
 } from "react-icons/fi";
 import { submitKYC, getMyKYCStatus, formatImageUrl } from "../../lib/api";
 import "./KYC.css";
@@ -47,10 +49,21 @@ export default function UserKYC() {
     documentType: "Aadhaar Card",
     documentNumber: "",
     address: userData.address || "",
+    // Bank Details
+    accountHolderName: userData.name || "",
+    accountNumber: "",
+    confirmAccountNumber: "",
+    ifscCode: "",
+    bankName: "",
   });
 
+  // Identity document file & preview
   const [documentFile, setDocumentFile] = useState(null);
   const [filePreview, setFilePreview] = useState("");
+
+  // Passbook image file & preview (Separate upload)
+  const [passbookFile, setPassbookFile] = useState(null);
+  const [passbookPreview, setPassbookPreview] = useState("");
 
   // Check current KYC status from backend
   const checkKYCStatus = async () => {
@@ -63,6 +76,22 @@ export default function UserKYC() {
 
       if (res.success && res.submitted && res.kyc) {
         setKycRecord(res.kyc);
+        // Prefill bank details if available
+        if (res.kyc.accountHolderName || res.kyc.accountNumber) {
+          setForm((prev) => ({
+            ...prev,
+            fullName: res.kyc.fullName || prev.fullName,
+            dob: res.kyc.dob || prev.dob,
+            documentType: res.kyc.documentType || prev.documentType,
+            documentNumber: res.kyc.documentNumber || prev.documentNumber,
+            address: res.kyc.address || prev.address,
+            accountHolderName: res.kyc.accountHolderName || prev.accountHolderName,
+            accountNumber: res.kyc.accountNumber || prev.accountNumber,
+            confirmAccountNumber: res.kyc.accountNumber || prev.confirmAccountNumber,
+            ifscCode: res.kyc.ifscCode || prev.ifscCode,
+            bankName: res.kyc.bankName || prev.bankName,
+          }));
+        }
       } else {
         setKycRecord(null);
       }
@@ -82,6 +111,7 @@ export default function UserKYC() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  // Handler for Identity Document (Aadhaar / PAN etc.)
   const handleFileChange = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -95,7 +125,7 @@ export default function UserKYC() {
     ];
 
     if (!allowed.includes(file.type) && !file.type.startsWith("image/")) {
-      setMessage("Please upload an image (JPG, PNG, WEBP) or PDF file.");
+      setMessage("Please upload an image (JPG, PNG, WEBP) or PDF file for Identity Document.");
       setMessageType("error");
       return;
     }
@@ -111,6 +141,39 @@ export default function UserKYC() {
       setFilePreview(URL.createObjectURL(file));
     } else {
       setFilePreview("");
+    }
+  };
+
+  // Handler for Bank Passbook / Cheque Image (Separate Upload)
+  const handlePassbookChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowed = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/jpg",
+    ];
+
+    if (!allowed.includes(file.type) && !file.type.startsWith("image/")) {
+      setMessage("Please upload an image (JPG, PNG, WEBP) or PDF for Bank Passbook.");
+      setMessageType("error");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setMessage("Passbook file must be smaller than 10 MB.");
+      setMessageType("error");
+      return;
+    }
+
+    setPassbookFile(file);
+    if (file.type.startsWith("image/")) {
+      setPassbookPreview(URL.createObjectURL(file));
+    } else {
+      setPassbookPreview("");
     }
   };
 
@@ -143,8 +206,39 @@ export default function UserKYC() {
       setMessageType("error");
       return;
     }
-    if (!documentFile) {
-      setMessage("Please upload your identity document file.");
+
+    // Identity Document validation
+    if (!documentFile && !kycRecord?.documentFile) {
+      setMessage("Please upload your identity document file (Aadhaar / PAN etc.).");
+      setMessageType("error");
+      return;
+    }
+
+    // Bank Account Details validation
+    if (!form.accountHolderName.trim()) {
+      setMessage("Please enter Account Holder Name.");
+      setMessageType("error");
+      return;
+    }
+    if (!form.accountNumber.trim()) {
+      setMessage("Please enter Bank Account Number.");
+      setMessageType("error");
+      return;
+    }
+    if (form.accountNumber.trim() !== form.confirmAccountNumber.trim()) {
+      setMessage("Bank Account Numbers do not match. Please verify.");
+      setMessageType("error");
+      return;
+    }
+    if (!form.ifscCode.trim()) {
+      setMessage("Please enter Bank IFSC Code.");
+      setMessageType("error");
+      return;
+    }
+
+    // Passbook Image validation
+    if (!passbookFile && !kycRecord?.passbookFile) {
+      setMessage("Please upload your Bank Passbook or Cancelled Cheque image.");
       setMessageType("error");
       return;
     }
@@ -160,14 +254,27 @@ export default function UserKYC() {
       data.append("documentType", form.documentType);
       data.append("documentNumber", form.documentNumber.trim());
       data.append("address", form.address.trim());
+
+      // Bank Details
+      data.append("accountHolderName", form.accountHolderName.trim());
+      data.append("accountNumber", form.accountNumber.trim());
+      data.append("ifscCode", form.ifscCode.trim().toUpperCase());
+      data.append("bankName", form.bankName.trim());
+
       if (userData._id || userData.id) {
         data.append("userId", userData._id || userData.id);
       }
-      data.append("documentFile", documentFile);
+
+      if (documentFile) {
+        data.append("documentFile", documentFile);
+      }
+      if (passbookFile) {
+        data.append("passbookFile", passbookFile);
+      }
 
       const res = await submitKYC(data);
       if (res.success) {
-        setMessage("KYC documents submitted successfully! Admin will verify your application soon.");
+        setMessage("KYC documents and bank details submitted successfully! Admin will verify your application soon.");
         setMessageType("success");
         setKycRecord(res.kyc);
         setShowResubmitForm(false);
@@ -191,9 +298,9 @@ export default function UserKYC() {
       {/* Top Heading */}
       <div className="kyc-page-heading">
         <div>
-          <span className="kyc-eyebrow">ACCOUNT COMPLIANCE & SECURITY</span>
-          <h1>KYC Verification</h1>
-          <p>Submit and track official identity documents for your vendor account.</p>
+          <span className="kyc-eyebrow">ACCOUNT COMPLIANCE &amp; SECURITY</span>
+          <h1>KYC &amp; Bank Verification</h1>
+          <p>Submit and track official identity documents and bank credentials for your vendor account.</p>
         </div>
 
         <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
@@ -218,13 +325,7 @@ export default function UserKYC() {
                 : ""
             }`}
           >
-            {isVerified
-              ? "● KYC Verified"
-              : isPending
-              ? "● Pending Review"
-              : isRejected
-              ? "● Rejected"
-              : "● Not Verified"}
+            ● {kycRecord?.status || "Not Submitted"}
           </span>
         </div>
       </div>
@@ -244,11 +345,17 @@ export default function UserKYC() {
         </div>
       )}
 
-      {/* Status Banner */}
+      {/* Status Hero Banner */}
       <section className="kyc-status-banner">
         <div
-          className={`kyc-banner-icon ${
-            isVerified ? "active-green" : isPending ? "active-yellow" : isRejected ? "active-red" : ""
+          className={`kyc-status-icon-wrap ${
+            isVerified
+              ? "verified"
+              : isPending
+              ? "pending"
+              : isRejected
+              ? "rejected"
+              : "unsubmitted"
           }`}
         >
           {isVerified ? (
@@ -261,24 +368,57 @@ export default function UserKYC() {
             <FiShield />
           )}
         </div>
-        <div>
+
+        <div className="kyc-status-copy">
+          <div className="kyc-status-tag-row">
+            <span
+              className={`kyc-tag ${
+                isVerified
+                  ? "verified"
+                  : isPending
+                  ? "pending"
+                  : isRejected
+                  ? "rejected"
+                  : "unsubmitted"
+              }`}
+            >
+              {isVerified
+                ? "KYC Verified & Approved"
+                : isPending
+                ? "Under Review by Admin"
+                : isRejected
+                ? "Verification Rejected"
+                : "Action Required"}
+            </span>
+
+            {kycRecord?.createdAt && (
+              <span className="kyc-date">
+                Submitted on {new Date(kycRecord.createdAt).toLocaleDateString("en-IN", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                })}
+              </span>
+            )}
+          </div>
+
           <h2>
             {isVerified
-              ? "Account Fully Verified & Certified"
+              ? "Your Identity & Bank Credentials are Fully Verified"
               : isPending
-              ? "KYC Documents Under Review"
+              ? "Your KYC & Bank Details are Under Active Review"
               : isRejected
               ? "KYC Verification Rejected by Admin"
-              : "Complete Your KYC Verification"}
+              : "Complete Your KYC & Bank Account Verification"}
           </h2>
           <p>
             {isVerified
-              ? "Your business and identity documents have been authenticated by the Starlink admin team."
+              ? "Your business, identity, and bank account details have been authenticated by the Starlink admin team."
               : isPending
-              ? "We have received your identity submission. Starlink admins are reviewing the submitted documents."
+              ? "We have received your identity submission and bank account proof. Starlink admins are reviewing the submitted documents."
               : isRejected
               ? `Reason for rejection: "${kycRecord.remarks || "Uploaded document was unclear or details did not match."}" Please re-upload updated documents.`
-              : "Upload your official government-issued ID (Aadhaar, PAN, Passport, GST Certificate) to activate full dealer benefits."}
+              : "Upload your official government-issued ID (Aadhaar, PAN) and Bank Passbook / Cheque to activate full dealer benefits and payouts."}
           </p>
         </div>
       </section>
@@ -303,6 +443,7 @@ export default function UserKYC() {
           </div>
 
           <div className="kyc-info-grid">
+            {/* Identity Information */}
             <div className="kyc-info-item">
               <span className="kyc-info-label">Applicant Name</span>
               <strong className="kyc-info-val">{kycRecord.fullName}</strong>
@@ -338,20 +479,82 @@ export default function UserKYC() {
               <strong className="kyc-info-val">{kycRecord.address}</strong>
             </div>
 
-            <div className="kyc-info-item" style={{ gridColumn: "span 2" }}>
-              <span className="kyc-info-label">Uploaded Document</span>
-              <div className="kyc-doc-file-row">
-                <span className="kyc-file-name">
-                  <FiFileText /> {kycRecord.documentOriginalName || "Identity Document File"}
-                </span>
-                <a
-                  href={formatImageUrl(kycRecord.documentFile)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="kyc-view-doc-btn"
-                >
-                  <FiEye /> View / Download Document
-                </a>
+            {/* Bank Account Details Grid in View Mode */}
+            <div className="kyc-info-item">
+              <span className="kyc-info-label">Bank Account Holder</span>
+              <strong className="kyc-info-val">{kycRecord.accountHolderName || "—"}</strong>
+            </div>
+
+            <div className="kyc-info-item">
+              <span className="kyc-info-label">Bank Account Number</span>
+              <strong className="kyc-info-val" style={{ fontFamily: "monospace", color: "#60a5fa" }}>
+                {kycRecord.accountNumber || "—"}
+              </strong>
+            </div>
+
+            <div className="kyc-info-item">
+              <span className="kyc-info-label">Bank IFSC Code</span>
+              <strong className="kyc-info-val" style={{ fontFamily: "monospace", color: "#ffd044" }}>
+                {kycRecord.ifscCode || "—"}
+              </strong>
+            </div>
+
+            <div className="kyc-info-item">
+              <span className="kyc-info-label">Bank Name</span>
+              <strong className="kyc-info-val">{kycRecord.bankName || "—"}</strong>
+            </div>
+
+            {/* Dual Documents View */}
+            <div className="kyc-docs-dual-display">
+              {/* Identity Document Card */}
+              <div className="kyc-doc-card-view">
+                <div className="kyc-doc-card-title">
+                  <span>Identity Proof ({kycRecord.documentType})</span>
+                  <FiFileText style={{ color: "#ffd044" }} />
+                </div>
+                <div className="kyc-doc-file-row">
+                  <span className="kyc-file-name">
+                    {kycRecord.documentOriginalName || "Identity Document"}
+                  </span>
+                  <a
+                    href={formatImageUrl(kycRecord.documentFile)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="kyc-view-doc-btn"
+                  >
+                    <FiEye /> View / Download
+                  </a>
+                </div>
+              </div>
+
+              {/* Passbook Document Card */}
+              <div className="kyc-doc-card-view passbook-card">
+                <div className="kyc-doc-card-title">
+                  <span>Bank Passbook / Cheque Photo</span>
+                  <FiCreditCard style={{ color: "#60a5fa" }} />
+                </div>
+                <div className="kyc-doc-file-row">
+                  <span className="kyc-file-name" style={{ color: "#93c5fd" }}>
+                    {kycRecord.passbookOriginalName || "Passbook Photo"}
+                  </span>
+                  {kycRecord.passbookFile ? (
+                    <a
+                      href={formatImageUrl(kycRecord.passbookFile)}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="kyc-view-doc-btn"
+                      style={{
+                        background: "linear-gradient(135deg, #60a5fa, #2563eb)",
+                        color: "#ffffff",
+                        borderColor: "#3b82f6",
+                      }}
+                    >
+                      <FiEye /> View Passbook
+                    </a>
+                  ) : (
+                    <span style={{ fontSize: "12px", color: "#8c8376" }}>Not Uploaded</span>
+                  )}
+                </div>
               </div>
             </div>
 
@@ -371,7 +574,7 @@ export default function UserKYC() {
               <FiFileText />
             </div>
             <div>
-              <h2>{isRejected ? "Re-submit Identity Details" : "Personal & Business Information"}</h2>
+              <h2>{isRejected ? "Re-submit KYC & Bank Details" : "Personal & Identity Information"}</h2>
               <p>Enter your details exactly as shown on your government identity document.</p>
             </div>
             {hasExistingSubmission && showResubmitForm && (
@@ -387,6 +590,7 @@ export default function UserKYC() {
           </div>
 
           <div className="kyc-form-grid">
+            {/* Identity Info Inputs */}
             <div className="kyc-field">
               <label htmlFor="kyc-full-name">Full Name (As on ID) *</label>
               <input
@@ -460,7 +664,7 @@ export default function UserKYC() {
                 name="documentNumber"
                 value={form.documentNumber}
                 onChange={handleChange}
-                placeholder="e.g. ABCD1234E or 12-digit Aadhaar"
+                placeholder="e.g. 12-digit Aadhaar / 10-digit PAN"
                 required
               />
             </div>
@@ -478,40 +682,164 @@ export default function UserKYC() {
               />
             </div>
 
-            {/* Document Upload Area */}
+            {/* =========================================================
+                SECTION 2: BANK ACCOUNT DETAILS
+            ========================================================= */}
+            <div className="kyc-section-divider">
+              <div className="kyc-section-divider-icon">
+                <FiCreditCard />
+              </div>
+              <div className="kyc-section-divider-text">
+                <h3>Bank Account Details</h3>
+                <p>Provide your official bank account credentials for verification and payouts.</p>
+              </div>
+            </div>
+
+            <div className="kyc-field">
+              <label htmlFor="kyc-acc-holder">Account Holder Name *</label>
+              <input
+                id="kyc-acc-holder"
+                name="accountHolderName"
+                value={form.accountHolderName}
+                onChange={handleChange}
+                placeholder="As printed on Bank Passbook"
+                required
+              />
+            </div>
+
+            <div className="kyc-field">
+              <label htmlFor="kyc-bank-name">Bank Name</label>
+              <input
+                id="kyc-bank-name"
+                name="bankName"
+                value={form.bankName}
+                onChange={handleChange}
+                placeholder="e.g. State Bank of India, HDFC Bank"
+              />
+            </div>
+
+            <div className="kyc-field">
+              <label htmlFor="kyc-acc-no">Bank Account Number *</label>
+              <input
+                id="kyc-acc-no"
+                name="accountNumber"
+                value={form.accountNumber}
+                onChange={handleChange}
+                placeholder="Enter Bank Account Number"
+                required
+              />
+            </div>
+
+            <div className="kyc-field">
+              <label htmlFor="kyc-confirm-acc-no">Confirm Bank Account Number *</label>
+              <input
+                id="kyc-confirm-acc-no"
+                name="confirmAccountNumber"
+                value={form.confirmAccountNumber}
+                onChange={handleChange}
+                placeholder="Re-enter Bank Account Number"
+                required
+              />
+            </div>
+
             <div className="kyc-field kyc-full-width">
-              <label htmlFor="kyc-document-file">Upload Identity Document *</label>
+              <label htmlFor="kyc-ifsc">Bank IFSC Code *</label>
+              <input
+                id="kyc-ifsc"
+                name="ifscCode"
+                value={form.ifscCode}
+                onChange={(e) =>
+                  setForm((prev) => ({
+                    ...prev,
+                    ifscCode: e.target.value.toUpperCase(),
+                  }))
+                }
+                placeholder="e.g. SBIN0001234 or HDFC0000123"
+                style={{ textTransform: "uppercase", letterSpacing: "1px" }}
+                required
+              />
+            </div>
 
-              <label className="kyc-upload-area" htmlFor="kyc-document-file">
-                <span className="kyc-upload-icon">
-                  <FiUploadCloud />
-                </span>
-                <strong>
-                  {documentFile ? documentFile.name : "Click to select and upload document"}
-                </strong>
-                <span>Supports JPG, PNG, WEBP or PDF · Maximum 10 MB</span>
+            {/* =========================================================
+                SECTION 3: DUAL FILE UPLOADS (AADHAAR + PASSBOOK SEPARATE)
+            ========================================================= */}
+            <div className="kyc-dual-upload-grid">
+              {/* UPLOAD 1: IDENTITY DOCUMENT (AADHAAR / PAN) */}
+              <div className="kyc-upload-box">
+                <label htmlFor="kyc-document-file">
+                  <FiFileText /> Upload Identity Document (Aadhaar / PAN) *
+                </label>
 
-                <input
-                  id="kyc-document-file"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,application/pdf"
-                  onChange={handleFileChange}
-                />
-              </label>
+                <label className="kyc-upload-area" htmlFor="kyc-document-file">
+                  <span className="kyc-upload-icon">
+                    <FiUploadCloud />
+                  </span>
+                  <strong>
+                    {documentFile
+                      ? documentFile.name
+                      : kycRecord?.documentOriginalName
+                      ? `Selected: ${kycRecord.documentOriginalName}`
+                      : "Click to select Identity Document"}
+                  </strong>
+                  <span>Supports JPG, PNG, WEBP or PDF · Max 10 MB</span>
 
-              {filePreview && (
-                <div className="kyc-selected-preview">
-                  <img src={filePreview} alt="Selected preview" />
-                  <span>Preview: {documentFile?.name}</span>
-                </div>
-              )}
+                  <input
+                    id="kyc-document-file"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,application/pdf"
+                    onChange={handleFileChange}
+                  />
+                </label>
+
+                {filePreview && (
+                  <div className="kyc-selected-preview">
+                    <img src={filePreview} alt="Selected preview" />
+                    <span>Selected: {documentFile?.name}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* UPLOAD 2: BANK PASSBOOK / CHEQUE (SEPARATE UPLOAD) */}
+              <div className="kyc-upload-box">
+                <label htmlFor="kyc-passbook-file" style={{ color: "#60a5fa" }}>
+                  <FiCreditCard /> Upload Bank Passbook / Cheque Photo *
+                </label>
+
+                <label className="kyc-upload-area passbook-zone" htmlFor="kyc-passbook-file">
+                  <span className="kyc-upload-icon">
+                    <FiCamera />
+                  </span>
+                  <strong>
+                    {passbookFile
+                      ? passbookFile.name
+                      : kycRecord?.passbookOriginalName
+                      ? `Selected: ${kycRecord.passbookOriginalName}`
+                      : "Click to select Bank Passbook Photo"}
+                  </strong>
+                  <span>Clear photo of front page or cheque · Max 10 MB</span>
+
+                  <input
+                    id="kyc-passbook-file"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,application/pdf"
+                    onChange={handlePassbookChange}
+                  />
+                </label>
+
+                {passbookPreview && (
+                  <div className="kyc-selected-preview passbook-preview">
+                    <img src={passbookPreview} alt="Passbook preview" />
+                    <span>Selected Passbook: {passbookFile?.name}</span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           <div className="kyc-privacy-note">
             <FiShield />
             <p>
-              Your documents are encrypted and accessible only by verified Starlink administrators for compliance verification under governing trade laws.
+              Your identity documents and bank credentials are securely encrypted and verified solely by authorized Starlink administrators for compliance and direct payout disbursement.
             </p>
           </div>
 
@@ -523,10 +851,10 @@ export default function UserKYC() {
             <FiCheckCircle />
             <span>
               {submitting
-                ? "Uploading & Submitting..."
+                ? "Uploading & Submitting Documents..."
                 : isRejected
-                ? "Re-submit for Verification"
-                : "Submit for Verification"}
+                ? "Re-submit KYC & Bank Details"
+                : "Submit KYC & Bank Details for Verification"}
             </span>
           </button>
         </form>

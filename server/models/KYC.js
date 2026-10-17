@@ -70,6 +70,41 @@ const kycSchema = new mongoose.Schema(
       required: [true, "Address is required"],
       trim: true,
     },
+    // Bank Account Details for Payouts & Verification
+    accountHolderName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    accountNumber: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    ifscCode: {
+      type: String,
+      default: "",
+      trim: true,
+      uppercase: true,
+    },
+    bankName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    passbookFile: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    passbookOriginalName: {
+      type: String,
+      default: "",
+    },
+    passbookMimeType: {
+      type: String,
+      default: "",
+    },
     status: {
       type: String,
       enum: ["Pending", "Verified", "Rejected"],

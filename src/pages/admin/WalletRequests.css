@@ -1,0 +1,592 @@
+/* =========================================================
+   ADMIN WALLET REQUESTS PAGE
+   Luxury Black & Gold Theme
+========================================================= */
+
+.admin-wallet-page {
+  width: 100%;
+  color: #f5f5f5;
+}
+
+.admin-wallet-page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-wallet-page-heading h1 {
+  margin: 6px 0;
+  color: #ffffff;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(24px, 3vw, 32px);
+  letter-spacing: -0.5px;
+}
+
+.admin-wallet-page-heading p {
+  margin: 0;
+  color: #b5aba0;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+
+/* Stats Grid */
+.admin-wallet-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.admin-wallet-stat-card {
+  background: #141414;
+  border: 1px solid rgba(255, 199, 45, 0.22);
+  border-radius: 12px;
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-wallet-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: #ffd044;
+}
+
+.admin-wallet-stat-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.admin-wallet-stat-icon.total {
+  background: rgba(255, 199, 45, 0.15);
+  color: #ffd044;
+  border: 1px solid rgba(255, 199, 45, 0.3);
+}
+
+.admin-wallet-stat-icon.pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.admin-wallet-stat-icon.approved {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.admin-wallet-stat-icon.rejected {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.admin-wallet-stat-icon.amount {
+  background: rgba(217, 119, 6, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(217, 119, 6, 0.3);
+}
+
+.admin-wallet-stat-info span {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #b5aba0;
+}
+
+.admin-wallet-stat-info h3 {
+  margin: 4px 0 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+/* Panel & Controls */
+.admin-wallet-panel {
+  background: #121212;
+  border: 1px solid rgba(255, 199, 45, 0.2);
+  border-radius: 12px;
+  padding: 22px;
+  margin-bottom: 24px;
+}
+
+.admin-wallet-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.admin-wallet-tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-wallet-tab {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 199, 45, 0.2);
+  color: #b5aba0;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-wallet-tab:hover {
+  background: #222222;
+  color: #ffffff;
+}
+
+.admin-wallet-tab.active {
+  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  color: #080808;
+  border-color: #ffd044;
+  box-shadow: 0 2px 10px rgba(255, 196, 34, 0.25);
+}
+
+.admin-wallet-search-box {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #181818;
+  border: 1px solid rgba(255, 199, 45, 0.25);
+  border-radius: 8px;
+  padding: 8px 14px;
+  min-width: 280px;
+}
+
+.admin-wallet-search-box input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #ffffff;
+  font-size: 13.5px;
+  width: 100%;
+}
+
+.admin-wallet-search-box input::placeholder {
+  color: #7a7369;
+}
+
+/* Table */
+.admin-wallet-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 199, 45, 0.18);
+}
+
+.admin-wallet-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-wallet-table th {
+  padding: 14px 16px;
+  background: #181818;
+  color: #ffd044;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 1px solid rgba(255, 199, 45, 0.25);
+  white-space: nowrap;
+}
+
+.admin-wallet-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: #e5e5e5;
+  font-size: 13.5px;
+  vertical-align: middle;
+}
+
+.admin-wallet-table tbody tr:hover {
+  background: #181818;
+}
+
+/* User Info cell */
+.admin-req-user-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.admin-req-user-name {
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.admin-req-user-meta {
+  font-size: 12px;
+  color: #a89d8d;
+}
+
+.admin-req-amount {
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffd044;
+  font-family: monospace;
+}
+
+/* Payment Mode Badges */
+.admin-mode-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-mode-pill.upi {
+  background: rgba(147, 51, 234, 0.15);
+  color: #c084fc;
+  border: 1px solid rgba(147, 51, 234, 0.3);
+}
+
+.admin-mode-pill.bank {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+/* Payment details box */
+.admin-req-details-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12.5px;
+  max-width: 240px;
+}
+
+.admin-req-details-box strong {
+  color: #ffffff;
+}
+
+.admin-req-details-box span {
+  color: #ffd044;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+/* Status Badges */
+.admin-req-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.admin-req-status.pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.admin-req-status.approved {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.admin-req-status.rejected {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+/* Action Buttons */
+.admin-req-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.admin-action-btn.approve {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25);
+}
+
+.admin-action-btn.approve:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.admin-action-btn.reject {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.admin-action-btn.reject:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #ef4444;
+}
+
+.admin-action-btn.view {
+  background: #202020;
+  color: #ffd044;
+  border: 1px solid rgba(255, 199, 45, 0.3);
+}
+
+.admin-action-btn.view:hover {
+  background: #2c2c2c;
+  color: #ffe58a;
+}
+
+.admin-action-btn.delete {
+  background: transparent;
+  color: #8c8376;
+  padding: 6px 8px;
+}
+
+.admin-action-btn.delete:hover {
+  color: #ef4444;
+}
+
+/* Modal Overlay & Modal Window */
+.admin-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 9999;
+  animation: modalFadeIn 0.2s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.admin-modal-card {
+  background: #141414;
+  border: 1px solid rgba(255, 199, 45, 0.3);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 540px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+  overflow: hidden;
+}
+
+.admin-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  background: #1a1a1a;
+  border-bottom: 1px solid rgba(255, 199, 45, 0.2);
+}
+
+.admin-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-modal-close {
+  background: transparent;
+  border: none;
+  color: #ffd044;
+  font-size: 20px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+
+.admin-modal-body {
+  padding: 22px;
+}
+
+.admin-modal-summary-box {
+  background: #191919;
+  border: 1px solid rgba(255, 199, 45, 0.16);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.admin-modal-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 13.5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.admin-modal-summary-row:last-child {
+  border-bottom: none;
+}
+
+.admin-modal-summary-row span:first-child {
+  color: #b5aba0;
+}
+
+.admin-modal-summary-row span:last-child {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.admin-modal-field {
+  margin-bottom: 16px;
+}
+
+.admin-modal-field label {
+  display: block;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #ffd044;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.admin-modal-field input,
+.admin-modal-field textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 199, 45, 0.25);
+  color: #ffffff;
+  font-size: 14px;
+  outline: none;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.admin-modal-field input:focus,
+.admin-modal-field textarea:focus {
+  border-color: #ffd044;
+  box-shadow: 0 0 0 3px rgba(255, 199, 45, 0.15);
+}
+
+.admin-modal-field small {
+  display: block;
+  margin-top: 5px;
+  color: #8c8376;
+  font-size: 12px;
+}
+
+.admin-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 22px;
+  background: #181818;
+  border-top: 1px solid rgba(255, 199, 45, 0.15);
+}
+
+.admin-btn-secondary {
+  padding: 9px 18px;
+  border-radius: 8px;
+  background: #252525;
+  color: #e5e5e5;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.admin-btn-secondary:hover {
+  background: #2e2e2e;
+}
+
+.admin-btn-primary {
+  padding: 9px 20px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  color: #080808;
+  border: 1px solid #f6c635;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(255, 196, 34, 0.25);
+}
+
+.admin-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ffea9f, #f0b71b);
+  transform: translateY(-1px);
+}
+
+.admin-btn-danger {
+  padding: 9px 20px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: #ffffff;
+  border: 1px solid #f87171;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.admin-btn-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #f87171, #ef4444);
+}
+
+.admin-btn-primary:disabled,
+.admin-btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Empty State */
+.admin-wallet-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #8c8376;
+  font-size: 14px;
+}

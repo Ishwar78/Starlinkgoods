@@ -18,6 +18,7 @@ import {
   FiPhone,
   FiMapPin,
   FiExternalLink,
+  FiCreditCard,
 } from "react-icons/fi";
 import {
   getAllKYCSubmissions,
@@ -43,6 +44,7 @@ export default function AdminKYC() {
   const [selectedKyc, setSelectedKyc] = useState(null);
   const [remarksInput, setRemarksInput] = useState("");
   const [actionLoading, setActionLoading] = useState(false);
+  const [activeProofTab, setActiveProofTab] = useState("identity"); // 'identity' | 'passbook'
 
   // Reject Modal
   const [rejectingKyc, setRejectingKyc] = useState(null);
@@ -366,6 +368,11 @@ export default function AdminKYC() {
                                 {sub.businessName}
                               </span>
                             )}
+                            {sub.accountNumber && (
+                              <span className="admin-bank-meta-pill" title={`IFSC: ${sub.ifscCode}`}>
+                                <FiCreditCard /> A/C: {sub.accountNumber}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -399,7 +406,11 @@ export default function AdminKYC() {
                               src={fileUrl}
                               alt="ID Proof"
                               className="kyc-table-file-thumb"
-                              onClick={() => setSelectedKyc(sub)}
+                              onClick={() => {
+                                setSelectedKyc(sub);
+                                setRemarksInput(sub.remarks || "");
+                                setActiveProofTab("identity");
+                              }}
                               title="Click to zoom proof"
                             />
                           ) : (
@@ -436,6 +447,7 @@ export default function AdminKYC() {
                             onClick={() => {
                               setSelectedKyc(sub);
                               setRemarksInput(sub.remarks || "");
+                              setActiveProofTab("identity");
                             }}
                             title="Inspect complete details & proof"
                           >
@@ -601,6 +613,33 @@ export default function AdminKYC() {
                   )}
                 </div>
 
+                {/* Bank Account Credentials Section */}
+                <div className="modal-info-section">
+                  <h4>Bank Account Credentials</h4>
+                  <div className="modal-info-row">
+                    <span>Account Holder:</span>
+                    <strong>{selectedKyc.accountHolderName || selectedKyc.fullName}</strong>
+                  </div>
+                  <div className="modal-info-row">
+                    <span>Bank Account Number:</span>
+                    <strong style={{ color: "#60a5fa", fontFamily: "monospace", fontSize: "14px" }}>
+                      {selectedKyc.accountNumber || "—"}
+                    </strong>
+                  </div>
+                  <div className="modal-info-row">
+                    <span>Bank IFSC Code:</span>
+                    <strong style={{ color: "#ffd044", fontFamily: "monospace" }}>
+                      {selectedKyc.ifscCode || "—"}
+                    </strong>
+                  </div>
+                  {selectedKyc.bankName && (
+                    <div className="modal-info-row">
+                      <span>Bank Name:</span>
+                      <strong>{selectedKyc.bankName}</strong>
+                    </div>
+                  )}
+                </div>
+
                 {/* Admin Remarks Input */}
                 <div className="modal-info-section">
                   <h4>Admin Audit Remarks</h4>
@@ -614,44 +653,128 @@ export default function AdminKYC() {
                 </div>
               </div>
 
-              {/* Right Column: High-Res Document Preview */}
+              {/* Right Column: High-Res Dual Document Preview */}
               <div className="modal-doc-col">
-                <h4>Uploaded Document Proof</h4>
-                <div className="modal-proof-container">
-                  {isImageFile(selectedKyc.documentFile) ? (
-                    <img
-                      src={formatImageUrl(selectedKyc.documentFile)}
-                      alt="Uploaded Document"
-                      className="modal-proof-img"
-                    />
-                  ) : (
-                    <div className="modal-pdf-box">
-                      <FiFileText className="pdf-big-icon" />
-                      <p>Portable Document Format (PDF)</p>
-                      <span>{selectedKyc.documentOriginalName || "Document.pdf"}</span>
-                      <a
-                        href={formatImageUrl(selectedKyc.documentFile)}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="admin-primary-button"
-                        style={{ marginTop: "14px" }}
-                      >
-                        <FiExternalLink /> Open in Fullscreen
-                      </a>
-                    </div>
-                  )}
+                <div className="admin-proof-tabs">
+                  <button
+                    type="button"
+                    className={`admin-proof-tab ${activeProofTab === "identity" ? "active" : ""}`}
+                    onClick={() => setActiveProofTab("identity")}
+                  >
+                    <FiFileText /> Identity Proof ({selectedKyc.documentType})
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-proof-tab ${activeProofTab === "passbook" ? "active" : ""}`}
+                    onClick={() => setActiveProofTab("passbook")}
+                  >
+                    <FiCreditCard /> Bank Passbook / Cheque
+                  </button>
                 </div>
 
-                <div className="proof-action-strip">
-                  <a
-                    href={formatImageUrl(selectedKyc.documentFile)}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="proof-link-btn"
-                  >
-                    <FiDownload /> Download Original Proof
-                  </a>
-                </div>
+                {activeProofTab === "identity" ? (
+                  <>
+                    <div className="modal-proof-container">
+                      {selectedKyc.documentFile ? (
+                        isImageFile(selectedKyc.documentFile) ? (
+                          <img
+                            src={formatImageUrl(selectedKyc.documentFile)}
+                            alt="Uploaded Identity Document"
+                            className="modal-proof-img"
+                          />
+                        ) : (
+                          <div className="modal-pdf-box">
+                            <FiFileText className="pdf-big-icon" />
+                            <p>Portable Document Format (PDF)</p>
+                            <span>{selectedKyc.documentOriginalName || "IdentityDocument.pdf"}</span>
+                            <a
+                              href={formatImageUrl(selectedKyc.documentFile)}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="admin-primary-button"
+                              style={{ marginTop: "14px" }}
+                            >
+                              <FiExternalLink /> Open in Fullscreen
+                            </a>
+                          </div>
+                        )
+                      ) : (
+                        <p style={{ color: "#8c8376" }}>No identity document uploaded.</p>
+                      )}
+                    </div>
+
+                    {selectedKyc.documentFile && (
+                      <div className="proof-action-strip">
+                        <a
+                          href={formatImageUrl(selectedKyc.documentFile)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="proof-link-btn"
+                        >
+                          <FiDownload /> Download Identity Document
+                        </a>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="modal-proof-container">
+                      {selectedKyc.passbookFile ? (
+                        isImageFile(selectedKyc.passbookFile) ? (
+                          <img
+                            src={formatImageUrl(selectedKyc.passbookFile)}
+                            alt="Uploaded Bank Passbook"
+                            className="modal-proof-img"
+                          />
+                        ) : (
+                          <div className="modal-pdf-box">
+                            <FiCreditCard className="pdf-big-icon" style={{ color: "#60a5fa" }} />
+                            <p>Passbook / Cheque Document (PDF)</p>
+                            <span>{selectedKyc.passbookOriginalName || "BankPassbook.pdf"}</span>
+                            <a
+                              href={formatImageUrl(selectedKyc.passbookFile)}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="admin-primary-button"
+                              style={{
+                                marginTop: "14px",
+                                background: "linear-gradient(135deg, #60a5fa, #2563eb)",
+                                color: "#ffffff",
+                                borderColor: "#3b82f6",
+                              }}
+                            >
+                              <FiExternalLink /> Open in Fullscreen
+                            </a>
+                          </div>
+                        )
+                      ) : (
+                        <div style={{ textAlign: "center", padding: "30px 20px", color: "#8c8376" }}>
+                          <FiCreditCard style={{ fontSize: "40px", marginBottom: "8px", opacity: 0.5 }} />
+                          <p style={{ margin: "4px 0", color: "#e5e5e5", fontWeight: "600" }}>
+                            No Bank Passbook Uploaded
+                          </p>
+                          <span style={{ fontSize: "12px" }}>
+                            User has not uploaded a passbook or cheque image yet.
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {selectedKyc.passbookFile && (
+                      <div className="proof-action-strip">
+                        <a
+                          href={formatImageUrl(selectedKyc.passbookFile)}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="proof-link-btn"
+                          style={{ color: "#60a5fa" }}
+                        >
+                          <FiDownload /> Download Bank Passbook Photo
+                        </a>
+                      </div>
+                    )}
+                  </>
+                )}
               </div>
             </div>
 

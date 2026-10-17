@@ -14,6 +14,7 @@ const pageNames = {
   "/admin/dashboard": "Dashboard",
   "/admin/users": "Vendor Management",
   "/admin/vendor-users": "Vendor Users",
+  "/admin/wallet-requests": "Wallet Requests",
   "/admin/kyc": "KYC Verification",
   "/admin/products": "Products",
   "/admin/categories": "Categories",

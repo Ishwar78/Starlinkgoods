@@ -18,6 +18,7 @@ const productRoutes = require("./routes/productRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const kycRoutes = require("./routes/kycRoutes");
 const membershipRoutes = require("./routes/membershipRoutes");
+const walletRequestRoutes = require("./routes/walletRequestRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -66,6 +67,9 @@ app.use("/api/kyc", kycRoutes);
 
 // Membership Registration & Razorpay Routes
 app.use("/api/membership", membershipRoutes);
+
+// Wallet Withdrawal / Payout Request Routes
+app.use("/api/wallet-requests", walletRequestRoutes);
 
 const startServer = async () => {
   try {

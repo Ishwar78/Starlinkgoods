@@ -22,6 +22,7 @@ import UserProtectedRoute from "./components/UserProtectedRoute.jsx";
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import Users from "./pages/admin/Users.jsx";
 import VendorUsers from "./pages/admin/VendorUsers.jsx";
+import AdminWalletRequests from "./pages/admin/WalletRequests.jsx";
 import Products from "./pages/admin/Products.jsx";
 import Categories from "./pages/admin/Categories.jsx";
 import AdminKYC from "./pages/admin/KYC.jsx";
@@ -89,6 +90,7 @@ export default function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="users" element={<Users />} />
             <Route path="vendor-users" element={<VendorUsers />} />
+            <Route path="wallet-requests" element={<AdminWalletRequests />} />
             <Route path="kyc" element={<AdminKYC />} />
             <Route path="products" element={<Products />} />
             <Route path="categories" element={<Categories />} />
