@@ -18,6 +18,7 @@ import {
   FiBookOpen,
 } from "react-icons/fi";
 import "./Home.css";
+import Footer from "../components/Footer";
 
 const categories = [
   { name: "Sofa Sets", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=500&q=85" },
@@ -189,6 +190,7 @@ export default function Home() {
   const WorkIcon = currentWork.icon;
 
   return (
+    <>
     <main>
       {notice && (
         <div className="toast-message" role="status">
@@ -720,5 +722,7 @@ export default function Home() {
         </button>
       )}
     </main>
+<Footer />
+    </>
   );
 }

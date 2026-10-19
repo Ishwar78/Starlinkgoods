@@ -79,7 +79,7 @@ export default function Users() {
     if (!query) return vendors;
 
     return vendors.filter((v) =>
-      [v.name, v.email, v.mobile, v.city, v.state, v.address, v.status]
+      [v.vendorId, v.name, v.email, v.mobile, v.city, v.state, v.address, v.status]
         .filter(Boolean)
         .some((val) => val.toLowerCase().includes(query))
     );
@@ -436,8 +436,27 @@ export default function Users() {
               {filteredVendors.map((vendor) => (
                 <tr key={vendor._id}>
                   <td>
-                    <strong>{vendor.name}</strong>
-                    <br />
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                      <strong>{vendor.name}</strong>
+                      {vendor.vendorId && (
+                        <span
+                          style={{
+                            background: "rgba(255, 199, 45, 0.15)",
+                            color: "#ffd044",
+                            border: "1px solid rgba(255, 199, 45, 0.35)",
+                            padding: "2px 7px",
+                            borderRadius: "4px",
+                            fontSize: "11px",
+                            fontFamily: "monospace",
+                            fontWeight: "800",
+                            letterSpacing: "0.5px",
+                          }}
+                          title={`Unique Vendor ID: ${vendor.vendorId}`}
+                        >
+                          {vendor.vendorId}
+                        </span>
+                      )}
+                    </div>
                     <small style={{ color: "#ffd044", fontSize: 11 }}>
                       {vendor.role || "Vendor"}
                     </small>

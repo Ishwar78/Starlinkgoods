@@ -98,12 +98,31 @@ router.post("/", async (req, res) => {
     }
 
     const currentBalance = typeof user.walletBalance === "number" ? user.walletBalance : 0;
-    if (currentBalance < numAmount) {
+
+    // Rule: User can only request up to wallet balance minus 10% (10% reserved for 5% TDS & 5% Software Charge)
+    const maxAllowed = Math.floor(currentBalance * 0.9);
+    if (numAmount > maxAllowed) {
       return res.status(400).json({
         success: false,
-        message: `Insufficient balance! Your available balance is ₹${currentBalance.toLocaleString(
+        message: `Maximum requestable amount is ₹${maxAllowed.toLocaleString(
           "en-IN"
-        )}, but you requested ₹${numAmount.toLocaleString("en-IN")}.`,
+        )} (Wallet balance ₹${currentBalance.toLocaleString(
+          "en-IN"
+        )} minus 10% deduction for 5% TDS & 5% Software Charge).`,
+      });
+    }
+
+    // 5% TDS & 5% Software charge calculations on requested amount
+    const tdsAmount = Math.round(numAmount * 0.05 * 100) / 100;
+    const softwareCharge = Math.round(numAmount * 0.05 * 100) / 100;
+    const totalDebited = Math.round((numAmount + tdsAmount + softwareCharge) * 100) / 100;
+
+    if (currentBalance < totalDebited) {
+      return res.status(400).json({
+        success: false,
+        message: `Insufficient balance! Total deduction with 5% TDS and 5% Software Charge is ₹${totalDebited.toLocaleString(
+          "en-IN"
+        )}, which exceeds your balance of ₹${currentBalance.toLocaleString("en-IN")}.`,
       });
     }
 
@@ -157,18 +176,25 @@ router.post("/", async (req, res) => {
       };
     }
 
-    // Deduct from user's wallet balance immediately to hold funds safely
-    user.walletBalance = currentBalance - numAmount;
+    // Deduct full amount (Requested Amount + 5% TDS + 5% Software Charge) from user's wallet
+    user.walletBalance = Math.round((currentBalance - totalDebited) * 100) / 100;
 
     const txnId = `REQ${Date.now()}${Math.floor(100 + Math.random() * 900)}`;
     const pendingTxn = {
       transactionId: txnId,
-      amount: numAmount,
+      amount: totalDebited,
+      payoutAmount: numAmount,
+      tdsAmount,
+      softwareCharge,
       type: "Debit",
       title: `Payout Request (${paymentMode})`,
-      description: `Requested withdrawal of ₹${numAmount.toLocaleString(
+      description: `Payout Amount: ₹${numAmount.toLocaleString(
         "en-IN"
-      )} via ${paymentMode}. Status: Under Admin Review`,
+      )} | 5% TDS: ₹${tdsAmount.toLocaleString(
+        "en-IN"
+      )} | 5% Software Charge: ₹${softwareCharge.toLocaleString(
+        "en-IN"
+      )} | Total Debited: ₹${totalDebited.toLocaleString("en-IN")}. Status: Under Review`,
       addedBy: "User",
       status: "Pending",
       createdAt: new Date(),
@@ -180,7 +206,7 @@ router.post("/", async (req, res) => {
     user.walletTransactions.unshift(pendingTxn);
     await user.save();
 
-    // Create the payout request record
+    // Create the payout request record with full breakdown
     const walletRequest = new WalletRequest({
       userId: user._id,
       userModel,
@@ -188,6 +214,12 @@ router.post("/", async (req, res) => {
       userEmail: user.email,
       userMobile: user.mobile,
       amount: numAmount,
+      netAmount: numAmount,
+      tdsPercent: 5,
+      tdsAmount,
+      softwareChargePercent: 5,
+      softwareCharge,
+      totalDebited,
       paymentMode,
       upiDetails,
       bankDetails,
@@ -280,7 +312,7 @@ router.get("/all", async (req, res) => {
     const requests = await WalletRequest.find(filter).sort({ createdAt: -1 });
 
     // Aggregate stats
-    const all = await WalletRequest.find({}, "status amount");
+    const all = await WalletRequest.find({}, "status amount netAmount totalDebited tdsAmount softwareCharge");
     const stats = {
       total: all.length,
       pending: all.filter((r) => r.status === "Pending").length,
@@ -290,6 +322,15 @@ router.get("/all", async (req, res) => {
       approvedAmount: all
         .filter((r) => r.status === "Approved")
         .reduce((sum, r) => sum + (Number(r.amount) || 0), 0),
+      totalTds: all
+        .filter((r) => r.status === "Approved")
+        .reduce((sum, r) => sum + (Number(r.tdsAmount) || 0), 0),
+      totalSoftwareCharge: all
+        .filter((r) => r.status === "Approved")
+        .reduce((sum, r) => sum + (Number(r.softwareCharge) || 0), 0),
+      totalDebited: all
+        .filter((r) => r.status === "Approved")
+        .reduce((sum, r) => sum + (Number(r.totalDebited || r.amount) || 0), 0),
     };
 
     return res.status(200).json({
@@ -348,6 +389,8 @@ router.patch("/:id/status", async (req, res) => {
       if (!user) user = await VendorUser.findOne({ email: request.userEmail });
     }
 
+    const totalDebitVal = request.totalDebited || request.amount;
+
     if (status === "Approved") {
       request.status = "Approved";
       request.adminRemarks = adminRemarks.trim();
@@ -360,12 +403,18 @@ router.patch("/:id/status", async (req, res) => {
         const pendingTxn = user.walletTransactions.find(
           (t) =>
             t.status === "Pending" &&
-            t.amount === request.amount &&
+            (t.amount === totalDebitVal || t.payoutAmount === request.amount) &&
             t.type === "Debit"
         );
         if (pendingTxn) {
           pendingTxn.status = "Completed";
-          pendingTxn.description = `Payout completed. Ref/UTR: ${adminTransactionId || "N/A"}. ${adminRemarks}`;
+          pendingTxn.description = `Payout completed. Payout: ₹${request.amount.toLocaleString(
+            "en-IN"
+          )} | 5% TDS: ₹${(request.tdsAmount || 0).toLocaleString(
+            "en-IN"
+          )} | 5% Software: ₹${(request.softwareCharge || 0).toLocaleString(
+            "en-IN"
+          )} | Total: ₹${totalDebitVal.toLocaleString("en-IN")}. Ref/UTR: ${adminTransactionId || "N/A"}. ${adminRemarks}`;
         }
         await user.save();
       }
@@ -374,27 +423,31 @@ router.patch("/:id/status", async (req, res) => {
         success: true,
         message: `Payout request of ₹${request.amount.toLocaleString(
           "en-IN"
-        )} approved successfully!`,
+        )} approved successfully! (Wallet debited: ₹${totalDebitVal.toLocaleString("en-IN")})`,
         request,
       });
     } else {
-      // Status is "Rejected": Refund held amount back to user's wallet
+      // Status is "Rejected": Refund full debited amount (including 10% charges) back to user's wallet
       request.status = "Rejected";
       request.adminRemarks = adminRemarks.trim() || "Declined by Admin";
       request.processedAt = new Date();
       await request.save();
 
+      const refundAmount = totalDebitVal;
+
       if (user) {
         if (typeof user.walletBalance !== "number") user.walletBalance = 0;
-        user.walletBalance += request.amount;
+        user.walletBalance = Math.round((user.walletBalance + refundAmount) * 100) / 100;
 
         const refundTxnId = `REF${Date.now()}${Math.floor(100 + Math.random() * 900)}`;
         const refundTxn = {
           transactionId: refundTxnId,
-          amount: request.amount,
+          amount: refundAmount,
           type: "Credit",
           title: "Payout Request Refund",
-          description: `Refund for rejected withdrawal: ${request.adminRemarks}`,
+          description: `Refund for rejected withdrawal: Full ₹${refundAmount.toLocaleString(
+            "en-IN"
+          )} (Payout ₹${request.amount} + 10% TDS & Software charges). Reason: ${request.adminRemarks}`,
           addedBy: "Admin",
           status: "Completed",
           createdAt: new Date(),
@@ -408,7 +461,7 @@ router.patch("/:id/status", async (req, res) => {
         const pendingTxn = user.walletTransactions.find(
           (t) =>
             t.status === "Pending" &&
-            t.amount === request.amount &&
+            (t.amount === totalDebitVal || t.payoutAmount === request.amount) &&
             t.type === "Debit"
         );
         if (pendingTxn) {
@@ -421,9 +474,9 @@ router.patch("/:id/status", async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        message: `Payout request rejected. ₹${request.amount.toLocaleString(
+        message: `Payout request rejected. Full ₹${refundAmount.toLocaleString(
           "en-IN"
-        )} has been refunded back to user's wallet.`,
+        )} (including 10% charges) has been refunded back to user's wallet.`,
         request,
       });
     }

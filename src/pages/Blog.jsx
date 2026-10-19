@@ -137,6 +137,8 @@ const Blog = () => {
   const currentLatest = latestUpdates[latestIndex];
 
   return (
+<>
+
     <main className="blog-page">
       {/* ================= HERO SLIDER ================= */}
       <section
@@ -346,6 +348,8 @@ const Blog = () => {
         </div>
       </section>
     </main>
+   
+      </>
   );
 };
 

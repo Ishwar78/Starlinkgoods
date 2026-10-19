@@ -56,10 +56,15 @@ router.post("/login", async (req, res) => {
     }
 
     const cleanInput = loginInput.toLowerCase();
+    const upperInput = loginInput.toUpperCase();
 
-    // Find vendor by email or mobile
+    // Find vendor by email, mobile, or unique vendorId (e.g. SLG1001)
     const vendor = await Vendor.findOne({
-      $or: [{ email: cleanInput }, { mobile: loginInput }],
+      $or: [
+        { email: cleanInput },
+        { mobile: loginInput },
+        { vendorId: upperInput },
+      ],
     });
 
     if (!vendor) {
@@ -280,7 +285,10 @@ router.post("/", async (req, res) => {
       });
     }
 
+    const newVendorId = await Vendor.generateUniqueVendorId();
+
     const vendor = new Vendor({
+      vendorId: newVendorId,
       name: name.trim(),
       email: cleanEmail,
       mobile: cleanMobile,

@@ -19,6 +19,8 @@ const categoryRoutes = require("./routes/categoryRoutes");
 const kycRoutes = require("./routes/kycRoutes");
 const membershipRoutes = require("./routes/membershipRoutes");
 const walletRequestRoutes = require("./routes/walletRequestRoutes");
+const orderRoutes = require("./routes/orderRoutes");
+const Vendor = require("./models/Vendor");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -71,12 +73,16 @@ app.use("/api/membership", membershipRoutes);
 // Wallet Withdrawal / Payout Request Routes
 app.use("/api/wallet-requests", walletRequestRoutes);
 
+// Orders Routes
+app.use("/api/orders", orderRoutes);
+
 const startServer = async () => {
   try {
     await connectDB();
     await seedAdmin();
     await seedCategories();
     await seedProducts();
+    await Vendor.migrateExistingVendors();
 
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);

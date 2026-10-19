@@ -153,7 +153,14 @@ const UserSidebar = ({ isOpen = false, onClose = () => {}, userData: propUserDat
 
           <div className="user-sidebar-profile-info">
             <h4>{userName}</h4>
-            <p>{userSub}</p>
+            <p style={{ display: "flex", alignItems: "center", gap: "6px", flexWrap: "wrap" }}>
+              {userData.vendorId && (
+                <span style={{ color: "#ffd044", fontWeight: "700", fontFamily: "monospace" }}>
+                  {userData.vendorId}
+                </span>
+              )}
+              <span>{userSub}</span>
+            </p>
           </div>
 
           <span className="user-sidebar-online-dot" />

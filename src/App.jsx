@@ -11,8 +11,13 @@ import Founder from "./pages/Founder";
 import OurTeam from "./pages/OurTeam";
 import Blog from "./pages/Blog";
 
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsConditions from "./pages/TermsConditions";
+
 
 import MemberRegister from "./pages/MemberRegister.jsx";
+
+import VendorRegister from "./pages/VendorRegister";
 
 
 import AdminLogin from "./pages/AdminLogin.jsx";
@@ -48,6 +53,7 @@ export default function App() {
 
   return (
     <>
+    
       {!hideNavbar && <Navbar />}
       
       <Routes>
@@ -60,7 +66,17 @@ export default function App() {
         <Route path="/our-team" element={<OurTeam />} />
         <Route path="/blog" element={<Blog />} />
 
+        <Route
+  path="/privacy-policy"
+  element={<PrivacyPolicy />}
+/>
 
+<Route
+  path="/terms-conditions"
+  element={<TermsConditions />}
+/>
+
+<Route path="/vendor-register" element={<VendorRegister />} />
         <Route path="/member-register" element={<MemberRegister />} />
         <Route path="/footer" element={<Footer />} />
        

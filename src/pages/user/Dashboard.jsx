@@ -262,6 +262,23 @@ export default function Dashboard() {
             <div className="profile-avatar-meta-top">
               <h3>{userData.name || "Vendor User"}</h3>
               <span className="profile-badge-tag">{userData.role || "Vendor Account"}</span>
+              {userData.vendorId && (
+                <span
+                  className="profile-badge-tag"
+                  style={{
+                    background: "rgba(255, 199, 45, 0.2)",
+                    color: "#ffd044",
+                    border: "1px solid #ffd044",
+                    fontFamily: "monospace",
+                    fontSize: "12px",
+                    fontWeight: "800",
+                    letterSpacing: "0.8px",
+                  }}
+                  title="Your Unique Vendor ID"
+                >
+                  ID: {userData.vendorId}
+                </span>
+              )}
             </div>
             <p className="profile-avatar-hint">
               Upload your personal photo or store logo (JPG, PNG, WEBP). This photo is displayed in your sidebar and portal header.
@@ -298,6 +315,20 @@ export default function Dashboard() {
         </div>
 
         <div className="vendor-info-grid">
+          <div className="vendor-info-item">
+            <span className="vendor-info-label">Unique Vendor ID</span>
+            <strong
+              className="vendor-info-value"
+              style={{
+                color: "#ffd044",
+                fontFamily: "monospace",
+                fontSize: "15px",
+                letterSpacing: "0.8px",
+              }}
+            >
+              {userData.vendorId || "SLG-PENDING"}
+            </strong>
+          </div>
           <div className="vendor-info-item">
             <span className="vendor-info-label">Full Name</span>
             <strong className="vendor-info-value">{userData.name || "N/A"}</strong>

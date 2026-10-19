@@ -316,8 +316,11 @@ router.post("/verify-and-register", async (req, res) => {
 
     const membershipFee = Number(process.env.MEMBERSHIP_FEE) || 5000;
 
+    const newVendorId = await Vendor.generateUniqueVendorId();
+
     // 4. Create and Save the Vendor / User
     const newVendor = new Vendor({
+      vendorId: newVendorId,
       name: userName,
       email: cleanEmail,
       mobile: cleanMobile,
@@ -342,6 +345,7 @@ router.post("/verify-and-register", async (req, res) => {
     const token = jwt.sign(
       {
         id: newVendor._id,
+        vendorId: newVendor.vendorId,
         email: newVendor.email,
         mobile: newVendor.mobile,
         role: newVendor.role,

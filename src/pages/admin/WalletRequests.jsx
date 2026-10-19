@@ -365,7 +365,9 @@ export default function AdminWalletRequests() {
             <thead>
               <tr>
                 <th>User Details</th>
-                <th>Requested Amount</th>
+                <th>Net Payout</th>
+                <th>10% Deductions</th>
+                <th>Total Wallet Debit</th>
                 <th>Payment Mode</th>
                 <th>Account / Payout Details</th>
                 <th>Date &amp; Time</th>
@@ -386,6 +388,9 @@ export default function AdminWalletRequests() {
                       minute: "2-digit",
                     })
                   : "N/A";
+                const tdsVal = typeof r.tdsAmount === "number" ? r.tdsAmount : Math.round(Number(r.amount) * 0.05 * 100) / 100;
+                const scVal = typeof r.softwareCharge === "number" ? r.softwareCharge : Math.round(Number(r.amount) * 0.05 * 100) / 100;
+                const totalDebVal = typeof r.totalDebited === "number" ? r.totalDebited : Math.round((Number(r.amount) + tdsVal + scVal) * 100) / 100;
 
                 return (
                   <tr key={r._id}>
@@ -398,13 +403,37 @@ export default function AdminWalletRequests() {
                     </td>
 
                     <td>
-                      <span className="admin-req-amount">
+                      <span className="admin-req-amount" style={{ color: "#34d399" }}>
                         ₹
                         {Number(r.amount).toLocaleString("en-IN", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         })}
                       </span>
+                      <div style={{ fontSize: "11px", color: "#a89d8d" }}>Disbursement</div>
+                    </td>
+
+                    <td>
+                      <div style={{ fontSize: "12px", lineHeight: "1.4" }}>
+                        <span style={{ color: "#f87171" }}>
+                          TDS (5%): -₹{tdsVal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                        </span>
+                        <br />
+                        <span style={{ color: "#f87171" }}>
+                          Software (5%): -₹{scVal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                        </span>
+                      </div>
+                    </td>
+
+                    <td>
+                      <span className="admin-req-amount" style={{ color: "#ffd044" }}>
+                        ₹
+                        {totalDebVal.toLocaleString("en-IN", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </span>
+                      <div style={{ fontSize: "11px", color: "#a89d8d" }}>Debited</div>
                     </td>
 
                     <td>
@@ -573,9 +602,27 @@ export default function AdminWalletRequests() {
                   <span>{approveModalReq.userName} ({approveModalReq.userEmail})</span>
                 </div>
                 <div className="admin-modal-summary-row">
-                  <span>Amount to Disburse</span>
+                  <span>Net Amount to Disburse</span>
+                  <span style={{ color: "#34d399", fontSize: "16px", fontWeight: "800" }}>
+                    ₹{approveModalReq.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="admin-modal-summary-row">
+                  <span>5% TDS Deduction</span>
+                  <span style={{ color: "#f87171" }}>
+                    -₹{(approveModalReq.tdsAmount ?? Math.round(approveModalReq.amount * 0.05 * 100) / 100).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="admin-modal-summary-row">
+                  <span>5% Software Charge</span>
+                  <span style={{ color: "#f87171" }}>
+                    -₹{(approveModalReq.softwareCharge ?? Math.round(approveModalReq.amount * 0.05 * 100) / 100).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="admin-modal-summary-row" style={{ borderTop: "1px solid rgba(255,208,68,0.2)", paddingTop: "6px" }}>
+                  <span style={{ color: "#ffd044", fontWeight: "700" }}>Total Cut from Wallet</span>
                   <span style={{ color: "#ffd044", fontSize: "16px", fontWeight: "800" }}>
-                    ₹{approveModalReq.amount.toLocaleString("en-IN")}
+                    ₹{(approveModalReq.totalDebited ?? Math.round(approveModalReq.amount * 1.10 * 100) / 100).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
                 <div className="admin-modal-summary-row">
@@ -673,22 +720,27 @@ export default function AdminWalletRequests() {
             </div>
 
             <div className="admin-modal-body">
-              <div
-                style={{
-                  background: "rgba(239, 68, 68, 0.12)",
-                  border: "1px solid rgba(239, 68, 68, 0.28)",
-                  padding: "12px 14px",
-                  borderRadius: "8px",
-                  color: "#fca5a5",
-                  fontSize: "13px",
-                  marginBottom: "16px",
-                  lineHeight: "1.5",
-                }}
-              >
-                <strong>Automatic Wallet Refund:</strong> Rejecting this request will immediately refund{" "}
-                <strong>₹{rejectModalReq.amount.toLocaleString("en-IN")}</strong> back into{" "}
-                <strong>{rejectModalReq.userName}'s</strong> wallet balance.
-              </div>
+              {(() => {
+                const totalRefund = rejectModalReq.totalDebited ?? Math.round(rejectModalReq.amount * 1.10 * 100) / 100;
+                return (
+                  <div
+                    style={{
+                      background: "rgba(239, 68, 68, 0.12)",
+                      border: "1px solid rgba(239, 68, 68, 0.28)",
+                      padding: "12px 14px",
+                      borderRadius: "8px",
+                      color: "#fca5a5",
+                      fontSize: "13px",
+                      marginBottom: "16px",
+                      lineHeight: "1.5",
+                    }}
+                  >
+                    <strong>Automatic Wallet Refund:</strong> Rejecting this request will immediately refund the full{" "}
+                    <strong>₹{totalRefund.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</strong> (Payout ₹{rejectModalReq.amount.toLocaleString("en-IN")} + 10% TDS &amp; Software charges) back into{" "}
+                    <strong>{rejectModalReq.userName}'s</strong> wallet balance.
+                  </div>
+                );
+              })()}
 
               <div className="admin-modal-field">
                 <label>Reason for Rejection *</label>
@@ -753,9 +805,27 @@ export default function AdminWalletRequests() {
                   <span>{viewDetailsReq.userEmail} | {viewDetailsReq.userMobile}</span>
                 </div>
                 <div className="admin-modal-summary-row">
-                  <span>Requested Amount</span>
+                  <span>Net Payout to Disburse</span>
+                  <span style={{ color: "#34d399", fontSize: "16px", fontWeight: "800" }}>
+                    ₹{viewDetailsReq.amount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="admin-modal-summary-row">
+                  <span>5% TDS Deduction</span>
+                  <span style={{ color: "#f87171" }}>
+                    -₹{(viewDetailsReq.tdsAmount ?? Math.round(viewDetailsReq.amount * 0.05 * 100) / 100).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="admin-modal-summary-row">
+                  <span>5% Software Charge</span>
+                  <span style={{ color: "#f87171" }}>
+                    -₹{(viewDetailsReq.softwareCharge ?? Math.round(viewDetailsReq.amount * 0.05 * 100) / 100).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                  </span>
+                </div>
+                <div className="admin-modal-summary-row" style={{ borderTop: "1px solid rgba(255,208,68,0.2)", paddingTop: "6px" }}>
+                  <span style={{ color: "#ffd044", fontWeight: "700" }}>Total Cut from Wallet</span>
                   <span style={{ color: "#ffd044", fontSize: "16px", fontWeight: "800" }}>
-                    ₹{viewDetailsReq.amount.toLocaleString("en-IN")}
+                    ₹{(viewDetailsReq.totalDebited ?? Math.round(viewDetailsReq.amount * 1.10 * 100) / 100).toLocaleString("en-IN", { minimumFractionDigits: 2 })}
                   </span>
                 </div>
                 <div className="admin-modal-summary-row">

@@ -386,7 +386,7 @@ export default function Contact() {
         </Link>
       </section>
     </main>
-    {/* <Footer /> */}
+    <Footer />
     </>
   );
 }

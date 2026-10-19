@@ -13,17 +13,17 @@ const aboutLinks = [
 
 const founderHeroSlides = [
   {
-    image: "/images/founder-hero.jpg",
+    image: "/banner.png",
     alt: "Foundation and community awareness",
   },
-  {
-    image: "/images/founder-hero-2.jpg",
-    alt: "People working together for social awareness",
-  },
-  {
-    image: "/images/founder-hero-3.jpg",
-    alt: "Community gathering",
-  },
+  // {
+  //   image: "/images/founder-hero-2.jpg",
+  //   alt: "People working together for social awareness",
+  // },
+  // {
+  //   image: "/images/founder-hero-3.jpg",
+  //   alt: "Community gathering",
+  // },
 ];
 
 function FounderHeroSlider() {
@@ -105,7 +105,7 @@ export default function Founder() {
         <div className="founder-profile-image-wrap">
           <div className="founder-profile-image-frame">
             <img
-              src="/images/founder.jpg"
+              src="/download.png"
               alt="Founder of Ekam Nyaay Foundation"
               className="founder-profile-image"
               loading="lazy"
@@ -139,7 +139,7 @@ export default function Founder() {
           </p>
 
           <div className="founder-profile-identity">
-            <h1 id="founder-name">Deepika Narayan Bhardwaj</h1>
+            <h1 id="founder-name"> esrgdfvdrfc</h1>
             <p className="founder-designation">Founder</p>
           </div>
         </div>

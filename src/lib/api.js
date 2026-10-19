@@ -418,3 +418,49 @@ export async function deleteWalletRequest(requestId) {
   });
 }
 
+// ==========================================
+// ORDER API HELPERS
+// ==========================================
+
+export async function getOrderRazorpayConfig() {
+  return apiFetch("/api/orders/razorpay-config");
+}
+
+export async function createOrderRazorpayOrder(orderPayload) {
+  return apiFetch("/api/orders/create-razorpay-order", {
+    method: "POST",
+    body: JSON.stringify(orderPayload),
+  });
+}
+
+export async function createOrder(orderFormData) {
+  return apiFetch("/api/orders", {
+    method: "POST",
+    body: orderFormData,
+  });
+}
+
+export async function getMyOrders(params = {}) {
+  const query = new URLSearchParams();
+  if (params.vendorId) query.append("vendorId", params.vendorId);
+  if (params.vendorEmail) query.append("vendorEmail", params.vendorEmail);
+  const qs = query.toString();
+  return apiFetch(`/api/orders/my-orders${qs ? `?${qs}` : ""}`);
+}
+
+export async function getAllOrders(params = {}) {
+  const query = new URLSearchParams();
+  if (params.search) query.append("search", params.search);
+  if (params.status && params.status !== "All") query.append("status", params.status);
+  const qs = query.toString();
+  return apiFetch(`/api/orders/all${qs ? `?${qs}` : ""}`);
+}
+
+export async function updateOrderStatus(orderId, { orderStatus, adminNotes }) {
+  return apiFetch(`/api/orders/${orderId}/status`, {
+    method: "PATCH",
+    body: JSON.stringify({ orderStatus, adminNotes }),
+  });
+}
+
+

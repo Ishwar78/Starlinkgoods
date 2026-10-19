@@ -18,17 +18,17 @@ const aboutLinks = [
 
 const teamHeroSlides = [
   {
-    image: "/images/team-hero.jpg",
+    image: "/banner.png",
     alt: "Ekam Nyaay Foundation team banner",
   },
-  {
-    image: "/images/team-hero-2.jpg",
-    alt: "Ekam Nyaay Foundation initiatives",
-  },
-  {
-    image: "/images/team-hero-3.jpg",
-    alt: "Ekam Nyaay Foundation community work",
-  },
+  // {
+  //   image: "/images/team-hero-2.jpg",
+  //   alt: "Ekam Nyaay Foundation initiatives",
+  // },
+  // {
+  //   image: "/images/team-hero-3.jpg",
+  //   alt: "Ekam Nyaay Foundation community work",
+  // },
 ];
 
 function TeamHeroSlider() {
@@ -80,10 +80,10 @@ function TeamHeroSlider() {
 const teamMembers = [
   {
     id: "harsh",
-    name: "Adv. Harsh Asija",
+    name: "Adv. ",
     role: "Legal Counselling & Research",
-    image: "/images/harsh-asija.jpg",
-    imageAlt: "Advocate Harsh Asija",
+    image: "/blog.avif",
+    imageAlt: "Advocate ",
     theme: "gold",
     linkedin: "",
     description:
@@ -95,7 +95,7 @@ const teamMembers = [
     id: "rohit",
     name: "Rohit Kumar",
     role: "Counselling and Project Lead",
-    image: "/images/rohit-kumar.jpg",
+    image: "/blog2.avif",
     imageAlt: "Rohit Kumar",
     theme: "dark",
     linkedin: "",

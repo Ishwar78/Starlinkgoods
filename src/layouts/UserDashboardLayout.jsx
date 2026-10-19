@@ -83,7 +83,11 @@ export default function UserDashboardLayout() {
 
   const userName = userData.name || "Vendor User";
   const userInitial = userName.charAt(0).toUpperCase();
-  const userSub = userData.role ? `${userData.role} Account` : "Vendor Account";
+  const userSub = userData.vendorId
+    ? `${userData.vendorId} · ${userData.role || "Vendor"}`
+    : userData.role
+    ? `${userData.role} Account`
+    : "Vendor Account";
 
   return (
     <div className="user-shell">

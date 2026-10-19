@@ -19,11 +19,11 @@ import {
 import "./Footer.css";
 
 const exploreLinks = [
-  ["Home", "#home"],
-  ["About Us", "#about"],
+  ["Home", "/"],
+  ["About Us", "/about"],
   ["Brands", "#brands"],
   ["Special Offers", "#offers"],
-  ["Contact Us", "#contact"],
+  ["Contact Us", "/contact"],
 ];
 
 const categoryLinks = [
@@ -41,7 +41,7 @@ const supportLinks = [
   ["Shopping Cart", "#cart"],
   ["Shipping & Delivery", "#shipping"],
   ["Returns & Refunds", "#returns"],
-  ["Privacy Policy", "#privacy"],
+  ["Privacy Policy", "/privacy-policy"],
 ];
 
 const socialLinks = [
@@ -168,46 +168,7 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Newsletter */}
-      <section className="slg-newsletter">
-        <div className="slg-newsletter-copy">
-          <span className="slg-newsletter-kicker">THE SLG EDIT</span>
-          <h2>Make room for beautiful living.</h2>
-          <p>
-            Get the latest collections, home inspiration and special offers.
-          </p>
-        </div>
-
-        <form className="slg-newsletter-form" onSubmit={handleSubscribe}>
-          <label className="slg-sr-only" htmlFor="slg-footer-email">
-            Email address
-          </label>
-
-          <input
-            id="slg-footer-email"
-            type="email"
-            placeholder="Enter your email address"
-            value={email}
-            onChange={(event) => {
-              setEmail(event.target.value);
-              setSubscribed(false);
-            }}
-            required
-          />
-
-          <button type="submit">
-            Subscribe <FiArrowRight />
-          </button>
-
-          {subscribed && (
-            <p className="slg-newsletter-message" role="status">
-              Thanks for your interest! Connect the newsletter API to save
-              your subscription.
-            </p>
-          )}
-        </form>
-      </section>
-
+     
       {/* Copyright */}
       <div className="slg-footer-bottom">
         <p>
@@ -216,9 +177,9 @@ export default function Footer() {
         </p>
 
         <div className="slg-legal-links">
-          <a href="#privacy">Privacy Policy</a>
+          <a href="/privacy-policy">Privacy Policy</a>
           <span>|</span>
-          <a href="#terms">Terms & Conditions</a>
+          <a href="/terms-conditions">Terms & Conditions</a>
         </div>
 
         <a className="slg-back-top" href="#home">

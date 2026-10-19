@@ -473,8 +473,8 @@ export default function MemberRegister() {
               // Store user credentials and token for immediate login
               localStorage.setItem("userToken", verifyRes.token);
               localStorage.setItem("userData", JSON.stringify(verifyRes.user));
-
-              setSuccess("Membership registration successful! Redirecting to your dashboard...");
+              const vendorIdStr = verifyRes.user?.vendorId ? ` (Vendor ID: ${verifyRes.user.vendorId})` : "";
+              setSuccess(`Membership registration successful!${vendorIdStr} Redirecting to your dashboard...`);
 
               // Navigate directly to User Dashboard
               setTimeout(() => {

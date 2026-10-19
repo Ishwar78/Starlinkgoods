@@ -3,6 +3,13 @@ const bcrypt = require("bcryptjs");
 
 const vendorSchema = new mongoose.Schema(
   {
+    vendorId: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+      uppercase: true,
+    },
     name: {
       type: String,
       required: [true, "Name is required"],
@@ -111,8 +118,68 @@ const vendorSchema = new mongoose.Schema(
   }
 );
 
-// Hash password before saving
+// Unique Vendor ID Generator (e.g. SLG1001, SLG1002, etc.)
+vendorSchema.statics.generateUniqueVendorId = async function () {
+  const VendorModel = this;
+  const vendors = await VendorModel.find(
+    { vendorId: { $regex: /^SLG\d+$/i } },
+    { vendorId: 1 }
+  );
+
+  let maxNum = 1000;
+  for (const v of vendors) {
+    if (v.vendorId) {
+      const num = parseInt(v.vendorId.replace(/\D/g, ""), 10);
+      if (!isNaN(num) && num > maxNum) {
+        maxNum = num;
+      }
+    }
+  }
+
+  let nextNum = maxNum + 1;
+  let candidateId = `SLG${nextNum}`;
+
+  while (await VendorModel.findOne({ vendorId: candidateId })) {
+    nextNum++;
+    candidateId = `SLG${nextNum}`;
+  }
+
+  return candidateId;
+};
+
+// Migration helper to auto-assign SLG IDs to any legacy vendors lacking vendorId
+vendorSchema.statics.migrateExistingVendors = async function () {
+  try {
+    const VendorModel = this;
+    const vendorsWithoutId = await VendorModel.find({
+      $or: [
+        { vendorId: { $exists: false } },
+        { vendorId: "" },
+        { vendorId: null },
+      ],
+    }).sort({ createdAt: 1 });
+
+    if (vendorsWithoutId.length > 0) {
+      console.log(`ℹ️ Assigning SLG IDs to ${vendorsWithoutId.length} existing vendors...`);
+      for (const vendor of vendorsWithoutId) {
+        const newId = await VendorModel.generateUniqueVendorId();
+        vendor.vendorId = newId;
+        await vendor.save();
+        console.log(`✅ Assigned ${newId} to vendor: ${vendor.name} (${vendor.email})`);
+      }
+    }
+  } catch (err) {
+    console.warn("Migration of vendor IDs warning:", err.message);
+  }
+};
+
+// Auto-assign vendorId and hash password before saving
 vendorSchema.pre("save", async function () {
+  if (!this.vendorId) {
+    const VendorModel = this.constructor;
+    this.vendorId = await VendorModel.generateUniqueVendorId();
+  }
+
   if (!this.isModified("password")) return;
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);

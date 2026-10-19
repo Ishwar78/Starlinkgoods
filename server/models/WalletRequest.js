@@ -34,6 +34,30 @@ const walletRequestSchema = new mongoose.Schema(
       required: [true, "Requested amount is required"],
       min: [1, "Amount must be at least ₹1"],
     },
+    netAmount: {
+      type: Number,
+      default: 0,
+    },
+    tdsPercent: {
+      type: Number,
+      default: 5,
+    },
+    tdsAmount: {
+      type: Number,
+      default: 0,
+    },
+    softwareChargePercent: {
+      type: Number,
+      default: 5,
+    },
+    softwareCharge: {
+      type: Number,
+      default: 0,
+    },
+    totalDebited: {
+      type: Number,
+      default: 0,
+    },
     paymentMode: {
       type: String,
       required: [true, "Payment mode is required"],

@@ -4,6 +4,13 @@
    Black, White & Gold Theme
 ========================================= */
 
+.site-header,
+.site-header *,
+.site-header *::before,
+.site-header *::after {
+  box-sizing: border-box;
+}
+
 .site-header {
   position: fixed;
   top: 0;
@@ -15,13 +22,6 @@
   background: #050505;
   border-bottom: 1px solid rgba(255, 199, 45, 0.4);
   box-shadow: 0 5px 22px rgba(0, 0, 0, 0.3);
-  box-sizing: border-box;
-}
-
-.site-header *,
-.site-header *::before,
-.site-header *::after {
-  box-sizing: border-box;
 }
 
 .site-header-spacer {
@@ -31,9 +31,7 @@
   pointer-events: none;
 }
 
-/* =========================================
-   HEADER MAIN
-========================================= */
+/* HEADER MAIN */
 
 .header-main {
   display: flex;
@@ -44,9 +42,7 @@
   padding: 10px 2% 10px 1%;
 }
 
-/* =========================================
-   LOGO
-========================================= */
+/* LOGO */
 
 .brand {
   display: flex;
@@ -73,9 +69,7 @@
   transform: scale(1.02);
 }
 
-/* =========================================
-   SEARCH
-========================================= */
+/* SEARCH */
 
 .header-search {
   display: flex;
@@ -134,9 +128,7 @@
   background: #ffda55;
 }
 
-/* =========================================
-   HEADER ACTIONS
-========================================= */
+/* HEADER ACTIONS */
 
 .header-actions {
   display: flex;
@@ -146,6 +138,8 @@
   flex: 0 0 auto;
 }
 
+/* VENDOR + MEMBER REGISTER */
+
 .register-button,
 .login-button {
   display: inline-flex;
@@ -153,18 +147,20 @@
   justify-content: center;
   gap: 7px;
   min-height: 43px;
-  padding: 0 15px;
+  padding: 0 13px;
   border: 1px solid #f6c635;
   border-radius: 6px;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   text-decoration: none;
   white-space: nowrap;
+  cursor: pointer;
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .register-button {
@@ -177,6 +173,13 @@
   background: #ffcf45;
   transform: translateY(-1px);
 }
+
+.register-icon {
+  flex-shrink: 0;
+  font-size: 16px;
+}
+
+/* Login */
 
 .login-button {
   color: #080808;
@@ -193,9 +196,7 @@
   font-size: 17px;
 }
 
-/* =========================================
-   NAVIGATION BAR
-========================================= */
+/* NAVIGATION BAR */
 
 .main-nav {
   width: 100%;
@@ -214,7 +215,7 @@
   overflow: visible;
 }
 
-/* Standard navigation links */
+/* NAVIGATION LINKS */
 
 .nav-link {
   position: relative;
@@ -261,9 +262,7 @@
   left: 0;
 }
 
-/* =========================================
-   WHO WE ARE DROPDOWN
-========================================= */
+/* WHO WE ARE DROPDOWN */
 
 .nav-dropdown {
   position: relative;
@@ -295,8 +294,6 @@
   height: 14px;
 }
 
-/* Dropdown panel */
-
 .dropdown-menu {
   position: absolute;
   top: calc(100% - 1px);
@@ -321,8 +318,6 @@
     visibility 0.2s ease;
 }
 
-/* Small triangle above dropdown */
-
 .dropdown-menu::before {
   position: absolute;
   top: -12px;
@@ -336,16 +331,12 @@
   transform: translateX(-50%);
 }
 
-/* Show dropdown after button click */
-
 .dropdown-open > .dropdown-menu {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
   transform: translate(-50%, 0);
 }
-
-/* Dropdown items */
 
 .dropdown-item {
   display: flex;
@@ -382,9 +373,7 @@
   background: #e9ac00;
 }
 
-/* =========================================
-   MOBILE MENU BUTTON
-========================================= */
+/* MOBILE MENU BUTTON */
 
 .mobile-menu-toggle {
   display: none;
@@ -402,31 +391,39 @@
   cursor: pointer;
 }
 
-/* =========================================
-   TABLET
-========================================= */
+/* TABLET */
 
 @media (max-width: 1100px) {
   .header-main {
-    gap: 15px;
-    padding-right: 2%;
+    gap: 12px;
+    padding-right: 1.5%;
     padding-left: 1%;
   }
 
   .brand {
-    flex-basis: 175px;
-    width: 175px;
-    height: 68px;
+    flex-basis: 155px;
+    width: 155px;
+    height: 65px;
+  }
+
+  .header-search {
+    flex-basis: 180px;
   }
 
   .header-actions {
-    gap: 7px;
+    gap: 6px;
   }
 
   .register-button,
   .login-button {
-    padding-inline: 10px;
-    font-size: 12px;
+    gap: 5px;
+    padding: 0 8px;
+    font-size: 11px;
+  }
+
+  .register-icon,
+  .login-icon {
+    font-size: 14px;
   }
 
   .nav-inner {
@@ -438,9 +435,35 @@
   }
 }
 
-/* =========================================
-   MOBILE
-========================================= */
+/* SMALL DESKTOP / TABLET */
+
+@media (max-width: 900px) and (min-width: 701px) {
+  .header-main {
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+  }
+
+  .brand {
+    flex-basis: 150px;
+    width: 150px;
+  }
+
+  .header-search {
+    max-width: none;
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+  }
+
+  .site-header-spacer {
+    height: 150px;
+  }
+}
+
+/* MOBILE */
 
 @media (max-width: 700px) {
   .site-header-spacer {
@@ -466,7 +489,7 @@
     grid-row: 1;
     justify-self: start;
     width: 100%;
-    max-width: 175px;
+    max-width: 160px;
     height: 48px;
     margin-left: 0;
   }
@@ -474,19 +497,24 @@
   .header-actions {
     grid-column: 3;
     grid-row: 1;
-    gap: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
   }
 
   .register-button,
   .login-button {
     min-height: 34px;
-    padding: 0 9px;
+    gap: 4px;
+    padding: 0 7px;
     border-radius: 5px;
-    font-size: 11px;
+    font-size: 10px;
   }
 
+  .register-icon,
   .login-icon {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   .header-search {
@@ -570,8 +598,6 @@
     display: none;
   }
 
-  /* Dropdown opens inside mobile navigation */
-
   .dropdown-menu {
     position: relative;
     top: auto;
@@ -607,13 +633,11 @@
   }
 }
 
-/* =========================================
-   SMALL MOBILE
-========================================= */
+/* SMALL MOBILE */
 
-@media (max-width: 390px) {
+@media (max-width: 480px) {
   .site-header-spacer {
-    height: 100px;
+    height: 105px;
   }
 
   .header-main {
@@ -631,23 +655,25 @@
   }
 
   .brand {
-    max-width: 140px;
+    max-width: 125px;
     height: 42px;
   }
 
   .header-actions {
-    gap: 5px;
+    gap: 4px;
   }
 
   .register-button,
   .login-button {
     min-height: 31px;
-    padding: 0 7px;
-    font-size: 10px;
+    gap: 3px;
+    padding: 0 5px;
+    font-size: 9px;
   }
 
+  .register-icon,
   .login-icon {
-    display: none;
+    font-size: 11px;
   }
 
   .header-search {
@@ -655,9 +681,30 @@
   }
 }
 
-/* =========================================
-   ACCESSIBILITY
-========================================= */
+/* VERY SMALL MOBILE */
+
+@media (max-width: 360px) {
+  .brand {
+    max-width: 100px;
+  }
+
+  .header-actions {
+    gap: 3px;
+  }
+
+  .register-button,
+  .login-button {
+    padding: 0 4px;
+    font-size: 8px;
+  }
+
+  .register-icon,
+  .login-icon {
+    display: none;
+  }
+}
+
+/* ACCESSIBILITY */
 
 .nav-link:focus-visible,
 .dropdown-item:focus-visible,

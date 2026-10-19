@@ -149,10 +149,20 @@ const Wallet = () => {
     ? String(userData._id).slice(-4)
     : "2026";
 
-  // Handle Quick Percentage Pill Click
+  // Maximum amount user can request (Wallet balance minus 10% deduction for 5% TDS & 5% Software Charge)
+  const maxWithdrawable = Math.max(0, Math.floor(walletBalance * 0.9));
+
+  // Live calculation for request modal
+  const parsedReqAmount = Math.max(0, Number(reqAmount) || 0);
+  const liveTds = Math.round(parsedReqAmount * 0.05 * 100) / 100;
+  const liveSoftwareCharge = Math.round(parsedReqAmount * 0.05 * 100) / 100;
+  const liveTotalDebit = Math.round((parsedReqAmount + liveTds + liveSoftwareCharge) * 100) / 100;
+  const liveRemainingBalance = Math.max(0, Math.round((walletBalance - liveTotalDebit) * 100) / 100);
+
+  // Handle Quick Percentage Pill Click (Calculates percentage of maxWithdrawable)
   const handleQuickPercent = (pct) => {
-    if (walletBalance <= 0) return;
-    const calc = Math.floor((walletBalance * pct) / 100);
+    if (walletBalance <= 0 || maxWithdrawable <= 0) return;
+    const calc = Math.floor((maxWithdrawable * pct) / 100);
     setReqAmount(String(calc));
     setModalError("");
   };
@@ -178,11 +188,20 @@ const Wallet = () => {
       return;
     }
 
-    if (numAmount > walletBalance) {
+    if (numAmount > maxWithdrawable) {
       setModalError(
-        `Amount cannot exceed your available balance of ₹${walletBalance.toLocaleString(
+        `Amount cannot exceed ₹${maxWithdrawable.toLocaleString(
           "en-IN"
-        )}.`
+        )} (Wallet balance ₹${walletBalance.toLocaleString("en-IN")} minus 10% deduction for 5% TDS & 5% Software Charge).`
+      );
+      return;
+    }
+
+    if (liveTotalDebit > walletBalance) {
+      setModalError(
+        `Total debit with 10% charges (₹${liveTotalDebit.toLocaleString(
+          "en-IN"
+        )}) exceeds your available wallet balance of ₹${walletBalance.toLocaleString("en-IN")}.`
       );
       return;
     }
@@ -234,7 +253,7 @@ const Wallet = () => {
         showToast(
           `Withdrawal request of ₹${numAmount.toLocaleString(
             "en-IN"
-          )} submitted successfully! It is now under admin review.`,
+          )} submitted successfully! (Total wallet deduction with 10% TDS & Software charges: ₹${liveTotalDebit.toLocaleString("en-IN")}). It is now under admin review.`,
           "success"
         );
         setShowWithdrawModal(false);
@@ -506,7 +525,9 @@ const Wallet = () => {
             <table className="wallet-table">
               <thead>
                 <tr>
-                  <th>Requested Amount</th>
+                  <th>Requested Payout</th>
+                  <th>10% Deductions</th>
+                  <th>Total Debited</th>
                   <th>Payment Mode</th>
                   <th>Payout Destination</th>
                   <th>Date &amp; Time</th>
@@ -526,16 +547,42 @@ const Wallet = () => {
                         minute: "2-digit",
                       })
                     : "N/A";
+                  const tdsVal = typeof req.tdsAmount === "number" ? req.tdsAmount : Math.round(Number(req.amount) * 0.05 * 100) / 100;
+                  const scVal = typeof req.softwareCharge === "number" ? req.softwareCharge : Math.round(Number(req.amount) * 0.05 * 100) / 100;
+                  const totalDebVal = typeof req.totalDebited === "number" ? req.totalDebited : Math.round((Number(req.amount) + tdsVal + scVal) * 100) / 100;
 
                   return (
                     <tr key={req._id}>
                       <td>
-                        <strong style={{ color: "#ffd044", fontSize: "15px" }}>
+                        <strong style={{ color: "#34d399", fontSize: "14.5px" }}>
                           ₹{Number(req.amount).toLocaleString("en-IN", {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
                           })}
                         </strong>
+                        <div style={{ fontSize: "11px", color: "#a89d8d" }}>Net Payout</div>
+                      </td>
+
+                      <td>
+                        <div style={{ fontSize: "12px", lineHeight: "1.4" }}>
+                          <span style={{ color: "#f87171" }}>
+                            TDS (5%): -₹{tdsVal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                          </span>
+                          <br />
+                          <span style={{ color: "#f87171" }}>
+                            Software (5%): -₹{scVal.toLocaleString("en-IN", { minimumFractionDigits: 2 })}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td>
+                        <strong style={{ color: "#ffd044", fontSize: "14.5px" }}>
+                          -₹{totalDebVal.toLocaleString("en-IN", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </strong>
+                        <div style={{ fontSize: "11px", color: "#a89d8d" }}>From Wallet</div>
                       </td>
 
                       <td>
@@ -621,7 +668,7 @@ const Wallet = () => {
 
                 {payoutRequests.length === 0 && (
                   <tr>
-                    <td colSpan="6" className="wallet-empty-state">
+                    <td colSpan="8" className="wallet-empty-state">
                       {loading
                         ? "Loading requests..."
                         : "You have not submitted any withdrawal requests yet."}
@@ -653,10 +700,28 @@ const Wallet = () => {
 
             <form onSubmit={handleSubmitWithdrawal}>
               <div className="admin-modal-body">
-                {/* Available balance banner */}
+                {/* 5% TDS and 5% Software Charge deduction notice line */}
+                <div className="wallet-modal-tds-notice">
+                  <div className="wallet-tds-headline">
+                    <FiAlertCircle style={{ flexShrink: 0, fontSize: "16px" }} />
+                    <span>5% TDS and 5% Software Charge minus (Total 10% deduction)</span>
+                  </div>
+                  <p className="wallet-tds-subtext">
+                    As per policy, <strong>5% TDS</strong> and <strong>5% Software Charge</strong> (total <strong>10%</strong>) are deducted on withdrawal requests. You can request a maximum of your wallet balance minus 10%.
+                  </p>
+                </div>
+
+                {/* Available balance & max withdrawable limit */}
                 <div className="wallet-modal-balance-hint">
-                  <span>Available Wallet Balance</span>
-                  <strong>₹{walletBalance.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</strong>
+                  <div className="wallet-hint-item">
+                    <span>Available Balance</span>
+                    <strong>₹{walletBalance.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</strong>
+                  </div>
+                  <div className="wallet-hint-divider"></div>
+                  <div className="wallet-hint-item highlight">
+                    <span>Max Request Limit (-10%)</span>
+                    <strong>₹{maxWithdrawable.toLocaleString("en-IN")}</strong>
+                  </div>
                 </div>
 
                 {modalError && (
@@ -681,12 +746,17 @@ const Wallet = () => {
 
                 {/* Amount Field */}
                 <div className="wallet-modal-field">
-                  <label>Amount to Withdraw (₹) *</label>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: "6px" }}>
+                    <label style={{ margin: 0 }}>Amount to Withdraw (₹) *</label>
+                    <small style={{ color: "#ffd044", fontSize: "11px", fontWeight: "600" }}>
+                      Max: ₹{maxWithdrawable.toLocaleString("en-IN")}
+                    </small>
+                  </div>
                   <input
                     type="number"
                     min="1"
-                    max={walletBalance}
-                    placeholder="Enter amount (e.g. 1000)"
+                    max={maxWithdrawable}
+                    placeholder={`Enter amount up to ₹${maxWithdrawable.toLocaleString("en-IN")}`}
                     value={reqAmount}
                     onChange={(e) => setReqAmount(e.target.value)}
                     required
@@ -700,11 +770,39 @@ const Wallet = () => {
                         type="button"
                         className="wallet-amount-pill"
                         onClick={() => handleQuickPercent(pct)}
+                        disabled={maxWithdrawable <= 0}
                       >
                         {pct === 100 ? "MAX (100%)" : `${pct}%`}
                       </button>
                     ))}
                   </div>
+
+                  {/* Live Deduction Breakdown Box */}
+                  {parsedReqAmount > 0 && (
+                    <div className="wallet-deduction-breakdown">
+                      <div className="wallet-breakdown-row">
+                        <span>Requested Payout (Net):</span>
+                        <span className="val net">₹{parsedReqAmount.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="wallet-breakdown-row">
+                        <span>5% TDS Deduction:</span>
+                        <span className="val charge">- ₹{liveTds.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="wallet-breakdown-row">
+                        <span>5% Software Charge:</span>
+                        <span className="val charge">- ₹{liveSoftwareCharge.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="wallet-breakdown-divider"></div>
+                      <div className="wallet-breakdown-row total">
+                        <span>Total Cut from Wallet:</span>
+                        <span className="val total-debit">- ₹{liveTotalDebit.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                      </div>
+                      <div className="wallet-breakdown-row balance-after">
+                        <span>Remaining Wallet Balance:</span>
+                        <span className="val">₹{liveRemainingBalance.toLocaleString("en-IN", { minimumFractionDigits: 2 })}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Payment Mode Selector */}

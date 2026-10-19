@@ -7,6 +7,7 @@ import {
   FiSearch,
   FiChevronDown,
   FiUser,
+  FiUsers,
 } from "react-icons/fi";
 
 import "./Navbar.css";
@@ -43,7 +44,6 @@ export default function Navbar() {
 
   useEffect(() => {
     closeMenu();
-    // Close navigation menus when the route changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
@@ -92,7 +92,7 @@ export default function Navbar() {
         behavior: "smooth",
       });
     } else {
-      window.location.href = `/#products`;
+      window.location.href = "/#products";
     }
 
     closeMenu();
@@ -111,7 +111,9 @@ export default function Navbar() {
           <button
             type="button"
             className="mobile-menu-toggle"
-            aria-label={menuOpen ? "Close navigation" : "Open navigation"}
+            aria-label={
+              menuOpen ? "Close navigation" : "Open navigation"
+            }
             aria-expanded={menuOpen}
             onClick={() => {
               setMenuOpen((previous) => !previous);
@@ -158,11 +160,22 @@ export default function Navbar() {
           <div className="header-actions">
             {/* Member Register */}
             <Link
-              to="/member-register"
-              className="register-button"
+              to="/vendor-register"
+              className="register-button vendor-register-button"
               onClick={closeMenu}
             >
-              Member Register
+              <FiUser className="register-icon" />
+              <span>Member Register</span>
+            </Link>
+
+            {/* Vendor Register */}
+            <Link
+              to="/member-register"
+              className="register-button member-register-button"
+              onClick={closeMenu}
+            >
+              <FiUsers className="register-icon" />
+              <span>Vendor Register</span>
             </Link>
 
             {/* Login / Dashboard */}
@@ -223,12 +236,16 @@ export default function Navbar() {
                 className="nav-link dropdown-trigger"
                 aria-expanded={whoMenuOpen}
                 aria-haspopup="true"
-                onClick={() => setWhoMenuOpen((previous) => !previous)}
+                onClick={() =>
+                  setWhoMenuOpen((previous) => !previous)
+                }
               >
                 <span>Who We Are</span>
+
                 <span className="dropdown-plus" aria-hidden="true">
                   {whoMenuOpen ? "−" : "+"}
                 </span>
+
                 <FiChevronDown className="dropdown-chevron" />
               </button>
 
@@ -248,7 +265,8 @@ export default function Navbar() {
               </div>
             </div>
 
- <NavLink
+            {/* Blogs */}
+            <NavLink
               to="/blog"
               className={({ isActive }) =>
                 `nav-link ${isActive ? "active" : ""}`
@@ -257,6 +275,7 @@ export default function Navbar() {
             >
               Blogs
             </NavLink>
+
             {/* Contact */}
             <NavLink
               to="/contact"
