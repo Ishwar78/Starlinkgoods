@@ -13,9 +13,19 @@ import {
   FiExternalLink,
   FiShield,
   FiCalendar,
+  FiEye,
+  FiEyeOff,
+  FiCreditCard,
+  FiLock,
+  FiMail,
+  FiPhone,
+  FiMapPin,
+  FiHome,
 } from "react-icons/fi";
 
 import {
+  createMembershipOrder,
+  verifyAndRegisterMember,
   createVendorUser,
   getMyVendorUsers,
   deleteVendorUser,
@@ -28,11 +38,15 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const EMPTY_FORM = {
   name: "",
   lastName: "",
-  dob: "",
   email: "",
   mobile: "",
   city: "",
   state: "",
+  address: "",
+  password: "",
+  confirmPassword: "",
+  // Legacy / Commented out fields
+  dob: "",
   aadhaarNumber: "",
   familyIdNumber: "",
   panNumber: "",
@@ -244,8 +258,22 @@ const AddUser = () => {
 
   const [form, setForm] = useState({ ...EMPTY_FORM });
   const [documents, setDocuments] = useState({ ...EMPTY_DOCUMENTS });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const vendorId = userData._id || userData.id || "";
+
+  // Load Razorpay script if not already present
+  useEffect(() => {
+    if (window.Razorpay) return;
+    const scriptId = "razorpay-checkout-script";
+    if (document.getElementById(scriptId)) return;
+    const script = document.createElement("script");
+    script.id = scriptId;
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
 
   const showMessage = (text, type = "success") => {
     setMessage(text);
@@ -258,6 +286,7 @@ const AddUser = () => {
 
       const response = await getMyVendorUsers({
         vendorId,
+        vendorUniqueId: userData.vendorId || "",
         vendorEmail: userData.email || "",
       });
 
@@ -280,7 +309,7 @@ const AddUser = () => {
   useEffect(() => {
     fetchUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [vendorId, userData.email]);
+  }, [vendorId, userData.email, userData.vendorId]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -351,20 +380,8 @@ const AddUser = () => {
   };
 
   const validateForm = () => {
-    if (
-      !form.name.trim() ||
-      !form.lastName.trim() ||
-      !form.dob ||
-      !form.email.trim() ||
-      !form.mobile.trim() ||
-      !form.city.trim() ||
-      !form.state.trim()
-    ) {
-      return "First name, last name, DOB, email, mobile, city and state are required.";
-    }
-
-    if (!calculateAge(form.dob)) {
-      return "Please select a valid date of birth that is not in the future.";
+    if (!form.name.trim() || !form.lastName.trim()) {
+      return "Please enter both First Name and Last Name.";
     }
 
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
@@ -372,42 +389,23 @@ const AddUser = () => {
     }
 
     if (!/^\d{10}$/.test(form.mobile.trim())) {
-      return "Mobile number must contain exactly 10 digits.";
+      return "Mobile number must be exactly 10 digits.";
     }
 
-    if (
-      form.aadhaarNumber &&
-      !/^\d{12}$/.test(form.aadhaarNumber.trim())
-    ) {
-      return "Aadhaar number must contain exactly 12 digits.";
+    if (!form.city.trim() || !form.state.trim()) {
+      return "City and State are required.";
     }
 
-    if (
-      form.panNumber &&
-      !/^[A-Z]{5}\d{4}[A-Z]$/i.test(form.panNumber.trim())
-    ) {
-      return "Please enter a valid PAN card number.";
+    if (!form.address?.trim()) {
+      return "Address is required.";
     }
 
-    if (
-      form.ifscCode &&
-      !/^[A-Z]{4}0[A-Z0-9]{6}$/i.test(form.ifscCode.trim())
-    ) {
-      return "Please enter a valid IFSC code.";
+    if (!form.password || form.password.length < 6) {
+      return "Password must be at least 6 characters long.";
     }
 
-    if (
-      form.houseOwnerCertificate === "Yes" &&
-      !form.certificateAuthority
-    ) {
-      return "Please select the certificate issuing authority.";
-    }
-
-    if (
-      form.houseOwnerCertificate === "Yes" &&
-      !documents.ownerCertificate
-    ) {
-      return "Please upload the house owner certificate.";
+    if (form.password !== form.confirmPassword) {
+      return "Password and Confirm Password do not match.";
     }
 
     return "";
@@ -418,79 +416,132 @@ const AddUser = () => {
     setMessage("");
 
     const validationError = validateForm();
-
     if (validationError) {
       showMessage(validationError, "error");
+      return;
+    }
+
+    if (!window.Razorpay) {
+      showMessage("Payment gateway is loading. Please check your internet connection.", "error");
       return;
     }
 
     try {
       setSubmitting(true);
 
-      const fullName =
-        `${form.name.trim()} ${form.lastName.trim()}`.trim();
+      const parentVendorId = userData.vendorId || userData.id || userData._id || "";
+      const parentVendorName = userData.name || "Vendor";
 
-      const payload = {
-        ...form,
-
-        // Keep name as the full name for compatibility with existing
-        // code that expects a single "name" field.
-        name: fullName,
+      // 1. Create ₹500 Razorpay Order
+      const orderData = await createMembershipOrder({
+        vendorId: parentVendorId,
+        vendorName: parentVendorName,
         firstName: form.name.trim(),
         lastName: form.lastName.trim(),
-        dob: form.dob,
-        age: calculateAge(form.dob),
-
+        fullName: `${form.name.trim()} ${form.lastName.trim()}`,
+        name: `${form.name.trim()} ${form.lastName.trim()}`,
         email: form.email.trim(),
         mobile: form.mobile.trim(),
+        password: form.password,
         city: form.city.trim(),
         state: form.state.trim(),
+        address: form.address.trim(),
+        fee: 500,
+      });
 
-        aadhaarNumber: form.aadhaarNumber.trim(),
-        familyIdNumber: form.familyIdNumber.trim(),
-        panNumber: form.panNumber.trim().toUpperCase(),
-        bankAccountNumber: form.bankAccountNumber.trim(),
-        ifscCode: form.ifscCode.trim().toUpperCase(),
+      if (!orderData || !orderData.success || !orderData.orderId) {
+        throw new Error(orderData?.message || "Failed to initialize ₹500 payment order.");
+      }
 
-        vendorId,
-        vendorName: userData.name || "Vendor",
-        vendorEmail: userData.email || "",
-        vendorMobile: userData.mobile || "",
+      // 2. Open Razorpay Checkout modal
+      const options = {
+        key: orderData.keyId,
+        order_id: orderData.orderId,
+        amount: orderData.amount, // 50000 paise
+        currency: orderData.currency || "INR",
+        name: "Star Link Goods",
+        description: "Member Registration Fee (₹500)",
+        image: "/Logo.jpeg",
+        prefill: {
+          name: `${form.name} ${form.lastName}`.trim(),
+          email: form.email.trim(),
+          contact: form.mobile.trim(),
+        },
+        notes: {
+          vendorId: parentVendorId,
+          vendorName: parentVendorName,
+          purpose: `Member Registration by Vendor ${parentVendorId}`,
+        },
+        theme: { color: "#ffd044" },
+        modal: {
+          ondismiss: () => {
+            setSubmitting(false);
+            showMessage("Payment window closed. User registration was not completed.", "error");
+          },
+        },
+        handler: async (paymentResponse) => {
+          try {
+            setSubmitting(true);
+            showMessage("Payment verified! Saving member to database...", "success");
 
-        documents: {
-          aadhaar: documents.aadhaar,
-          pan: documents.pan,
-          familyId: documents.familyId,
-          bankProof: documents.bankProof,
-          ownerCertificate:
-            form.houseOwnerCertificate === "Yes"
-              ? documents.ownerCertificate
-              : null,
+            // 3. Verify payment and create member in DB
+            const regData = await verifyAndRegisterMember({
+              vendorId: parentVendorId,
+              vendorName: parentVendorName,
+              firstName: form.name.trim(),
+              lastName: form.lastName.trim(),
+              fullName: `${form.name.trim()} ${form.lastName.trim()}`,
+              name: `${form.name.trim()} ${form.lastName.trim()}`,
+              email: form.email.trim(),
+              mobile: form.mobile.trim(),
+              city: form.city.trim(),
+              state: form.state.trim(),
+              address: form.address.trim(),
+              password: form.password,
+              fee: 500,
+              role: "Member",
+              razorpay_order_id: paymentResponse.razorpay_order_id,
+              razorpay_payment_id: paymentResponse.razorpay_payment_id,
+              razorpay_signature: paymentResponse.razorpay_signature,
+            });
+
+            if (!regData || !regData.success) {
+              throw new Error(regData?.message || "Payment verified, but registration failed.");
+            }
+
+            showMessage(
+              `Member "${regData.user.name}" registered successfully with ID: ${regData.user.vendorId}!`,
+              "success"
+            );
+
+            setForm({ ...EMPTY_FORM });
+            setDocuments({ ...EMPTY_DOCUMENTS });
+            await fetchUsers();
+          } catch (regErr) {
+            console.error("Member registration error:", regErr);
+            showMessage(regErr.message || "Failed to complete member registration.", "error");
+          } finally {
+            setSubmitting(false);
+          }
         },
       };
 
-      const response = await createVendorUser(payload);
-
-      if (!response?.success) {
-        throw new Error(
-          response?.message || "Failed to register user."
+      const rzpInstance = new window.Razorpay(options);
+      rzpInstance.on("payment.failed", (response) => {
+        setSubmitting(false);
+        showMessage(
+          `Payment failed: ${response.error?.description || "Transaction declined"}. Member was not registered.`,
+          "error"
         );
-      }
+      });
 
-      showMessage(`User "${fullName}" added successfully.`, "success");
-
-      setForm({ ...EMPTY_FORM });
-      setDocuments({ ...EMPTY_DOCUMENTS });
-      setSearch("");
-
-      await fetchUsers();
+      rzpInstance.open();
     } catch (error) {
       console.error("Add user error:", error);
       showMessage(
         error?.message || "Unable to register user.",
         "error"
       );
-    } finally {
       setSubmitting(false);
     }
   };
@@ -750,9 +801,9 @@ const AddUser = () => {
             <FiUserPlus />
           </div>
           <div>
-            <h2>User Information</h2>
+            <h2>Member Information</h2>
             <p>
-              Enter personal details and upload supporting documents.
+              Enter member's basic details, create an account password, and complete ₹500 registration fee.
             </p>
           </div>
         </div>
@@ -763,7 +814,7 @@ const AddUser = () => {
               <span>01</span>
               <div>
                 <h3>Personal Information</h3>
-                <p>Basic contact, date of birth and location details</p>
+                <p>Basic contact and location details</p>
               </div>
             </div>
 
@@ -791,36 +842,6 @@ const AddUser = () => {
                 autoComplete="family-name"
                 required
               />
-            </div>
-
-            <div className="add-user-field">
-              <label htmlFor="add-user-dob">Date of Birth *</label>
-              <div className="add-user-date-wrap">
-                <input
-                  id="add-user-dob"
-                  name="dob"
-                  type="date"
-                  value={form.dob}
-                  max={new Date().toLocaleDateString("en-CA")}
-                  onChange={handleChange}
-                  autoComplete="bday"
-                  required
-                />
-                <FiCalendar />
-              </div>
-
-              <span className="add-user-field-hint">
-                Select the user's date of birth.
-              </span>
-
-              {form.dob && calculateAge(form.dob) && (
-                <div className="add-user-age-preview">
-                  <span className="add-user-age-label">
-                    Calculated Age
-                  </span>
-                  <strong>{formatAge(form.dob)}</strong>
-                </div>
-              )}
             </div>
 
             <div className="add-user-field">
@@ -877,8 +898,125 @@ const AddUser = () => {
               />
             </div>
 
+            <div className="add-user-field" style={{ gridColumn: "1 / -1" }}>
+              <label htmlFor="add-user-address">Full Address *</label>
+              <input
+                id="add-user-address"
+                name="address"
+                value={form.address || ""}
+                onChange={handleChange}
+                placeholder="House no., street, area, landmark..."
+                autoComplete="street-address"
+                required
+              />
+            </div>
+
             <div className="add-user-form-section-title">
               <span>02</span>
+              <div>
+                <h3>Account Password</h3>
+                <p>Create login credentials for the member</p>
+              </div>
+            </div>
+
+            <div className="add-user-field">
+              <label htmlFor="add-user-password">Create Password *</label>
+              <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                <input
+                  id="add-user-password"
+                  name="password"
+                  type={showPassword ? "text" : "password"}
+                  value={form.password || ""}
+                  onChange={handleChange}
+                  placeholder="Min 6 characters"
+                  autoComplete="new-password"
+                  style={{ paddingRight: "42px", width: "100%" }}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "transparent",
+                    border: "none",
+                    color: "#ffd044",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: "16px",
+                    padding: "4px",
+                  }}
+                  title={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+            </div>
+
+            <div className="add-user-field">
+              <label htmlFor="add-user-confirm-password">Confirm Password *</label>
+              <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                <input
+                  id="add-user-confirm-password"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={form.confirmPassword || ""}
+                  onChange={handleChange}
+                  placeholder="Re-enter password"
+                  autoComplete="new-password"
+                  style={{ paddingRight: "42px", width: "100%" }}
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    background: "transparent",
+                    border: "none",
+                    color: "#ffd044",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    fontSize: "16px",
+                    padding: "4px",
+                  }}
+                  title={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+            </div>
+
+            {/* ==============================================================
+                DOCUMENT & IDENTITY DETAILS (COMMENTED OUT AS PER REQUIREMENT)
+                ============================================================== */}
+            {/*
+            <div className="add-user-field">
+              <label htmlFor="add-user-dob">Date of Birth</label>
+              <div className="add-user-date-wrap">
+                <input
+                  id="add-user-dob"
+                  name="dob"
+                  type="date"
+                  value={form.dob}
+                  max={new Date().toLocaleDateString("en-CA")}
+                  onChange={handleChange}
+                  autoComplete="bday"
+                />
+                <FiCalendar />
+              </div>
+            </div>
+
+            <div className="add-user-form-section-title">
+              <span>03</span>
               <div>
                 <h3>Identity Details</h3>
                 <p>Identification numbers and documents</p>
@@ -926,7 +1064,7 @@ const AddUser = () => {
             </div>
 
             <div className="add-user-form-section-title">
-              <span>03</span>
+              <span>04</span>
               <div>
                 <h3>Bank Details</h3>
                 <p>Account and IFSC information</p>
@@ -961,20 +1099,15 @@ const AddUser = () => {
             </div>
 
             <div className="add-user-form-section-title">
-              <span>04</span>
+              <span>05</span>
               <div>
                 <h3>House Owner Certificate</h3>
-                <p>
-                  If available, select the issuing authority and upload
-                  the certificate.
-                </p>
+                <p>If available, select the issuing authority and upload the certificate.</p>
               </div>
             </div>
 
             <div className="add-user-field">
-              <label htmlFor="add-user-owner-certificate">
-                House Owner Certificate Available? *
-              </label>
+              <label htmlFor="add-user-owner-certificate">House Owner Certificate Available?</label>
               <select
                 id="add-user-owner-certificate"
                 name="houseOwnerCertificate"
@@ -989,70 +1122,43 @@ const AddUser = () => {
             {form.houseOwnerCertificate === "Yes" && (
               <>
                 <div className="add-user-field">
-                  <label htmlFor="add-user-authority">
-                    Certificate Issued By *
-                  </label>
+                  <label htmlFor="add-user-authority">Certificate Issued By *</label>
                   <select
                     id="add-user-authority"
                     name="certificateAuthority"
                     value={form.certificateAuthority}
                     onChange={handleChange}
-                    required
                   >
                     <option value="">Select issuing authority</option>
                     <option value="Sarpanch">Sarpanch</option>
-                    <option value="Municipal Council (MC)">
-                      Municipal Council (MC)
-                    </option>
+                    <option value="Municipal Council (MC)">Municipal Council (MC)</option>
                     <option value="Registrar">Registrar</option>
                     <option value="Other">Other</option>
                   </select>
                 </div>
-
-                {form.certificateAuthority === "Other" && (
-                  <div className="add-user-field">
-                    <label htmlFor="add-user-other-authority">
-                      Other Authority Name *
-                    </label>
-                    <input
-                      id="add-user-other-authority"
-                      name="certificateAuthority"
-                      value={form.certificateAuthority === "Other" ? "" : form.certificateAuthority}
-                      onChange={handleChange}
-                      placeholder="Enter authority name"
-                    />
-                  </div>
-                )}
-
                 <div className="add-user-certificate-upload">
-                  {renderUploadField(
-                    "ownerCertificate",
-                    "Upload House Owner Certificate",
-                    true
-                  )}
+                  {renderUploadField("ownerCertificate", "Upload House Owner Certificate")}
                 </div>
               </>
             )}
 
             <div className="add-user-form-section-title">
-              <span>05</span>
+              <span>06</span>
               <div>
                 <h3>Upload Documents</h3>
                 <p>Upload PDF, JPG or PNG files up to 5 MB each.</p>
               </div>
             </div>
 
-            {DOCUMENT_FIELDS.map(({ key, label }) =>
-              renderUploadField(key, label)
-            )}
+            {DOCUMENT_FIELDS.map(({ key, label }) => renderUploadField(key, label))}
+            */}
           </div>
 
           <div className="add-user-form-note">
             <FiShield />
             <p>
-              Personal and banking details are sensitive. Only upload
-              documents required for registration and restrict access
-              to authorized users.
+              Member will be registered under Vendor ID{" "}
+              <strong style={{ color: "#ffd044" }}>{userData.vendorId || userData.name}</strong>. A one-time ₹500 registration fee via Razorpay is required to activate the account.
             </p>
           </div>
 
@@ -1060,16 +1166,27 @@ const AddUser = () => {
             type="submit"
             className="add-user-submit"
             disabled={submitting}
+            style={{
+              background: "linear-gradient(135deg, #ffd044, #e5aa0a)",
+              color: "#080808",
+              fontWeight: 800,
+              fontSize: "14.5px",
+              padding: "13px 26px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              cursor: submitting ? "not-allowed" : "pointer",
+            }}
           >
             {submitting ? (
               <>
                 <FiLoader className="spinning" />
-                Registering User...
+                Processing Registration &amp; ₹500 Payment...
               </>
             ) : (
               <>
-                <FiUserPlus />
-                Register User
+                <FiCreditCard />
+                Next &amp; Pay ₹500 (Register Member)
               </>
             )}
           </button>
@@ -1079,8 +1196,8 @@ const AddUser = () => {
       <section className="add-user-list-card">
         <div className="add-user-list-heading">
           <div>
-            <h2>Registered Users</h2>
-            <p>View personal details and uploaded documents.</p>
+            <h2>Registered Members &amp; Users</h2>
+            <p>Members who joined using your Vendor ID or registered through your portal.</p>
           </div>
 
           <label className="add-user-search">
@@ -1089,7 +1206,7 @@ const AddUser = () => {
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search name, DOB, email, mobile..."
+              placeholder="Search by name, member ID, email, mobile..."
               aria-label="Search registered users"
             />
             {search && (
@@ -1106,27 +1223,20 @@ const AddUser = () => {
         </div>
 
         <p className="add-user-search-summary">
-          Showing {filteredUsers.length} of {users.length} users
+          Showing {filteredUsers.length} of {users.length} members
         </p>
 
         <div className="add-user-table-wrap">
           <table className="add-user-table">
             <thead>
               <tr>
-                <th>User</th>
-                <th>DOB</th>
-                <th>Age</th>
-                <th>Mobile</th>
-                <th>City / State</th>
-                <th>Aadhaar</th>
-                <th>Family ID</th>
-                <th>PAN</th>
-                <th>Bank Account</th>
-                <th>IFSC</th>
-                <th>Certificate</th>
-                <th>Documents</th>
+                <th>Member / User</th>
+                <th>Member ID</th>
+                <th>Contact</th>
+                <th>Location</th>
+                <th>Fee Paid</th>
                 <th>Status</th>
-                <th>Created</th>
+                <th>Registered Date</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -1134,30 +1244,23 @@ const AddUser = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={15} className="add-user-empty">
+                  <td colSpan={8} className="add-user-empty">
                     <FiLoader className="spinning" />
-                    Loading registered users...
+                    Loading registered members...
                   </td>
                 </tr>
               ) : filteredUsers.length === 0 ? (
                 <tr>
-                  <td colSpan={15} className="add-user-empty">
+                  <td colSpan={8} className="add-user-empty">
                     {search
-                      ? "No users match your search."
-                      : "No registered users found."}
+                      ? "No members match your search."
+                      : "No registered members found under your vendor ID yet."}
                   </td>
                 </tr>
               ) : (
                 filteredUsers.map((user) => {
                   const userId = user._id || user.id;
                   const fullName = getFullName(user);
-                  const certificateStatus =
-                    user.houseOwnerCertificate || "No";
-
-                  const uploadedCount = SAVED_DOCUMENT_FIELDS.filter(
-                    ({ key }) =>
-                      Boolean(getDocumentUrl(getDocument(user, key)))
-                  ).length;
 
                   return (
                     <React.Fragment key={userId}>
@@ -1174,45 +1277,52 @@ const AddUser = () => {
                           </div>
                         </td>
 
-                        <td>{formatDate(user.dob)}</td>
                         <td>
-                          <span className="add-user-age-table">
-                            {formatAge(user.dob)}
-                          </span>
-                        </td>
-                        <td>{user.mobile || "—"}</td>
-                        <td>
-                          {[user.city, user.state]
-                            .filter(Boolean)
-                            .join(", ") || "—"}
-                        </td>
-                        <td>{maskValue(user.aadhaarNumber)}</td>
-                        <td>{user.familyIdNumber || "—"}</td>
-                        <td>{maskValue(user.panNumber)}</td>
-                        <td>{maskValue(user.bankAccountNumber)}</td>
-                        <td>{user.ifscCode || "—"}</td>
-
-                        <td>
-                          <span
-                            className={`add-user-status ${
-                              certificateStatus === "Yes"
-                                ? "is-yes"
-                                : "is-no"
-                            }`}
-                          >
-                            {certificateStatus}
-                          </span>
-                          {certificateStatus === "Yes" &&
-                            user.certificateAuthority && (
-                              <small className="add-user-authority">
-                                {user.certificateAuthority}
-                              </small>
-                            )}
+                          {user.vendorId ? (
+                            <span
+                              style={{
+                                background: "rgba(255, 199, 45, 0.15)",
+                                color: "#ffd044",
+                                border: "1px solid rgba(255, 199, 45, 0.35)",
+                                padding: "3px 8px",
+                                borderRadius: "5px",
+                                fontSize: "12px",
+                                fontFamily: "monospace",
+                                fontWeight: "800",
+                                letterSpacing: "0.5px",
+                                display: "inline-block",
+                              }}
+                            >
+                              {user.vendorId}
+                            </span>
+                          ) : (
+                            <span style={{ color: "#a89d8d", fontSize: 12 }}>—</span>
+                          )}
                         </td>
 
                         <td>
-                          <span className="add-user-doc-count">
-                            {uploadedCount}/5 uploaded
+                          <div>
+                            <FiPhone style={{ marginRight: 4, color: "#ffd044", fontSize: 11 }} />
+                            <span>{user.mobile || "—"}</span>
+                          </div>
+                          {user.email && (
+                            <div style={{ color: "#a89d8d", fontSize: 11 }}>
+                              <FiMail style={{ marginRight: 4, color: "#ffd044", fontSize: 10 }} />
+                              <span>{user.email}</span>
+                            </div>
+                          )}
+                        </td>
+
+                        <td>
+                          <div style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                            <FiMapPin style={{ color: "#ffd044", fontSize: 12 }} />
+                            <span>{[user.city, user.state].filter(Boolean).join(", ") || "—"}</span>
+                          </div>
+                        </td>
+
+                        <td>
+                          <span style={{ color: "#34d399", fontWeight: 700, fontSize: "12px" }}>
+                            ₹500 Paid
                           </span>
                         </td>
 
@@ -1228,7 +1338,9 @@ const AddUser = () => {
                           </span>
                         </td>
 
-                        <td>{formatDate(user.createdAt)}</td>
+                        <td style={{ color: "#a89d8d", fontSize: 12 }}>
+                          {formatDate(user.createdAt)}
+                        </td>
 
                         <td>
                           <button
@@ -1236,30 +1348,10 @@ const AddUser = () => {
                             className="add-user-delete"
                             onClick={() => handleDeleteUser(user)}
                             aria-label={`Delete ${fullName}`}
-                            title="Delete user"
+                            title="Delete member"
                           >
                             <FiTrash2 />
                           </button>
-                        </td>
-                      </tr>
-
-                      <tr className="add-user-documents-row">
-                        <td colSpan={15}>
-                          <details className="add-user-documents-details">
-                            <summary>
-                              <FiFileText />
-                              <span>Documents — {fullName}</span>
-                              <span className="add-user-summary-hint">
-                                View uploaded documents
-                              </span>
-                            </summary>
-
-                            <div className="add-user-saved-documents-grid">
-                              {SAVED_DOCUMENT_FIELDS.map(({ key, label }) =>
-                                renderSavedDocument(user, key, label)
-                              )}
-                            </div>
-                          </details>
                         </td>
                       </tr>
                     </React.Fragment>

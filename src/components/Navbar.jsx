@@ -19,12 +19,22 @@ const whoWeAreItems = [
   { label: "Our Team", href: "/our-team" },
 ];
 
+const achievementsItems = [
+  { label: "Making a Difference", href: "/making-deference" },
+  { label: "Our Impact", href: "/our-impact" },
+  { label: "Testimonials", href: "/testimonial" },
+];
+
 export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [whoMenuOpen, setWhoMenuOpen] = useState(false);
+  const [achievementsMenuOpen, setAchievementsMenuOpen] =
+    useState(false);
   const [search, setSearch] = useState("");
 
   const dropdownRef = useRef(null);
+  const achievementsDropdownRef = useRef(null);
+
   const location = useLocation();
 
   const userToken = localStorage.getItem("userToken");
@@ -40,6 +50,7 @@ export default function Navbar() {
   const closeMenu = () => {
     setMenuOpen(false);
     setWhoMenuOpen(false);
+    setAchievementsMenuOpen(false);
   };
 
   useEffect(() => {
@@ -55,11 +66,19 @@ export default function Navbar() {
       ) {
         setWhoMenuOpen(false);
       }
+
+      if (
+        achievementsDropdownRef.current &&
+        !achievementsDropdownRef.current.contains(event.target)
+      ) {
+        setAchievementsMenuOpen(false);
+      }
     };
 
     const handleEscape = (event) => {
       if (event.key === "Escape") {
         setWhoMenuOpen(false);
+        setAchievementsMenuOpen(false);
         setMenuOpen(false);
       }
     };
@@ -77,6 +96,7 @@ export default function Navbar() {
     event.preventDefault();
 
     const query = search.trim();
+
     if (!query) return;
 
     window.dispatchEvent(
@@ -102,6 +122,10 @@ export default function Navbar() {
     (item) => location.pathname === item.href
   );
 
+  const isAchievementsActive = achievementsItems.some(
+    (item) => location.pathname === item.href
+  );
+
   return (
     <>
       <header className="site-header">
@@ -118,6 +142,7 @@ export default function Navbar() {
             onClick={() => {
               setMenuOpen((previous) => !previous);
               setWhoMenuOpen(false);
+              setAchievementsMenuOpen(false);
             }}
           >
             {menuOpen ? <FiX /> : <FiMenu />}
@@ -131,7 +156,7 @@ export default function Navbar() {
             onClick={closeMenu}
           >
             <img
-              src="/Logo.jpeg"
+              src="/Logo-1.png"
               alt="Star Link Goods"
               className="brand-logo"
             />
@@ -169,14 +194,14 @@ export default function Navbar() {
             </Link>
 
             {/* Vendor Register */}
-            <Link
+            {/* <Link
               to="/vendor-register"
               className="register-button vendor-register-button"
               onClick={closeMenu}
             >
               <FiUsers className="register-icon" />
               <span>Vendor Register</span>
-            </Link>
+            </Link> */}
 
             {/* Login / Dashboard */}
             {userToken ? (
@@ -236,9 +261,10 @@ export default function Navbar() {
                 className="nav-link dropdown-trigger"
                 aria-expanded={whoMenuOpen}
                 aria-haspopup="true"
-                onClick={() =>
-                  setWhoMenuOpen((previous) => !previous)
-                }
+                onClick={() => {
+                  setWhoMenuOpen((previous) => !previous);
+                  setAchievementsMenuOpen(false);
+                }}
               >
                 <span>Who We Are</span>
 
@@ -251,6 +277,50 @@ export default function Navbar() {
 
               <div className="dropdown-menu">
                 {whoWeAreItems.map((item) => (
+                  <NavLink
+                    key={item.label}
+                    to={item.href}
+                    className={({ isActive }) =>
+                      `dropdown-item ${isActive ? "active" : ""}`
+                    }
+                    onClick={closeMenu}
+                  >
+                    {item.label}
+                  </NavLink>
+                ))}
+              </div>
+            </div>
+
+            {/* Achievements Dropdown */}
+            <div
+              className={`nav-dropdown achievements-dropdown ${
+                achievementsMenuOpen ? "dropdown-open" : ""
+              } ${
+                isAchievementsActive ? "dropdown-active" : ""
+              }`}
+              ref={achievementsDropdownRef}
+            >
+              <button
+                type="button"
+                className="nav-link dropdown-trigger"
+                aria-expanded={achievementsMenuOpen}
+                aria-haspopup="true"
+                onClick={() => {
+                  setAchievementsMenuOpen((previous) => !previous);
+                  setWhoMenuOpen(false);
+                }}
+              >
+                <span>Achievements</span>
+
+                <span className="dropdown-plus" aria-hidden="true">
+                  {achievementsMenuOpen ? "−" : "+"}
+                </span>
+
+                <FiChevronDown className="dropdown-chevron" />
+              </button>
+
+              <div className="dropdown-menu">
+                {achievementsItems.map((item) => (
                   <NavLink
                     key={item.label}
                     to={item.href}

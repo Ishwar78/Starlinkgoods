@@ -10,6 +10,10 @@ import WhatWeDo from "./pages/WhatWeDo";
 import Founder from "./pages/Founder";
 import OurTeam from "./pages/OurTeam";
 import Blog from "./pages/Blog";
+import BlogDetail from "./pages/BlogDetail.jsx";
+import MakingADifference from "./pages/MakingADifference.jsx";
+import OurImpact from "./pages/OurImpact.jsx";
+import Testimonials from "./pages/Testimonials.jsx";
 
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
@@ -17,6 +21,8 @@ import TermsConditions from "./pages/TermsConditions";
 
 import VendorRegister from "./pages/VendorRegister.jsx";
 import MemberRegister from "./pages/MemberRegister.jsx";
+
+
 
 
 
@@ -66,6 +72,10 @@ export default function App() {
         <Route path="/founder" element={<Founder />} />
         <Route path="/our-team" element={<OurTeam />} />
         <Route path="/blog" element={<Blog />} />
+        <Route path="/blog/:slug" element={<BlogDetail />} />
+        <Route path="/making-deference" element={<MakingADifference />} />
+        <Route path="/our-impact" element={<OurImpact />} />
+        <Route path="/testimonial" element={<Testimonials />} />
 
         <Route
   path="/privacy-policy"

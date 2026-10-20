@@ -15,6 +15,7 @@ const extractVendorInfo = async (req) => {
   let vendorName = body.vendorName || "Vendor";
   let vendorEmail = body.vendorEmail || "";
   let vendorMobile = body.vendorMobile || "";
+  let vendorUniqueId = body.vendorUniqueId || query.vendorUniqueId || "";
 
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith("Bearer ")) {
@@ -31,6 +32,7 @@ const extractVendorInfo = async (req) => {
           vendorName = vendor.name;
           vendorEmail = vendor.email;
           vendorMobile = vendor.mobile;
+          vendorUniqueId = vendor.vendorId || "";
         }
       }
     } catch (err) {
@@ -38,7 +40,33 @@ const extractVendorInfo = async (req) => {
     }
   }
 
-  return { vendorId, vendorName, vendorEmail, vendorMobile };
+  // If vendorUniqueId wasn't found yet and vendorId/email is present, look up Vendor
+  if (!vendorUniqueId && (vendorId || vendorEmail)) {
+    try {
+      const orList = [];
+      if (vendorId && vendorId.toString().match(/^[0-9a-fA-F]{24}$/)) {
+        orList.push({ _id: vendorId });
+      }
+      if (vendorId) {
+        orList.push({ vendorId: vendorId.toString().toUpperCase() });
+      }
+      if (vendorEmail) {
+        orList.push({ email: vendorEmail.toString().toLowerCase().trim() });
+      }
+      if (orList.length > 0) {
+        const found = await Vendor.findOne({ $or: orList });
+        if (found) {
+          vendorUniqueId = found.vendorId || "";
+          vendorName = found.name || vendorName;
+          vendorEmail = found.email || vendorEmail;
+          vendorMobile = found.mobile || vendorMobile;
+          vendorId = found._id.toString();
+        }
+      }
+    } catch (e) {}
+  }
+
+  return { vendorId, vendorName, vendorEmail, vendorMobile, vendorUniqueId };
 };
 
 /**
@@ -127,12 +155,16 @@ router.post("/", async (req, res) => {
 
 /**
  * GET /api/vendor-users/my-users
- * Fetch all users added strictly by the logged-in vendor
+ * Fetch all users/members affiliated with the logged-in vendor:
+ * 1. Members joined via Navbar Member Register using this vendor's ID
+ * 2. Members added directly by this vendor through Add User
+ * 3. Legacy users from VendorUser collection
  */
 router.get("/my-users", async (req, res) => {
   try {
     const vendorInfo = await extractVendorInfo(req);
     const effectiveVendorId = vendorInfo.vendorId || req.query.vendorId || null;
+    const effectiveVendorUniqueId = vendorInfo.vendorUniqueId || req.query.vendorUniqueId || null;
     const effectiveVendorEmail = (
       vendorInfo.vendorEmail ||
       req.query.vendorEmail ||
@@ -141,8 +173,7 @@ router.get("/my-users", async (req, res) => {
       .toLowerCase()
       .trim();
 
-    // If no vendor identity can be determined, strictly return empty list
-    if (!effectiveVendorId && !effectiveVendorEmail) {
+    if (!effectiveVendorId && !effectiveVendorEmail && !effectiveVendorUniqueId) {
       return res.status(200).json({
         success: true,
         count: 0,
@@ -150,22 +181,106 @@ router.get("/my-users", async (req, res) => {
       });
     }
 
-    const queryConditions = [];
-    if (effectiveVendorId) {
-      queryConditions.push({ vendorId: effectiveVendorId });
+    // 1. Fetch affiliated members from Vendor collection (role: Member)
+    const memberOrConditions = [];
+    if (effectiveVendorUniqueId) {
+      memberOrConditions.push({ parentVendorId: effectiveVendorUniqueId });
+      memberOrConditions.push({ vendorId: { $regex: new RegExp(`^${effectiveVendorUniqueId}-`, "i") } });
     }
-    if (effectiveVendorEmail) {
-      queryConditions.push({ vendorEmail: effectiveVendorEmail });
+    if (effectiveVendorId) {
+      memberOrConditions.push({ parentVendorId: effectiveVendorId.toString() });
     }
 
-    const users = await VendorUser.find({ $or: queryConditions }).sort({
-      createdAt: -1,
+    let affiliatedMembers = [];
+    if (memberOrConditions.length > 0) {
+      affiliatedMembers = await Vendor.find({
+        role: { $in: ["Member", "member"] },
+        $or: memberOrConditions,
+      }).sort({ createdAt: -1 });
+    }
+
+    console.log("MY-USERS DEBUG:", {
+      effectiveVendorId,
+      effectiveVendorUniqueId,
+      effectiveVendorEmail,
+      memberConditionsCount: memberOrConditions.length,
+      affiliatedFound: affiliatedMembers.length,
     });
+
+    // 2. Fetch users from VendorUser collection
+    const vuConditions = [];
+    if (effectiveVendorId && effectiveVendorId.toString().match(/^[0-9a-fA-F]{24}$/)) {
+      vuConditions.push({ vendorId: effectiveVendorId });
+    }
+    if (effectiveVendorEmail) {
+      vuConditions.push({ vendorEmail: effectiveVendorEmail });
+    }
+
+    let vendorUsers = [];
+    if (vuConditions.length > 0) {
+      vendorUsers = await VendorUser.find({ $or: vuConditions }).sort({
+        createdAt: -1,
+      });
+    }
+
+    // 3. Merge & Deduplicate
+    const combinedUsers = [];
+    const seenEmails = new Set();
+    const seenMobiles = new Set();
+    const seenIds = new Set();
+
+    for (const m of affiliatedMembers) {
+      const email = (m.email || "").toLowerCase().trim();
+      const mobile = (m.mobile || "").trim();
+      const idStr = m._id.toString();
+
+      if ((email && seenEmails.has(email)) || (mobile && seenMobiles.has(mobile)) || seenIds.has(idStr)) {
+        continue;
+      }
+      if (email) seenEmails.add(email);
+      if (mobile) seenMobiles.add(mobile);
+      seenIds.add(idStr);
+
+      const mObj = m.toObject ? m.toObject() : { ...m };
+      combinedUsers.push({
+        ...mObj,
+        _id: m._id,
+        vendorId: m.vendorId, // e.g. SLG1002-01
+        name: m.name,
+        firstName: m.firstName || (m.name ? m.name.split(" ")[0] : ""),
+        lastName: m.lastName || (m.name ? m.name.split(" ").slice(1).join(" ") : ""),
+        email: m.email,
+        mobile: m.mobile,
+        city: m.city,
+        state: m.state,
+        address: m.address,
+        role: m.role || "Member",
+        status: m.status || "Active",
+        membershipFee: m.membershipFee || 500,
+        paymentStatus: m.paymentStatus || "Paid",
+        createdAt: m.createdAt,
+      });
+    }
+
+    for (const u of vendorUsers) {
+      const email = (u.email || "").toLowerCase().trim();
+      const mobile = (u.mobile || "").trim();
+      const idStr = u._id.toString();
+
+      if ((email && seenEmails.has(email)) || (mobile && seenMobiles.has(mobile)) || seenIds.has(idStr)) {
+        continue;
+      }
+      if (email) seenEmails.add(email);
+      if (mobile) seenMobiles.add(mobile);
+      seenIds.add(idStr);
+
+      combinedUsers.push(u.toObject ? u.toObject() : u);
+    }
 
     return res.status(200).json({
       success: true,
-      count: users.length,
-      users,
+      count: combinedUsers.length,
+      users: combinedUsers,
     });
   } catch (error) {
     console.error("Error fetching my vendor users:", error);
@@ -240,7 +355,12 @@ router.patch("/:id/status", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   try {
     const user = await VendorUser.findByIdAndDelete(req.params.id);
-    if (!user) {
+    const member = await Vendor.findOneAndDelete({
+      _id: req.params.id,
+      role: { $in: ["Member", "member"] },
+    });
+
+    if (!user && !member) {
       return res.status(404).json({
         success: false,
         message: "User not found.",

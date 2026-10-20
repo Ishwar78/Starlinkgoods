@@ -3,6 +3,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const Razorpay = require("razorpay");
 const Vendor = require("../models/Vendor");
+const VendorUser = require("../models/VendorUser");
 
 const router = express.Router();
 
@@ -456,6 +457,35 @@ router.post("/verify-and-register", async (req, res) => {
     });
 
     await newVendor.save();
+
+    // Sync to VendorUser for vendor directory
+    try {
+      await VendorUser.findOneAndUpdate(
+        {
+          $or: [
+            { email: newVendor.email },
+            { mobile: newVendor.mobile },
+          ],
+        },
+        {
+          name: newVendor.name,
+          email: newVendor.email,
+          mobile: newVendor.mobile,
+          city: newVendor.city,
+          state: newVendor.state,
+          address: newVendor.address,
+          vendorId: parentVendor ? parentVendor._id : (newVendor.parentVendorId || null),
+          vendorName: parentVendor ? parentVendor.name : (newVendor.parentVendorName || "Vendor"),
+          vendorEmail: parentVendor ? parentVendor.email : "",
+          vendorMobile: parentVendor ? parentVendor.mobile : "",
+          role: "Member",
+          status: "Active",
+        },
+        { upsert: true, new: true }
+      );
+    } catch (vuErr) {
+      console.warn("Sync to VendorUser non-critical warning:", vuErr.message);
+    }
 
     // 6. Generate Auth JWT Token for immediate login
     const token = jwt.sign(

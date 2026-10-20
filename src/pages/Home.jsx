@@ -19,8 +19,9 @@ import {
 } from "react-icons/fi";
 import "./Home.css";
 import Footer from "../components/Footer";
+import { getCategories, getProducts, formatImageUrl } from "../lib/api.js";
 
-const categories = [
+const fallbackCategories = [
   { name: "Sofa Sets", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=500&q=85" },
   { name: "Beds", image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=500&q=85" },
   { name: "Mattresses", image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=500&q=85" },
@@ -32,8 +33,18 @@ const categories = [
   { name: "Home Decor", image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=500&q=85" },
 ];
 
-const products = [
-  { id: 1, name: "Modern 3 Seater Sofa", category: "Sofa Sets", price: 24999, oldPrice: 32999, badge: "Best Seller", rating: "4.8", reviews: 120, image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=700&q=85" },
+const fallbackProducts = [
+  {
+    id: 1,
+    name: "Modern 3 Seater Sofa",
+    category: "Sofa Sets",
+    price: 24999,
+    oldPrice: 32999,
+    badge: "Best Seller",
+    rating: "4.8",
+    reviews: 120,
+    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=700&q=85"
+  },
   { id: 2, name: "King Size Storage Bed", category: "Beds", price: 28999, oldPrice: 35999, badge: "10% OFF", rating: "4.7", reviews: 85, image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=700&q=85" },
   { id: 3, name: "Orthopedic Mattress", category: "Mattresses", price: 15999, oldPrice: 22000, badge: "Popular", rating: "4.6", reviews: 92, image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=700&q=85" },
   { id: 4, name: "6 Seater Dining Set", category: "Dining Sets", price: 26999, oldPrice: 34999, badge: "Best Seller", rating: "4.8", reviews: 64, image: "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=700&q=85" },
@@ -85,6 +96,51 @@ const workItems = [
   },
 ];
 
+/* OUR HEROES & DOCUMENTARIES */
+
+const impactSlides = [
+  {
+    category: "Documentaries",
+    title: "Martyrs Of Marriage",
+    description:
+      "Martyrs of Marriage is a feature-length documentary directed and produced by Deepika Narayan Bhardwaj. It documents concerns about the misuse of Section 498A of the Indian Penal Code and its impact on families.",
+    image: "/Logo-1.png",
+    imageAlt: "Martyrs of Marriage documentary",
+    buttonText: "WATCH DOCUMENTARY",
+    link: "/documentaries",
+  },
+  {
+    category: "Our Heroes",
+    title: "Standing Strong Through Adversity",
+    description:
+      "Meet the people whose courage, determination and resilience inspire others. Discover their journeys, the challenges they have faced and the positive difference their stories can make.",
+    image: "/download.png",
+    imageAlt: "Our Heroes inspirational story",
+    buttonText: "READ THEIR STORY",
+    link: "/our-heroes",
+  },
+  {
+    category: "Documentaries",
+    title: "Stories That Need To Be Heard",
+    description:
+      "Explore documentaries that bring important social issues into focus, encourage informed conversations and give audiences an opportunity to understand different perspectives.",
+    image: "/documentary-2.jpg",
+    imageAlt: "Social awareness documentary",
+    buttonText: "EXPLORE DOCUMENTARIES",
+    link: "/documentaries",
+  },
+  {
+    category: "Our Heroes",
+    title: "Real People. Real Stories.",
+    description:
+      "Celebrate the individuals who speak up, support others and work towards a more informed and compassionate society. Every story has the power to inspire meaningful change.",
+    image: "/our-hero-2.jpg",
+    imageAlt: "People making a difference",
+    buttonText: "DISCOVER MORE",
+    link: "/our-heroes",
+  },
+];
+
 const faqs = [
   {
     question: "How can I place an order?",
@@ -123,6 +179,54 @@ export default function Home() {
   const [notice, setNotice] = useState("");
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeWork, setActiveWork] = useState(0);
+  const [categories, setCategories] = useState(fallbackCategories);
+  const [productsList, setProductsList] = useState(fallbackProducts);
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchCatalog = async () => {
+      try {
+        const [catRes, prodRes] = await Promise.all([
+          getCategories({ status: "Active" }).catch(() => ({ categories: [] })),
+          getProducts().catch(() => ({ products: [] })),
+        ]);
+
+        if (isMounted) {
+          if (catRes?.success && Array.isArray(catRes.categories) && catRes.categories.length > 0) {
+            setCategories(catRes.categories);
+          }
+
+          if (prodRes?.success && Array.isArray(prodRes.products) && prodRes.products.length > 0) {
+            const formattedDbProducts = prodRes.products.map((p) => ({
+              id: p._id,
+              _id: p._id,
+              name: p.name,
+              category: p.category,
+              price: p.price,
+              oldPrice: p.oldPrice || Math.round(p.price * 1.25),
+              badge: p.badge || (p.stock < 5 ? "Limited" : "In Stock"),
+              rating: p.rating || "4.8",
+              reviews: p.reviews || 60,
+              image: formatImageUrl(p.image),
+            }));
+
+            const existingNames = new Set(formattedDbProducts.map((p) => p.name.toLowerCase()));
+            const nonDuplicateFallbacks = fallbackProducts.filter(
+              (p) => !existingNames.has(p.name.toLowerCase())
+            );
+            setProductsList([...formattedDbProducts, ...nonDuplicateFallbacks]);
+          }
+        }
+      } catch (err) {
+        console.warn("Error loading live catalog for home page:", err);
+      }
+    };
+
+    fetchCatalog();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   useEffect(() => {
     const onSearch = (event) => setSearchTerm(event.detail || "");
@@ -147,12 +251,40 @@ export default function Home() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
+  const [activeImpactSlide, setActiveImpactSlide] = useState(0);
+
+  const currentImpact = impactSlides[activeImpactSlide];
+
+  const nextImpactSlide = () => {
+    setActiveImpactSlide(
+      (current) => (current + 1) % impactSlides.length
+    );
+  };
+
+  const previousImpactSlide = () => {
+    setActiveImpactSlide(
+      (current) =>
+        (current - 1 + impactSlides.length) % impactSlides.length
+    );
+  };
+
+  /* Automatic carousel */
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setActiveImpactSlide(
+        (current) => (current + 1) % impactSlides.length
+      );
+    }, 6000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
   const filteredProducts = useMemo(
     () =>
-      products.filter((product) => {
+      productsList.filter((product) => {
         const categoryMatch =
           selectedCategory === "All" ||
-          product.category === selectedCategory;
+          product.category?.trim().toLowerCase() === selectedCategory?.trim().toLowerCase();
 
         const searchMatch = `${product.name} ${product.category}`
           .toLowerCase()
@@ -160,7 +292,7 @@ export default function Home() {
 
         return categoryMatch && searchMatch;
       }),
-    [selectedCategory, searchTerm]
+    [productsList, selectedCategory, searchTerm]
   );
 
   const addToCart = (product) => {
@@ -191,477 +323,592 @@ export default function Home() {
 
   return (
     <>
-    <main>
-      {notice && (
-        <div className="toast-message" role="status">
-          {notice}
-        </div>
-      )}
-
-      {/* HERO SECTION */}
-      <section className="hero container" aria-label="Featured furniture">
-        <a className="side-promo promo-sofa" href="#products">
-          <span className="promo-kicker">COMFORT MEETS STYLE</span>
-          <strong>Premium<br />Sofa Sets</strong>
-          <span className="promo-button">
-            Shop Now <FiArrowRight />
-          </span>
-          <img
-            src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=650&q=85"
-            alt="Modern sofa"
-          />
-        </a>
-
-        <div className="hero-main">
-          <img
-            src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=90"
-            alt="Contemporary living room"
-          />
-
-          <div className="hero-overlay">
-            <span className="eyebrow">
-              MODERN FURNITURE FOR MODERN LIVING
-            </span>
-            <h1>Transform<br />Your Home</h1>
-            <p>Stylish · Comfortable · Affordable</p>
-            <a className="primary-btn" href="#products">
-              Shop Collection <FiArrowRight />
-            </a>
+      <main>
+        {notice && (
+          <div className="toast-message" role="status">
+            {notice}
           </div>
-
-          <div className="hero-dots">
-            <i className="selected" />
-            <i />
-            <i />
-          </div>
-        </div>
-
-        <a className="side-promo promo-bed" href="#categories">
-          <span className="promo-kicker">REST. RELAX. RECHARGE.</span>
-          <strong>Luxury<br />Mattresses</strong>
-          <span className="promo-button">
-            Shop Now <FiArrowRight />
-          </span>
-          <img
-            src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=650&q=85"
-            alt="Luxury bedroom"
-          />
-        </a>
-      </section>
-
-     
-{/* CATEGORIES */}
-<section className="hs-category-section" id="categories">
-  <div className="hs-category-container">
-    <div className="hs-category-heading">
-      <h2>Shop by Category</h2>
-      <p>
-        Find the perfect pieces for every corner of your home
-      </p>
-    </div>
-
-    <div className="hs-category-grid">
-      {categories.slice(0, 4).map((category) => (
-        <button
-          type="button"
-          className={`hs-category-card ${
-            selectedCategory === category.name
-              ? "hs-category-active"
-              : ""
-          }`}
-          key={category.name}
-          onClick={() => {
-            setSelectedCategory(category.name);
-            document
-              .getElementById("products")
-              ?.scrollIntoView({ behavior: "smooth" });
-          }}
-        >
-          <span className="hs-category-image">
-            <img
-              src={category.image}
-              alt={category.name}
-              loading="lazy"
-            />
-          </span>
-
-          <strong>{category.name}</strong>
-        </button>
-      ))}
-    </div>
-  </div>
-</section>
-
-
-     
-{/* ================= FEATURED PRODUCTS ================= */}
-
-<section className="fp-section" id="products">
-  <div className="fp-container">
-    <div className="fp-heading">
-      <div className="fp-heading-copy">
-        <span className="fp-eyebrow">OUR COLLECTION</span>
-        <h2>Featured Products</h2>
-        <p>
-          Handpicked furniture to make your home more beautiful
-        </p>
-      </div>
-
-      <div className="fp-heading-actions">
-        {selectedCategory !== "All" && (
-          <button
-            className="fp-clear-filter"
-            type="button"
-            onClick={() => setSelectedCategory("All")}
-          >
-            Clear filter
-          </button>
         )}
 
-        <a className="fp-view-all" href="#products">
-          View All Products <FiArrowRight />
-        </a>
-      </div>
-    </div>
-
-    {searchTerm && (
-      <div className="fp-search-message">
-        <span>
-          Search results for "{searchTerm}"
-        </span>
-
-        <button
-          type="button"
-          onClick={() => setSearchTerm("")}
-        >
-          Clear search
-        </button>
-      </div>
-    )}
-
-    <div className="fp-grid">
-      {filteredProducts.length > 0 ? (
-        filteredProducts.map((product) => (
-          <article className="fp-card" key={product.id}>
-            <div className="fp-image-wrap">
-              <img
-                className="fp-product-image"
-                src={product.image}
-                alt={product.name}
-                loading="lazy"
-              />
-
-              {product.badge && (
-                <span
-                  className={`fp-badge ${
-                    product.badge === "10% OFF"
-                      ? "fp-badge-sale"
-                      : ""
-                  }`}
-                >
-                  {product.badge}
-                </span>
-              )}
-
-              <button
-                className={`fp-wishlist ${
-                  wishlist.includes(product.id)
-                    ? "fp-wishlist-active"
-                    : ""
-                }`}
-                type="button"
-                onClick={() => toggleWishlist(product.id)}
-                aria-label={`Toggle wishlist for ${product.name}`}
-                aria-pressed={wishlist.includes(product.id)}
-              >
-                <FiHeart />
-              </button>
-            </div>
-
-            <div className="fp-info">
-              <span className="fp-category">
-                {product.category}
-              </span>
-
-              <h3 className="fp-product-name">
-                {product.name}
-              </h3>
-
-              <div
-                className="fp-rating"
-                aria-label={`${product.rating} out of 5 stars`}
-              >
-                <span className="fp-stars" aria-hidden="true">
-                  ★★★★★
-                </span>
-
-                <span className="fp-rating-value">
-                  {product.rating}
-                </span>
-
-                <span className="fp-review-count">
-                  ({product.reviews})
-                </span>
-              </div>
-
-              <div className="fp-price">
-                <strong>{money(product.price)}</strong>
-                <del>{money(product.oldPrice)}</del>
-              </div>
-
-              <button
-                className="fp-add-cart"
-                type="button"
-                onClick={() => addToCart(product)}
-              >
-                <FiShoppingCart />
-                <span>Add to Cart</span>
-              </button>
-            </div>
-          </article>
-        ))
-      ) : (
-        <div className="fp-empty">
-          <h3>No products found</h3>
-          <p>
-            Try another search or browse our complete furniture collection.
-          </p>
-
-          <button
-            type="button"
-            className="fp-empty-button"
-            onClick={() => {
-              setSearchTerm("");
-              setSelectedCategory("All");
-            }}
-          >
-            Show All Products
-          </button>
-        </div>
-      )}
-    </div>
-  </div>
-</section>
-
-
-      {/* OFFER BANNER */}
-      <section className="container offer-banner" id="offers">
-        <img
-          src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1500&q=85"
-          alt="Stylish living room"
-          loading="lazy"
-        />
-
-        <div className="offer-content">
-          <span>LIMITED TIME OFFER</span>
-          <h2>FLAT 20% OFF</h2>
-          <p>on selected furniture collections</p>
-          <a className="light-btn" href="#products">
-            Shop the Sale <FiArrowRight />
-          </a>
-        </div>
-      </section>
-
-      {/* WHAT WE DO */}
-      <section className="what-we-do-section" id="what-we-do">
-        <div className="what-we-do-grid">
-          <div className="what-we-do-copy">
-            <span className="what-we-do-eyebrow">OUR PURPOSE</span>
-            <h2>What <span>We Do</span></h2>
-            <p>
-              We believe that a beautiful home begins with thoughtful choices.
-              Our collection brings together comfort, functionality and
-              timeless design to help you create spaces that feel truly yours.
-              From everyday essentials to statement furniture, we make it
-              easier to build a home that reflects your style.
-            </p>
-            <a className="what-we-do-link" href="#categories">
-              Explore Our Collections <FiArrowRight />
-            </a>
-          </div>
-
-          <div className="what-we-do-visual">
+        {/* HERO SECTION */}
+        <section className="hero container" aria-label="Featured furniture">
+          <a className="side-promo promo-sofa" href="#products">
+            <span className="promo-kicker">COMFORT MEETS STYLE</span>
+            <strong>Premium<br />Sofa Sets</strong>
+            <span className="promo-button">
+              Shop Now <FiArrowRight />
+            </span>
             <img
-              className="what-we-do-background"
-              src={currentWork.image}
-              alt={`${currentWork.title} furniture and home lifestyle`}
-              key={currentWork.image}
+              src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=650&q=85"
+              alt="Modern sofa"
+            />
+          </a>
+
+          <div className="hero-main">
+            <img
+              src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=90"
+              alt="Contemporary living room"
             />
 
-            <div className="what-we-do-gold-circle" key={currentWork.title}>
-              <div className="what-we-do-content">
-                <div className="what-we-do-icon">
-                  <WorkIcon />
-                </div>
-                <h3>{currentWork.title}</h3>
-                <p>{currentWork.description}</p>
+            <div className="hero-overlay">
+              <span className="eyebrow">
+                MODERN FURNITURE FOR MODERN LIVING
+              </span>
+              <h1>Transform<br />Your Home</h1>
+              <p>Stylish · Comfortable · Affordable</p>
+              <a className="primary-btn" href="#products">
+                Shop Collection <FiArrowRight />
+              </a>
+            </div>
+
+            <div className="hero-dots">
+              <i className="selected" />
+              <i />
+              <i />
+            </div>
+          </div>
+
+          <a className="side-promo promo-bed" href="#categories">
+            <span className="promo-kicker">REST. RELAX. RECHARGE.</span>
+            <strong>Luxury<br />Mattresses</strong>
+            <span className="promo-button">
+              Shop Now <FiArrowRight />
+            </span>
+            <img
+              src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=650&q=85"
+              alt="Luxury bedroom"
+            />
+          </a>
+        </section>
+
+
+        {/* CATEGORIES */}
+        <section className="hs-category-section" id="categories">
+          <div className="hs-category-container">
+            <div className="hs-category-heading">
+              <h2>Shop by Category</h2>
+              <p>
+                Find the perfect pieces for every corner of your home
+              </p>
+            </div>
+
+            <div className="hs-category-grid">
+              {categories.map((category) => (
+                <button
+                  type="button"
+                  className={`hs-category-card ${selectedCategory.trim().toLowerCase() === (category.name || "").trim().toLowerCase()
+                      ? "hs-category-active"
+                      : ""
+                    }`}
+                  key={category._id || category.name}
+                  onClick={() => {
+                    setSelectedCategory(category.name);
+                    document
+                      .getElementById("products")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
+                  <span className="hs-category-image">
+                    <img
+                      src={formatImageUrl(category.image)}
+                      alt={category.name}
+                      loading="lazy"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=500&q=85";
+                      }}
+                    />
+                  </span>
+
+                  <strong>{category.name}</strong>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+
+
+
+        {/* ================= FEATURED PRODUCTS ================= */}
+
+        <section className="fp-section" id="products">
+          <div className="fp-container">
+            <div className="fp-heading">
+              <div className="fp-heading-copy">
+                <span className="fp-eyebrow">OUR COLLECTION</span>
+                <h2>Featured Products</h2>
+                <p>
+                  Handpicked furniture to make your home more beautiful
+                </p>
               </div>
 
-              <div className="what-we-do-dots" aria-label="Choose a feature">
-                {workItems.map((item, index) => (
+              <div className="fp-heading-actions">
+                {selectedCategory !== "All" && (
+                  <button
+                    className="fp-clear-filter"
+                    type="button"
+                    onClick={() => setSelectedCategory("All")}
+                  >
+                    Clear filter
+                  </button>
+                )}
+
+                <a className="fp-view-all" href="#products">
+                  View All Products <FiArrowRight />
+                </a>
+              </div>
+            </div>
+
+            {searchTerm && (
+              <div className="fp-search-message">
+                <span>
+                  Search results for "{searchTerm}"
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => setSearchTerm("")}
+                >
+                  Clear search
+                </button>
+              </div>
+            )}
+
+            <div className="fp-grid">
+              {filteredProducts.length > 0 ? (
+                filteredProducts.map((product) => (
+                  <article className="fp-card" key={product.id}>
+                    <div className="fp-image-wrap">
+                      <img
+                        className="fp-product-image"
+                        src={product.image}
+                        alt={product.name}
+                        loading="lazy"
+                      />
+
+                      {product.badge && (
+                        <span
+                          className={`fp-badge ${product.badge === "10% OFF"
+                              ? "fp-badge-sale"
+                              : ""
+                            }`}
+                        >
+                          {product.badge}
+                        </span>
+                      )}
+
+                      <button
+                        className={`fp-wishlist ${wishlist.includes(product.id)
+                            ? "fp-wishlist-active"
+                            : ""
+                          }`}
+                        type="button"
+                        onClick={() => toggleWishlist(product.id)}
+                        aria-label={`Toggle wishlist for ${product.name}`}
+                        aria-pressed={wishlist.includes(product.id)}
+                      >
+                        <FiHeart />
+                      </button>
+                    </div>
+
+                    <div className="fp-info">
+                      <span className="fp-category">
+                        {product.category}
+                      </span>
+
+                      <h3 className="fp-product-name">
+                        {product.name}
+                      </h3>
+
+                      <div
+                        className="fp-rating"
+                        aria-label={`${product.rating} out of 5 stars`}
+                      >
+                        <span className="fp-stars" aria-hidden="true">
+                          ★★★★★
+                        </span>
+
+                        <span className="fp-rating-value">
+                          {product.rating}
+                        </span>
+
+                        <span className="fp-review-count">
+                          ({product.reviews})
+                        </span>
+                      </div>
+
+                      <div className="fp-price">
+                        <strong>{money(product.price)}</strong>
+                        <del>{money(product.oldPrice)}</del>
+                      </div>
+
+                      <button
+                        className="fp-add-cart"
+                        type="button"
+                        onClick={() => addToCart(product)}
+                      >
+                        <FiShoppingCart />
+                        <span>Add to Cart</span>
+                      </button>
+                    </div>
+                  </article>
+                ))
+              ) : (
+                <div className="fp-empty">
+                  <h3>No products found</h3>
+                  <p>
+                    Try another search or browse our complete furniture collection.
+                  </p>
+
                   <button
                     type="button"
-                    key={item.title}
-                    className={activeWork === index ? "active" : ""}
-                    onClick={() => setActiveWork(index)}
-                    aria-label={`Show ${item.title}`}
-                    aria-pressed={activeWork === index}
+                    className="fp-empty-button"
+                    onClick={() => {
+                      setSearchTerm("");
+                      setSelectedCategory("All");
+                    }}
+                  >
+                    Show All Products
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+
+        {/* OFFER BANNER */}
+        <section className="container offer-banner" id="offers">
+          <img
+            src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1500&q=85"
+            alt="Stylish living room"
+            loading="lazy"
+          />
+
+          <div className="offer-content">
+            <span>LIMITED TIME OFFER</span>
+            <h2>FLAT 20% OFF</h2>
+            <p>on selected furniture collections</p>
+            <a className="light-btn" href="#products">
+              Shop the Sale <FiArrowRight />
+            </a>
+          </div>
+        </section>
+
+        {/* WHAT WE DO */}
+        <section className="what-we-do-section" id="what-we-do">
+          <div className="what-we-do-grid">
+            <div className="what-we-do-copy">
+              <span className="what-we-do-eyebrow">OUR PURPOSE</span>
+              <h2>What <span>We Do</span></h2>
+              <p>
+                We believe that a beautiful home begins with thoughtful choices.
+                Our collection brings together comfort, functionality and
+                timeless design to help you create spaces that feel truly yours.
+                From everyday essentials to statement furniture, we make it
+                easier to build a home that reflects your style.
+              </p>
+              <a className="what-we-do-link" href="#categories">
+                Explore Our Collections <FiArrowRight />
+              </a>
+            </div>
+
+            <div className="what-we-do-visual">
+              <img
+                className="what-we-do-background"
+                src={currentWork.image}
+                alt={`${currentWork.title} furniture and home lifestyle`}
+                key={currentWork.image}
+              />
+
+              <div className="what-we-do-gold-circle" key={currentWork.title}>
+                <div className="what-we-do-content">
+                  <div className="what-we-do-icon">
+                    <WorkIcon />
+                  </div>
+                  <h3>{currentWork.title}</h3>
+                  <p>{currentWork.description}</p>
+                </div>
+
+                <div className="what-we-do-dots" aria-label="Choose a feature">
+                  {workItems.map((item, index) => (
+                    <button
+                      type="button"
+                      key={item.title}
+                      className={activeWork === index ? "active" : ""}
+                      onClick={() => setActiveWork(index)}
+                      aria-label={`Show ${item.title}`}
+                      aria-pressed={activeWork === index}
+                    >
+                      <span />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* OUR HEROES & DOCUMENTARIES */}
+        <section
+          className="impact-showcase"
+          id="our-heroes"
+          aria-label="Our Heroes and Documentaries"
+        >
+          <div className="impact-showcase-container">
+            {/* Section heading */}
+            <div className="impact-showcase-heading">
+              <h2>
+                <span className="impact-heading-highlight">
+                  {currentImpact.category}
+                </span>
+              </h2>
+
+              <a
+                className="impact-view-all"
+                href={currentImpact.link}
+              >
+                VIEW ALL
+                <FiChevronRight />
+                <FiChevronRight className="impact-double-chevron" />
+              </a>
+            </div>
+
+            {/* Featured slide */}
+            <div className="impact-slider">
+              <div className="impact-slider-shadow" />
+
+              <article
+                className="impact-feature-card"
+                key={currentImpact.title}
+              >
+                <div className="impact-feature-content">
+                  <span className="impact-feature-eyebrow">
+                    {currentImpact.category === "Our Heroes"
+                      ? "COURAGE • RESILIENCE • INSPIRATION"
+                      : "REAL STORIES • SOCIAL AWARENESS"}
+                  </span>
+
+                  <h3>{currentImpact.title}</h3>
+
+                  <p>{currentImpact.description}</p>
+
+                  <a
+                    className="impact-read-more"
+                    href={currentImpact.link}
+                  >
+                    {currentImpact.buttonText}
+                    <FiArrowRight />
+                  </a>
+                </div>
+
+                <div className="impact-feature-image">
+                  <img
+                    src={currentImpact.image}
+                    alt={currentImpact.imageAlt}
+                    loading="lazy"
+                  />
+
+                  <div className="impact-image-overlay" />
+
+                  <span className="impact-image-label">
+                    {currentImpact.category}
+                  </span>
+                </div>
+              </article>
+            </div>
+
+            {/* Slider controls */}
+            <div className="impact-slider-controls">
+              {/* <button
+        type="button"
+        className="impact-slider-arrow"
+        onClick={previousImpactSlide}
+        aria-label="Previous story"
+      >
+        <FiChevronLeft />
+      </button> */}
+
+              <div
+                className="impact-slider-dots"
+                aria-label="Choose a story"
+              >
+                {impactSlides.map((slide, index) => (
+                  <button
+                    type="button"
+                    key={slide.title}
+                    className={
+                      activeImpactSlide === index
+                        ? "active"
+                        : ""
+                    }
+                    onClick={() => setActiveImpactSlide(index)}
+                    aria-label={`Show ${slide.category}: ${slide.title}`}
+                    aria-pressed={activeImpactSlide === index}
                   >
                     <span />
                   </button>
                 ))}
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* SHOPPING BENEFITS */}
-      <section className="container service-row" aria-label="Shopping benefits">
-        <div className="service-item">
-          <span><FiTruck /></span>
-          <div>
-            <strong>Free Shipping</strong>
-            <small>On orders above ₹999</small>
-          </div>
-        </div>
-
-        <div className="service-item">
-          <span><FiShield /></span>
-          <div>
-            <strong>Secure Payment</strong>
-            <small>Safe and secure checkout</small>
-          </div>
-        </div>
-
-        <div className="service-item">
-          <span><FiRefreshCw /></span>
-          <div>
-            <strong>Easy Returns</strong>
-            <small>7-day hassle-free return</small>
-          </div>
-        </div>
-
-        <div className="service-item">
-          <span><FiStar /></span>
-          <div>
-            <strong>Premium Quality</strong>
-            <small>Made for everyday living</small>
-          </div>
-        </div>
-      </section>
-
-      {/* ABOUT SECTION */}
-      <section className="about-section" id="about">
-        <div className="container about-grid">
-          <div className="about-image">
-            <img
-              src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=85"
-              alt="Contemporary home interior"
-              loading="lazy"
-            />
-          </div>
-
-          <div className="about-copy">
-            <span className="eyebrow">ABOUT SLG</span>
-            <h2>Creating Beautiful Homes<br />For a Better Tomorrow</h2>
-            <p>
-              We believe great furniture should feel as good as it looks.
-              Explore thoughtfully selected sofas, beds, dining sets and
-              home essentials designed to bring comfort, quality and
-              timeless style to your everyday life.
-            </p>
-            <a className="primary-btn" href="#footer">
-              Know More <FiArrowRight />
-            </a>
-          </div>
-
-          <div className="about-stats">
-            <div>
-              <span><FiCheckCircle /></span>
-              <strong>1,000+</strong>
-              <small>Happy Customers</small>
-            </div>
-            <div>
-              <span><FiShoppingCart /></span>
-              <strong>500+</strong>
-              <small>Furniture Choices</small>
-            </div>
-            <div>
-              <span><FiTag /></span>
-              <strong>10+</strong>
-              <small>Trusted Collections</small>
-            </div>
-            <div>
-              <span><FiStar /></span>
-              <strong>4.8 / 5</strong>
-              <small>Customer Rating</small>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* TESTIMONIALS */}
-      <section
-        className="container section testimonial-section"
-        aria-label="Customer testimonials"
+              {/* <button
+        type="button"
+        className="impact-slider-arrow"
+        onClick={nextImpactSlide}
+        aria-label="Next story"
       >
-        <div className="testimonial-heading">
-          <h2><span>Testimonials</span></h2>
-          <span className="testimonial-kicker">PATRONS</span>
-        </div>
+        <FiChevronRight />
+      </button> */}
+            </div>
+          </div>
+        </section>
 
-        <div className="testimonial-stage">
-          <div className="testimonial-layer testimonial-layer-back" />
-          <div className="testimonial-layer testimonial-layer-mid" />
+        {/* SHOPPING BENEFITS */}
+        <section className="container service-row" aria-label="Shopping benefits">
+          <div className="service-item">
+            <span><FiTruck /></span>
+            <div>
+              <strong>Free Shipping</strong>
+              <small>On orders above ₹999</small>
+            </div>
+          </div>
 
-          <article className="testimonial-feature" key={activeReview.name}>
-            <div className="testimonial-art" aria-hidden="true">
-             
+          <div className="service-item">
+            <span><FiShield /></span>
+            <div>
+              <strong>Secure Payment</strong>
+              <small>Safe and secure checkout</small>
+            </div>
+          </div>
+
+          <div className="service-item">
+            <span><FiRefreshCw /></span>
+            <div>
+              <strong>Easy Returns</strong>
+              <small>7-day hassle-free return</small>
+            </div>
+          </div>
+
+          <div className="service-item">
+            <span><FiStar /></span>
+            <div>
+              <strong>Premium Quality</strong>
+              <small>Made for everyday living</small>
+            </div>
+          </div>
+        </section>
+
+        {/* ABOUT SECTION */}
+        <section className="about-section" id="about">
+          <div className="container about-grid">
+            <div className="about-image">
               <img
-                className="testimonial-thumb"
-                src="/download.png"
-                alt=""
+                src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=1200&q=85"
+                alt="Contemporary home interior"
                 loading="lazy"
               />
-              <span className="testimonial-art-spark">✦</span>
             </div>
 
-            <div className="testimonial-copy">
-              <div className="testimonial-quote-icon">
-                <FiMessageSquare />
+            <div className="about-copy">
+              <span className="eyebrow">ABOUT SLG</span>
+              <h2>Creating Beautiful Homes<br />For a Better Tomorrow</h2>
+              <p>
+                We believe great furniture should feel as good as it looks.
+                Explore thoughtfully selected sofas, beds, dining sets and
+                home essentials designed to bring comfort, quality and
+                timeless style to your everyday life.
+              </p>
+              <a className="primary-btn" href="#footer">
+                Know More <FiArrowRight />
+              </a>
+            </div>
+
+            <div className="about-stats">
+              <div>
+                <span><FiCheckCircle /></span>
+                <strong>1,000+</strong>
+                <small>Happy Customers</small>
               </div>
-              <p className="testimonial-quote">“{activeReview.quote}”</p>
-              <div className="testimonial-reviewer">
-                <strong>{activeReview.name}</strong>
-                <span>{activeReview.city} · Customer Review</span>
+              <div>
+                <span><FiShoppingCart /></span>
+                <strong>500+</strong>
+                <small>Furniture Choices</small>
               </div>
-              <div className="testimonial-rating" aria-label="5 out of 5 stars">
-                ★★★★★
+              <div>
+                <span><FiTag /></span>
+                <strong>10+</strong>
+                <small>Trusted Collections</small>
+              </div>
+              <div>
+                <span><FiStar /></span>
+                <strong>4.8 / 5</strong>
+                <small>Customer Rating</small>
               </div>
             </div>
-          </article>
-        </div>
+          </div>
+        </section>
 
-        <div
-          className="testimonial-pagination"
-          aria-label="Choose a customer review"
+        {/* TESTIMONIALS */}
+        <section
+          className="container section testimonial-section"
+          aria-label="Customer testimonials"
         >
-          {testimonials.map((testimonial, index) => (
-            <button
-              type="button"
-              key={testimonial.name}
-              className={activeTestimonial === index ? "active" : ""}
-              onClick={() => setActiveTestimonial(index)}
-              aria-label={`Show review ${index + 1} by ${testimonial.name}`}
-              aria-current={activeTestimonial === index ? "true" : undefined}
-            >
-              <span />
-            </button>
-          ))}
-        </div>
+          <div className="testimonial-heading">
+            <h2><span>Testimonials</span></h2>
+            <span className="testimonial-kicker">PATRONS</span>
+          </div>
 
-        {/* <div className="testimonial-mobile-controls">
+          <div className="testimonial-stage">
+            <div className="testimonial-layer testimonial-layer-back" />
+            <div className="testimonial-layer testimonial-layer-mid" />
+
+            <article className="testimonial-feature" key={activeReview.name}>
+              <div className="testimonial-art" aria-hidden="true">
+
+                <img
+                  className="testimonial-thumb"
+                  src="/download.png"
+                  alt=""
+                  loading="lazy"
+                />
+                <span className="testimonial-art-spark">✦</span>
+              </div>
+
+              <div className="testimonial-copy">
+                <div className="testimonial-quote-icon">
+                  <FiMessageSquare />
+                </div>
+                <p className="testimonial-quote">“{activeReview.quote}”</p>
+                <div className="testimonial-reviewer">
+                  <strong>{activeReview.name}</strong>
+                  <span>{activeReview.city} · Customer Review</span>
+                </div>
+                <div className="testimonial-rating" aria-label="5 out of 5 stars">
+                  ★★★★★
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <div
+            className="testimonial-pagination"
+            aria-label="Choose a customer review"
+          >
+            {testimonials.map((testimonial, index) => (
+              <button
+                type="button"
+                key={testimonial.name}
+                className={activeTestimonial === index ? "active" : ""}
+                onClick={() => setActiveTestimonial(index)}
+                aria-label={`Show review ${index + 1} by ${testimonial.name}`}
+                aria-current={activeTestimonial === index ? "true" : undefined}
+              >
+                <span />
+              </button>
+            ))}
+          </div>
+
+          {/* <div className="testimonial-mobile-controls">
           <button
             type="button"
             onClick={previousTestimonial}
@@ -677,52 +924,52 @@ export default function Home() {
             <FiChevronRight />
           </button>
         </div> */}
-      </section>
+        </section>
 
-      {/* FAQ SECTION */}
-      <section
-        className="container section faq-section"
-        id="faq"
-        aria-labelledby="faq-heading"
-      >
-        <div className="faq-heading">
-          <span className="faq-eyebrow">NEED SOME HELP?</span>
-          <h2 id="faq-heading">
-            Frequently Asked <span>Questions</span>
-          </h2>
-          <p>Quick answers to common questions about shopping with us.</p>
-        </div>
-
-        <div className="faq-grid">
-          {faqs.map((faq) => (
-            <details className="faq-item" key={faq.question}>
-              <summary>
-                <span>{faq.question}</span>
-                <span className="faq-plus" aria-hidden="true">+</span>
-              </summary>
-              <p>{faq.answer}</p>
-            </details>
-          ))}
-        </div>
-      </section>
-
-      {/* FLOATING CART */}
-      {cart.length > 0 && (
-        <button
-          className="floating-cart"
-          onClick={() =>
-            setNotice(
-              `You have ${cart.length} item${cart.length === 1 ? "" : "s"} in your cart`
-            )
-          }
-          aria-label={`Cart with ${cart.length} items`}
+        {/* FAQ SECTION */}
+        <section
+          className="container section faq-section"
+          id="faq"
+          aria-labelledby="faq-heading"
         >
-          <FiShoppingCart />
-          <span>{cart.length}</span>
-        </button>
-      )}
-    </main>
-<Footer />
+          <div className="faq-heading">
+            <span className="faq-eyebrow">NEED SOME HELP?</span>
+            <h2 id="faq-heading">
+              Frequently Asked <span>Questions</span>
+            </h2>
+            <p>Quick answers to common questions about shopping with us.</p>
+          </div>
+
+          <div className="faq-grid">
+            {faqs.map((faq) => (
+              <details className="faq-item" key={faq.question}>
+                <summary>
+                  <span>{faq.question}</span>
+                  <span className="faq-plus" aria-hidden="true">+</span>
+                </summary>
+                <p>{faq.answer}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+
+        {/* FLOATING CART */}
+        {cart.length > 0 && (
+          <button
+            className="floating-cart"
+            onClick={() =>
+              setNotice(
+                `You have ${cart.length} item${cart.length === 1 ? "" : "s"} in your cart`
+              )
+            }
+            aria-label={`Cart with ${cart.length} items`}
+          >
+            <FiShoppingCart />
+            <span>{cart.length}</span>
+          </button>
+        )}
+      </main>
+      <Footer />
     </>
   );
 }

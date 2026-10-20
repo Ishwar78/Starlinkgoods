@@ -339,13 +339,35 @@ router.get("/", async (req, res) => {
       vendors.map(async (v) => {
         const vObj = v.toJSON ? v.toJSON() : { ...v };
         if (v.vendorId) {
-          vObj.membersCount = await Vendor.countDocuments({
-            role: { $in: ["Member", "member"] },
-            $or: [
-              { parentVendorId: v.vendorId },
-              { vendorId: { $regex: new RegExp(`^${v.vendorId}-`, "i") } },
-            ],
+          const mList = await Vendor.find(
+            {
+              role: { $in: ["Member", "member"] },
+              $or: [
+                { parentVendorId: v.vendorId },
+                { vendorId: { $regex: new RegExp(`^${v.vendorId}-`, "i") } },
+              ],
+            },
+            { email: 1, mobile: 1 }
+          );
+          const vuList = await VendorUser.find(
+            {
+              $or: [
+                { vendorId: v._id },
+                { vendorEmail: v.email },
+              ],
+            },
+            { email: 1, mobile: 1 }
+          );
+          const uniqueSet = new Set();
+          mList.forEach((it) => {
+            if (it.email) uniqueSet.add(it.email.toLowerCase().trim());
+            else if (it.mobile) uniqueSet.add(it.mobile.trim());
           });
+          vuList.forEach((it) => {
+            if (it.email) uniqueSet.add(it.email.toLowerCase().trim());
+            else if (it.mobile) uniqueSet.add(it.mobile.trim());
+          });
+          vObj.membersCount = Math.max(uniqueSet.size, mList.length);
         } else {
           vObj.membersCount = 0;
         }
@@ -396,7 +418,7 @@ router.get("/:id/members", async (req, res) => {
       });
     }
 
-    // Find all members who joined under this vendor
+    // 1. Find all members in Vendor model who joined under this vendor
     const members = await Vendor.find({
       role: { $in: ["Member", "member"] },
       $or: [
@@ -405,6 +427,59 @@ router.get("/:id/members", async (req, res) => {
         { vendorId: { $regex: new RegExp(`^${vendor.vendorId}-`, "i") } },
       ],
     }).sort({ createdAt: -1 });
+
+    // 2. Also find any users in VendorUser collection
+    const vendorUsers = await VendorUser.find({
+      $or: [
+        { vendorId: vendor._id },
+        { vendorEmail: vendor.email },
+      ],
+    }).sort({ createdAt: -1 });
+
+    const combinedMembers = [...members.map((m) => (m.toObject ? m.toObject() : m))];
+    const seenEmails = new Set(
+      members.map((m) => (m.email || "").toLowerCase().trim()).filter(Boolean)
+    );
+    const seenMobiles = new Set(
+      members.map((m) => (m.mobile || "").trim()).filter(Boolean)
+    );
+    const seenIds = new Set(members.map((m) => m._id.toString()));
+
+    for (const vu of vendorUsers) {
+      const email = (vu.email || "").toLowerCase().trim();
+      const mobile = (vu.mobile || "").trim();
+      const idStr = vu._id.toString();
+
+      if (
+        (email && seenEmails.has(email)) ||
+        (mobile && seenMobiles.has(mobile)) ||
+        seenIds.has(idStr)
+      ) {
+        continue;
+      }
+      if (email) seenEmails.add(email);
+      if (mobile) seenMobiles.add(mobile);
+      seenIds.add(idStr);
+
+      combinedMembers.push({
+        _id: vu._id,
+        vendorId:
+          typeof vu.vendorId === "string" && vu.vendorId.startsWith("SLG")
+            ? vu.vendorId
+            : `${vendor.vendorId}-User`,
+        name: vu.name,
+        email: vu.email,
+        mobile: vu.mobile,
+        city: vu.city,
+        state: vu.state,
+        address: vu.address || "",
+        membershipFee: 500,
+        paymentStatus: "Paid",
+        role: "Member",
+        status: vu.status || "Active",
+        createdAt: vu.createdAt,
+      });
+    }
 
     return res.status(200).json({
       success: true,
@@ -415,8 +490,8 @@ router.get("/:id/members", async (req, res) => {
         email: vendor.email,
         mobile: vendor.mobile,
       },
-      count: members.length,
-      members,
+      count: combinedMembers.length,
+      members: combinedMembers,
     });
   } catch (error) {
     console.error("Error fetching vendor members:", error);

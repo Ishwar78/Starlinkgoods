@@ -90,7 +90,7 @@ export default function Footer() {
         {/* Brand */}
         <div className="slg-footer-brand">
           <a href="#home" className="slg-footer-logo">
-            <img src="/Logo.jpeg" alt="SLG - Star Link Goods" />
+            <img src="/Logo-1.png" alt="SLG - Star Link Goods" />
           </a>
 
           <p className="slg-footer-description">
