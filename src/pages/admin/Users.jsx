@@ -22,6 +22,8 @@ import {
   getVendors,
   getVendorMembers,
   createVendor,
+  createVendorOrder,
+  verifyAndCreateVendor,
   deleteVendor,
   toggleVendorStatus,
   addVendorWalletMoney,
@@ -44,6 +46,7 @@ export default function Users() {
   const [loadingMembers, setLoadingMembers] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("success");
 
@@ -55,7 +58,20 @@ export default function Users() {
     state: "",
     address: "",
     password: "",
+    confirmPassword: "",
   });
+
+  // Ensure Razorpay checkout script is loaded
+  useEffect(() => {
+    if (window.Razorpay) return;
+    const scriptId = "razorpay-checkout-script";
+    if (document.getElementById(scriptId)) return;
+    const script = document.createElement("script");
+    script.id = scriptId;
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
 
   // Fetch vendors from database on mount
   const fetchVendorsList = async () => {
@@ -109,41 +125,156 @@ export default function Users() {
       !form.city.trim() ||
       !form.state.trim() ||
       !form.address.trim() ||
-      !form.password
+      !form.password ||
+      !form.confirmPassword
     ) {
       setMessage("Please fill in all required fields.");
       setMessageType("error");
       return;
     }
 
+    const cleanMobile = form.mobile.replace(/\D/g, "").trim();
+    if (cleanMobile.length !== 10) {
+      setMessage("Please enter a valid 10-digit mobile number.");
+      setMessageType("error");
+      return;
+    }
+
+    if (form.password.length < 6) {
+      setMessage("Password must be at least 6 characters long.");
+      setMessageType("error");
+      return;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      setMessage("Password and Confirm Password do not match.");
+      setMessageType("error");
+      return;
+    }
+
+    if (!window.Razorpay) {
+      setMessage("Payment gateway is loading. Please check your internet connection.");
+      setMessageType("error");
+      return;
+    }
+
     try {
       setSubmitting(true);
-      const res = await createVendor(form);
+      setMessage("Initiating ₹5,000 Razorpay payment order...");
+      setMessageType("info");
 
-      if (res.success) {
-        setMessage(`Vendor "${form.name}" created successfully and saved in database!`);
-        setMessageType("success");
+      // 1. Create ₹5,000 Razorpay order
+      const orderData = await createVendorOrder({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        mobile: cleanMobile,
+        city: form.city.trim(),
+        state: form.state.trim(),
+        address: form.address.trim(),
+        password: form.password,
+        fee: 5000,
+      });
 
-        // Reset form
-        setForm({
-          name: "",
-          email: "",
-          mobile: "",
-          city: "",
-          state: "",
-          address: "",
-          password: "",
-        });
-
-        setShowForm(false);
-        // Refresh list
-        fetchVendorsList();
+      if (!orderData || !orderData.success) {
+        setMessage(orderData?.message || "Failed to create payment order.");
+        setMessageType("error");
+        setSubmitting(false);
+        return;
       }
+
+      // 2. Open Razorpay Checkout modal
+      const options = {
+        key: orderData.keyId,
+        order_id: orderData.orderId,
+        amount: orderData.amount, // 500000 paise
+        currency: orderData.currency || "INR",
+        name: "Star Link Goods",
+        description: `Vendor Registration Fee (₹5,000) - ${form.name.trim()}`,
+        image: "/Logo.jpeg",
+        prefill: {
+          name: form.name.trim(),
+          email: form.email.trim(),
+          contact: cleanMobile,
+        },
+        theme: {
+          color: "#ffd044",
+        },
+        modal: {
+          ondismiss: () => {
+            setSubmitting(false);
+            setMessage("Payment cancelled. Vendor was not created.");
+            setMessageType("error");
+          },
+        },
+        handler: async (paymentResponse) => {
+          try {
+            setSubmitting(true);
+            setMessage("Payment verified! Saving vendor to database...");
+            setMessageType("info");
+
+            const regData = await verifyAndCreateVendor({
+              razorpay_order_id: paymentResponse.razorpay_order_id,
+              razorpay_payment_id: paymentResponse.razorpay_payment_id,
+              razorpay_signature: paymentResponse.razorpay_signature,
+              name: form.name.trim(),
+              email: form.email.trim(),
+              mobile: cleanMobile,
+              city: form.city.trim(),
+              state: form.state.trim(),
+              address: form.address.trim(),
+              password: form.password,
+              fee: 5000,
+              role: "Vendor",
+              status: "Active",
+            });
+
+            if (!regData || !regData.success) {
+              throw new Error(regData?.message || "Payment verified, but saving vendor failed.");
+            }
+
+            setMessage(
+              `Vendor "${regData.vendor?.name}" (${regData.vendor?.vendorId || "New"}) successfully created and saved in database after ₹5,000 payment!`
+            );
+            setMessageType("success");
+
+            // Reset form
+            setForm({
+              name: "",
+              email: "",
+              mobile: "",
+              city: "",
+              state: "",
+              address: "",
+              password: "",
+              confirmPassword: "",
+            });
+
+            setShowForm(false);
+            fetchVendorsList();
+          } catch (verifyErr) {
+            console.error("Vendor verification error:", verifyErr);
+            setMessage(verifyErr.message || "Failed to verify payment and save vendor.");
+            setMessageType("error");
+          } finally {
+            setSubmitting(false);
+          }
+        },
+      };
+
+      const rzpInstance = new window.Razorpay(options);
+      rzpInstance.on("payment.failed", (failedRes) => {
+        setSubmitting(false);
+        setMessage(
+          `Payment failed: ${failedRes.error?.description || "Transaction declined"}. Vendor was not saved.`
+        );
+        setMessageType("error");
+      });
+
+      rzpInstance.open();
     } catch (err) {
       console.error("Create vendor error:", err);
-      setMessage(err.message || "Error creating vendor.");
+      setMessage(err.message || "Error creating vendor payment order.");
       setMessageType("error");
-    } finally {
       setSubmitting(false);
     }
   };
@@ -386,6 +517,38 @@ export default function Users() {
               </div>
             </div>
 
+            <div className="admin-form-field">
+              <label htmlFor="vendor-confirm-password">Confirm Password *</label>
+              <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                <input
+                  id="vendor-confirm-password"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  placeholder="Re-enter password to confirm"
+                  value={form.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  style={{ paddingRight: 40 }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  style={{
+                    position: "absolute",
+                    right: 12,
+                    background: "transparent",
+                    border: "none",
+                    color: "#ffd044",
+                    cursor: "pointer",
+                    fontSize: 16,
+                  }}
+                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                >
+                  {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
+              </div>
+            </div>
+
             <div className="admin-form-field full">
               <label htmlFor="vendor-address">Address *</label>
               <textarea
@@ -400,14 +563,50 @@ export default function Users() {
             </div>
           </div>
 
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "14px 18px",
+              background: "rgba(255, 208, 68, 0.08)",
+              border: "1px solid rgba(255, 208, 68, 0.28)",
+              borderRadius: "8px",
+              marginTop: "16px",
+              marginBottom: "20px",
+              flexWrap: "wrap",
+              gap: "10px",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "10px",
+                color: "#ffd044",
+                fontSize: "14px",
+                fontWeight: "700",
+              }}
+            >
+              <FiCreditCard size={20} />
+              <span>
+                Vendor Registration Fee:{" "}
+                <strong style={{ color: "#ffffff", fontSize: "15px" }}>₹5,000</strong>
+              </span>
+            </div>
+            <span style={{ fontSize: "12px", color: "#b5aba0" }}>
+              Secure Razorpay gateway will open. Vendor is saved and activated upon successful payment of ₹5,000.
+            </span>
+          </div>
+
           <div className="admin-form-actions">
             <button
               type="submit"
               className="admin-primary-button"
               disabled={submitting}
             >
-              <FiSave />
-              <span>{submitting ? "Saving to Database..." : "Save Vendor"}</span>
+              <FiCreditCard />
+              <span>{submitting ? "Processing ₹5,000 Payment..." : "Pay ₹5,000 & Save Vendor"}</span>
             </button>
 
             <button

@@ -73,6 +73,20 @@ export async function getVendorMembers(vendorId) {
   return apiFetch(`/api/vendors/${vendorId}/members`);
 }
 
+export async function createVendorOrder(vendorData) {
+  return apiFetch("/api/vendors/create-order", {
+    method: "POST",
+    body: JSON.stringify(vendorData),
+  });
+}
+
+export async function verifyAndCreateVendor(payload) {
+  return apiFetch("/api/vendors/verify-and-create", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
 export async function createVendor(vendorData) {
   return apiFetch("/api/vendors", {
     method: "POST",

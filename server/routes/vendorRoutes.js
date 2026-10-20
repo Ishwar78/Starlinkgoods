@@ -3,10 +3,27 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const crypto = require("crypto");
+const Razorpay = require("razorpay");
 const Vendor = require("../models/Vendor");
 const VendorUser = require("../models/VendorUser");
 
 const router = express.Router();
+
+// Helper to get Razorpay instance
+const getRazorpayInstance = () => {
+  const key_id = process.env.RAZORPAY_KEY_ID;
+  const key_secret = process.env.RAZORPAY_KEY_SECRET;
+
+  if (!key_id || !key_secret) {
+    throw new Error("Razorpay API credentials not configured in server environment.");
+  }
+
+  return new Razorpay({
+    key_id,
+    key_secret,
+  });
+};
 
 // Profile images upload directory
 const profileUploadDir = path.join(__dirname, "../uploads/profiles");
@@ -233,13 +250,251 @@ router.post("/profile-image", profileUpload.single("profileImage"), async (req, 
 });
 
 /**
+ * POST /api/vendors/create-order
+ * Validate vendor details, check email/mobile uniqueness, and create ₹5,000 Razorpay order
+ */
+router.post("/create-order", async (req, res) => {
+  try {
+    const { name, email, mobile, city, state, address, password, fee } = req.body;
+
+    const vendorName = (name || "").trim();
+    const cleanEmail = (email || "").toLowerCase().trim();
+    const cleanMobile = (mobile || "").replace(/\D/g, "").trim();
+
+    if (
+      !vendorName ||
+      !cleanEmail ||
+      !cleanMobile ||
+      !city?.trim() ||
+      !state?.trim() ||
+      !address?.trim() ||
+      !password
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields (name, email, mobile, city, state, address, password) are required.",
+      });
+    }
+
+    if (cleanMobile.length !== 10) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid 10-digit mobile number.",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters long.",
+      });
+    }
+
+    // Check if email or mobile already registered
+    const existing = await Vendor.findOne({
+      $or: [{ email: cleanEmail }, { mobile: cleanMobile }],
+    });
+
+    if (existing) {
+      let msg = "A user with this email and mobile number is already registered.";
+      if (existing.email === cleanEmail && existing.mobile !== cleanMobile) {
+        msg = "A vendor with this email is already registered. Email must be unique.";
+      } else if (existing.mobile === cleanMobile && existing.email !== cleanEmail) {
+        msg = "A vendor with this mobile number is already registered. Mobile number must be unique.";
+      }
+      return res.status(400).json({
+        success: false,
+        registered: true,
+        message: msg,
+      });
+    }
+
+    const razorpay = getRazorpayInstance();
+    const vendorFee = Number(fee) || 5000; // ₹5,000 for Vendor registration
+    const currency = process.env.RAZORPAY_CURRENCY || "INR";
+    const amountInPaise = Math.round(vendorFee * 100);
+
+    const orderOptions = {
+      amount: amountInPaise,
+      currency,
+      receipt: `vnd_${Date.now()}_${cleanMobile.slice(-4)}`,
+      notes: {
+        vendor_name: vendorName,
+        vendor_email: cleanEmail,
+        vendor_mobile: cleanMobile,
+        purpose: "Star Link Goods Vendor Account Registration (₹5,000)",
+      },
+    };
+
+    const order = await razorpay.orders.create(orderOptions);
+
+    return res.status(200).json({
+      success: true,
+      message: "Razorpay order created successfully.",
+      orderId: order.id,
+      amount: order.amount,
+      currency: order.currency,
+      fee: vendorFee,
+      keyId: process.env.RAZORPAY_KEY_ID,
+    });
+  } catch (error) {
+    console.error("Error creating vendor Razorpay order:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to create vendor payment order.",
+    });
+  }
+});
+
+/**
+ * POST /api/vendors/verify-and-create
+ * Verify Razorpay payment signature and create Vendor in database
+ */
+router.post("/verify-and-create", async (req, res) => {
+  try {
+    const {
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      name,
+      email,
+      mobile,
+      city,
+      state,
+      address,
+      password,
+      role = "Vendor",
+      status = "Active",
+      fee = 5000,
+    } = req.body;
+
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+      return res.status(400).json({
+        success: false,
+        message: "Payment verification details (order ID, payment ID, signature) are required.",
+      });
+    }
+
+    // Verify Razorpay signature
+    const keySecret = process.env.RAZORPAY_KEY_SECRET;
+    if (!keySecret) {
+      return res.status(500).json({
+        success: false,
+        message: "Razorpay secret key is not configured.",
+      });
+    }
+
+    const expectedSignature = crypto
+      .createHmac("sha256", keySecret)
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest("hex");
+
+    if (expectedSignature !== razorpay_signature) {
+      console.error("Vendor signature mismatch:", { expectedSignature, razorpay_signature });
+      return res.status(400).json({
+        success: false,
+        message: "Invalid payment signature. Payment verification failed. Vendor was not created.",
+      });
+    }
+
+    const cleanEmail = (email || "").toLowerCase().trim();
+    const cleanMobile = (mobile || "").replace(/\D/g, "").trim();
+    const vendorName = (name || "").trim();
+
+    if (
+      !vendorName ||
+      !cleanEmail ||
+      !cleanMobile ||
+      !city?.trim() ||
+      !state?.trim() ||
+      !address?.trim() ||
+      !password
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required to register vendor.",
+      });
+    }
+
+    // Double check uniqueness
+    const existing = await Vendor.findOne({
+      $or: [{ email: cleanEmail }, { mobile: cleanMobile }],
+    });
+
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        message: "A vendor with this email or mobile number already exists in database.",
+      });
+    }
+
+    // Generate unique Vendor ID (e.g. SLG1001, SLG1002, etc.)
+    const newVendorId = await Vendor.generateUniqueVendorId();
+
+    const vendor = new Vendor({
+      vendorId: newVendorId,
+      name: vendorName,
+      email: cleanEmail,
+      mobile: cleanMobile,
+      city: city.trim(),
+      state: state.trim(),
+      address: address.trim(),
+      password,
+      role: role || "Vendor",
+      status: status || "Active",
+      membershipFee: Number(fee) || 5000,
+      razorpayOrderId: razorpay_order_id,
+      razorpayPaymentId: razorpay_payment_id,
+      razorpaySignature: razorpay_signature,
+      paymentStatus: "Paid",
+    });
+
+    await vendor.save();
+
+    return res.status(201).json({
+      success: true,
+      message: `Vendor "${vendor.name}" (${vendor.vendorId}) created successfully!`,
+      vendor,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      const isMobile = error.keyPattern && error.keyPattern.mobile;
+      return res.status(400).json({
+        success: false,
+        message: isMobile
+          ? "This mobile number is already registered. Mobile number must be unique."
+          : "This email is already registered. Email must be unique.",
+      });
+    }
+    console.error("Error creating vendor with payment:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to create vendor account.",
+    });
+  }
+});
+
+/**
  * POST /api/vendors
  * Create a new vendor (validates both email and mobile uniqueness)
  */
 router.post("/", async (req, res) => {
   try {
-    const { name, email, mobile, city, state, address, password, role, status } =
-      req.body;
+    const {
+      name,
+      email,
+      mobile,
+      city,
+      state,
+      address,
+      password,
+      role,
+      status,
+      razorpay_order_id,
+      razorpay_payment_id,
+      razorpay_signature,
+      fee = 5000,
+    } = req.body;
 
     // Validate required fields
     if (
@@ -256,6 +511,29 @@ router.post("/", async (req, res) => {
         message:
           "All fields (name, email, mobile, city, state, address, password) are required.",
       });
+    }
+
+    // If Razorpay details provided, verify signature
+    if (razorpay_order_id && razorpay_payment_id && razorpay_signature) {
+      const keySecret = process.env.RAZORPAY_KEY_SECRET;
+      if (!keySecret) {
+        return res.status(500).json({
+          success: false,
+          message: "Razorpay secret key is not configured.",
+        });
+      }
+
+      const expectedSignature = crypto
+        .createHmac("sha256", keySecret)
+        .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+        .digest("hex");
+
+      if (expectedSignature !== razorpay_signature) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid payment signature. Verification failed.",
+        });
+      }
     }
 
     const cleanEmail = email.toLowerCase().trim();
@@ -298,13 +576,18 @@ router.post("/", async (req, res) => {
       password,
       role: role || "Vendor",
       status: status || "Active",
+      membershipFee: Number(fee) || 5000,
+      razorpayOrderId: razorpay_order_id || "",
+      razorpayPaymentId: razorpay_payment_id || "",
+      razorpaySignature: razorpay_signature || "",
+      paymentStatus: razorpay_payment_id ? "Paid" : "Pending",
     });
 
     await vendor.save();
 
     return res.status(201).json({
       success: true,
-      message: "Vendor created successfully!",
+      message: `Vendor "${vendor.name}" (${vendor.vendorId}) created successfully!`,
       vendor,
     });
   } catch (error) {
