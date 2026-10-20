@@ -69,6 +69,10 @@ export async function getVendors() {
   return apiFetch("/api/vendors");
 }
 
+export async function getVendorMembers(vendorId) {
+  return apiFetch(`/api/vendors/${vendorId}/members`);
+}
+
 export async function createVendor(vendorData) {
   return apiFetch("/api/vendors", {
     method: "POST",
@@ -352,6 +356,13 @@ export async function deleteKYC(id) {
 /* =======================================
    Membership Registration & Razorpay API
 ======================================= */
+
+export async function verifyVendorId(vendorId) {
+  return apiFetch("/api/membership/verify-vendor", {
+    method: "POST",
+    body: JSON.stringify({ vendorId }),
+  });
+}
 
 export async function getMembershipConfig() {
   return apiFetch("/api/membership/config");

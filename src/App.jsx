@@ -15,9 +15,10 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 
 
+import VendorRegister from "./pages/VendorRegister.jsx";
 import MemberRegister from "./pages/MemberRegister.jsx";
 
-import VendorRegister from "./pages/VendorRegister";
+
 
 
 import AdminLogin from "./pages/AdminLogin.jsx";
@@ -76,8 +77,8 @@ export default function App() {
   element={<TermsConditions />}
 />
 
-<Route path="/vendor-register" element={<VendorRegister />} />
         <Route path="/member-register" element={<MemberRegister />} />
+        <Route path="/vendor-register" element={<VendorRegister />} />
         <Route path="/footer" element={<Footer />} />
        
 

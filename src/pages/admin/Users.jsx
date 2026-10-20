@@ -20,6 +20,7 @@ import {
 } from "react-icons/fi";
 import {
   getVendors,
+  getVendorMembers,
   createVendor,
   deleteVendor,
   toggleVendorStatus,
@@ -38,6 +39,9 @@ export default function Users() {
   const [walletType, setWalletType] = useState("Credit");
   const [walletDesc, setWalletDesc] = useState("Admin Topup");
   const [walletSubmitting, setWalletSubmitting] = useState(false);
+  const [selectedVendorForMembers, setSelectedVendorForMembers] = useState(null);
+  const [vendorMembers, setVendorMembers] = useState([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
@@ -216,6 +220,25 @@ export default function Users() {
       setMessageType("error");
     } finally {
       setWalletSubmitting(false);
+    }
+  };
+
+  const handleOpenMembers = async (vendor) => {
+    setSelectedVendorForMembers(vendor);
+    setLoadingMembers(true);
+    setVendorMembers([]);
+    try {
+      const res = await getVendorMembers(vendor._id || vendor.vendorId);
+      if (res.success && Array.isArray(res.members)) {
+        setVendorMembers(res.members);
+      } else {
+        setVendorMembers([]);
+      }
+    } catch (err) {
+      console.error("Error loading vendor members:", err);
+      setVendorMembers([]);
+    } finally {
+      setLoadingMembers(false);
     }
   };
 
@@ -426,6 +449,7 @@ export default function Users() {
                 <th>Contact</th>
                 <th>Location</th>
                 <th>Address</th>
+                <th>Joined Members</th>
                 <th>Wallet</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -437,9 +461,18 @@ export default function Users() {
                 <tr key={vendor._id}>
                   <td>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                      <strong>{vendor.name}</strong>
+                      <strong
+                        onClick={() => handleOpenMembers(vendor)}
+                        style={{ cursor: "pointer", transition: "color 0.2s" }}
+                        title="Click to view affiliated members"
+                        className="vendor-name-link"
+                      >
+                        {vendor.name}
+                      </strong>
                       {vendor.vendorId && (
-                        <span
+                        <button
+                          type="button"
+                          onClick={() => handleOpenMembers(vendor)}
                           style={{
                             background: "rgba(255, 199, 45, 0.15)",
                             color: "#ffd044",
@@ -450,11 +483,12 @@ export default function Users() {
                             fontFamily: "monospace",
                             fontWeight: "800",
                             letterSpacing: "0.5px",
+                            cursor: "pointer",
                           }}
-                          title={`Unique Vendor ID: ${vendor.vendorId}`}
+                          title={`Click to view members under ${vendor.vendorId}`}
                         >
                           {vendor.vendorId}
-                        </span>
+                        </button>
                       )}
                     </div>
                     <small style={{ color: "#ffd044", fontSize: 11 }}>
@@ -491,6 +525,19 @@ export default function Users() {
                     >
                       {vendor.address}
                     </span>
+                  </td>
+
+                  <td>
+                    <button
+                      type="button"
+                      onClick={() => handleOpenMembers(vendor)}
+                      className="admin-members-badge-btn"
+                      title={`Click to view members registered under ${vendor.vendorId || vendor.name}`}
+                    >
+                      <FiUsers style={{ marginRight: 5, fontSize: 13 }} />
+                      <strong>{vendor.membersCount || 0}</strong>
+                      <span style={{ marginLeft: 4 }}>Members</span>
+                    </button>
                   </td>
 
                   <td>
@@ -689,6 +736,192 @@ export default function Users() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Affiliated Members Modal */}
+      {selectedVendorForMembers && (
+        <div
+          className="admin-modal-backdrop"
+          onClick={() => setSelectedVendorForMembers(null)}
+        >
+          <div
+            className="admin-modal-card members-modal-card"
+            onClick={(e) => e.stopPropagation()}
+            style={{ maxWidth: 880, width: "95%" }}
+          >
+            <div className="admin-modal-header">
+              <div>
+                <span className="admin-eyebrow">AFFILIATED MEMBERS DIRECTORY</span>
+                <h3 style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginTop: 4 }}>
+                  <span>Members Under: {selectedVendorForMembers.name}</span>
+                  {selectedVendorForMembers.vendorId && (
+                    <span
+                      style={{
+                        background: "rgba(255, 199, 45, 0.15)",
+                        color: "#ffd044",
+                        border: "1px solid rgba(255, 199, 45, 0.35)",
+                        padding: "2px 8px",
+                        borderRadius: "4px",
+                        fontSize: "13px",
+                        fontFamily: "monospace",
+                        fontWeight: "800",
+                      }}
+                    >
+                      {selectedVendorForMembers.vendorId}
+                    </span>
+                  )}
+                </h3>
+              </div>
+              <button
+                type="button"
+                className="admin-modal-close-btn"
+                onClick={() => setSelectedVendorForMembers(null)}
+              >
+                <FiX />
+              </button>
+            </div>
+
+            <div
+              className="members-modal-summary"
+              style={{
+                padding: "12px 16px",
+                background: "#181714",
+                borderBottom: "1px solid rgba(255,199,45,0.15)",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                flexWrap: "wrap",
+                gap: 8,
+              }}
+            >
+              <div style={{ fontSize: 13, color: "#d5cbbe" }}>
+                <span>Total Registered Members: </span>
+                <strong style={{ color: "#ffd044", fontSize: 15 }}>{vendorMembers.length}</strong>
+              </div>
+              <div style={{ fontSize: 12, color: "#a89d8d" }}>
+                Vendor Email: {selectedVendorForMembers.email} &bull; Mobile: {selectedVendorForMembers.mobile}
+              </div>
+            </div>
+
+            <div className="members-modal-body" style={{ maxHeight: "60vh", overflowY: "auto", padding: "16px" }}>
+              {loadingMembers && (
+                <div style={{ padding: "40px 0", textAlign: "center", color: "#ffd044" }}>
+                  Loading affiliated members...
+                </div>
+              )}
+
+              {!loadingMembers && vendorMembers.length === 0 && (
+                <div style={{ padding: "40px 0", textAlign: "center", color: "#8c8376" }}>
+                  <FiUsers style={{ fontSize: 40, color: "#ffd044", opacity: 0.5, marginBottom: 12 }} />
+                  <p style={{ margin: 0, fontSize: 15, color: "#ffffff", fontWeight: 600 }}>
+                    No members have registered under Vendor{" "}
+                    <span style={{ color: "#ffd044" }}>{selectedVendorForMembers.vendorId || selectedVendorForMembers.name}</span> yet.
+                  </p>
+                  <p style={{ margin: "8px auto 0", fontSize: 12.5, color: "#a89d8d", maxWidth: 480 }}>
+                    When someone signs up via <strong>Member Register</strong> using Vendor ID{" "}
+                    <span style={{ color: "#ffd044", fontFamily: "monospace" }}>{selectedVendorForMembers.vendorId}</span>, their generated Member ID (e.g.{" "}
+                    <span style={{ color: "#ffd044", fontFamily: "monospace" }}>{selectedVendorForMembers.vendorId}-01</span>) and profile details will be listed here.
+                  </p>
+                </div>
+              )}
+
+              {!loadingMembers && vendorMembers.length > 0 && (
+                <div className="admin-table-wrap">
+                  <table className="admin-table" style={{ fontSize: 13 }}>
+                    <thead>
+                      <tr>
+                        <th>Member ID</th>
+                        <th>Name</th>
+                        <th>Contact</th>
+                        <th>Location</th>
+                        <th>Registered Date</th>
+                        <th>Fee Paid</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {vendorMembers.map((m) => (
+                        <tr key={m._id || m.vendorId}>
+                          <td>
+                            <span
+                              style={{
+                                background: "rgba(255, 199, 45, 0.2)",
+                                color: "#ffd044",
+                                border: "1px solid rgba(255, 199, 45, 0.4)",
+                                padding: "3px 8px",
+                                borderRadius: "4px",
+                                fontSize: "12px",
+                                fontFamily: "monospace",
+                                fontWeight: "800",
+                                letterSpacing: "0.5px",
+                                display: "inline-block",
+                              }}
+                            >
+                              {m.vendorId || "N/A"}
+                            </span>
+                          </td>
+                          <td>
+                            <strong style={{ color: "#fff" }}>{m.name}</strong>
+                          </td>
+                          <td>
+                            <div>
+                              <FiPhone style={{ marginRight: 4, color: "#ffd044", fontSize: 11 }} />
+                              {m.mobile}
+                            </div>
+                            {m.email && (
+                              <div style={{ color: "#a89d8d", fontSize: 11 }}>
+                                <FiMail style={{ marginRight: 4, color: "#ffd044", fontSize: 10 }} />
+                                {m.email}
+                              </div>
+                            )}
+                          </td>
+                          <td>
+                            <FiMapPin style={{ marginRight: 4, color: "#ffd044", fontSize: 11 }} />
+                            <span>
+                              {m.city || m.state
+                                ? `${m.city || ""}${m.city && m.state ? ", " : ""}${m.state || ""}`
+                                : "-"}
+                            </span>
+                          </td>
+                          <td style={{ color: "#a89d8d", fontSize: 12 }}>
+                            {m.createdAt
+                              ? new Date(m.createdAt).toLocaleDateString("en-IN", {
+                                  day: "2-digit",
+                                  month: "short",
+                                  year: "numeric",
+                                })
+                              : "-"}
+                          </td>
+                          <td>
+                            <span style={{ color: "#4ade80", fontWeight: 700 }}>₹500 Paid</span>
+                          </td>
+                          <td>
+                            <span
+                              className={`admin-status ${m.status === "Active" ? "success" : "danger"}`}
+                              style={{ fontSize: 11, padding: "2px 8px" }}
+                            >
+                              {m.status || "Active"}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            <div className="admin-modal-footer" style={{ borderTop: "1px solid rgba(255,199,45,0.15)", padding: "12px 16px" }}>
+              <button
+                type="button"
+                className="admin-secondary-button"
+                onClick={() => setSelectedVendorForMembers(null)}
+              >
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -96,7 +96,17 @@ const UserSidebar = ({ isOpen = false, onClose = () => {}, userData: propUserDat
 
   const userName = userData.name || "Vendor User";
   const userInitial = userName.charAt(0).toUpperCase();
-  const userSub = userData.email || userData.role || "Vendor Panel";
+  const isMember = (userData?.role || "").toLowerCase() === "member";
+  const userSub = userData.email || (isMember ? "Member Account" : userData.role || "Vendor Panel");
+
+  const displayMenuItems = menuItems.filter((item) => {
+    if (isMember) {
+      if (item.path === "/user/wallet" || item.path === "/user/add-user") {
+        return false;
+      }
+    }
+    return true;
+  });
 
   const handleLogout = () => {
     localStorage.removeItem("userToken");
@@ -122,7 +132,7 @@ const UserSidebar = ({ isOpen = false, onClose = () => {}, userData: propUserDat
 
           <div className="user-sidebar-brand-text">
             <h2>SLG</h2>
-            <span>Vendor Portal</span>
+            <span>{isMember ? "Member Portal" : "Vendor Portal"}</span>
           </div>
 
           <button
@@ -171,7 +181,7 @@ const UserSidebar = ({ isOpen = false, onClose = () => {}, userData: propUserDat
         </div>
 
         <nav className="user-sidebar-nav">
-          {menuItems.map((item) => (
+          {displayMenuItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}

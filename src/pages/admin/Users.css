@@ -50,6 +50,33 @@
   min-width: 0;
 }
 
+/* Joined Members Badge Button */
+.admin-members-badge-btn {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(255, 199, 45, 0.08);
+  border: 1px solid rgba(255, 199, 45, 0.28);
+  color: #ffd044;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.admin-members-badge-btn:hover {
+  background: rgba(255, 199, 45, 0.2);
+  border-color: #ffd044;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(255, 199, 45, 0.25);
+}
+
+.vendor-name-link:hover {
+  color: #ffd044;
+}
+
 /* Wallet Badge in Table */
 .admin-wallet-badge {
   display: inline-flex;

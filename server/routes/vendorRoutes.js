@@ -328,22 +328,101 @@ router.post("/", async (req, res) => {
 
 /**
  * GET /api/vendors
- * Get all vendors
+ * Get all vendors (with affiliated members count)
  */
 router.get("/", async (req, res) => {
   try {
-    const vendors = await Vendor.find().sort({ createdAt: -1 });
+    const filter = { role: { $ne: "Member" } };
+    const vendors = await Vendor.find(filter).sort({ createdAt: -1 });
+
+    const vendorsWithMembers = await Promise.all(
+      vendors.map(async (v) => {
+        const vObj = v.toJSON ? v.toJSON() : { ...v };
+        if (v.vendorId) {
+          vObj.membersCount = await Vendor.countDocuments({
+            role: { $in: ["Member", "member"] },
+            $or: [
+              { parentVendorId: v.vendorId },
+              { vendorId: { $regex: new RegExp(`^${v.vendorId}-`, "i") } },
+            ],
+          });
+        } else {
+          vObj.membersCount = 0;
+        }
+        return vObj;
+      })
+    );
 
     return res.status(200).json({
       success: true,
-      count: vendors.length,
-      vendors,
+      count: vendorsWithMembers.length,
+      vendors: vendorsWithMembers,
     });
   } catch (error) {
     console.error("Error fetching vendors:", error);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch vendors.",
+      error: error.message,
+    });
+  }
+});
+
+/**
+ * GET /api/vendors/:id/members
+ * Get all members joined under a specific vendor
+ */
+router.get("/:id/members", async (req, res) => {
+  try {
+    const { id } = req.params;
+    let vendor = null;
+
+    if (id.match(/^[0-9a-fA-F]{24}$/)) {
+      vendor = await Vendor.findById(id);
+    }
+    if (!vendor) {
+      vendor = await Vendor.findOne({
+        $or: [
+          { vendorId: id.toUpperCase() },
+          { vendorId: id },
+        ],
+      });
+    }
+
+    if (!vendor) {
+      return res.status(404).json({
+        success: false,
+        message: "Vendor not found.",
+      });
+    }
+
+    // Find all members who joined under this vendor
+    const members = await Vendor.find({
+      role: { $in: ["Member", "member"] },
+      $or: [
+        { parentVendorId: vendor.vendorId },
+        { parentVendorId: vendor._id.toString() },
+        { vendorId: { $regex: new RegExp(`^${vendor.vendorId}-`, "i") } },
+      ],
+    }).sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      success: true,
+      vendor: {
+        _id: vendor._id,
+        vendorId: vendor.vendorId,
+        name: vendor.name,
+        email: vendor.email,
+        mobile: vendor.mobile,
+      },
+      count: members.length,
+      members,
+    });
+  } catch (error) {
+    console.error("Error fetching vendor members:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch affiliated members.",
       error: error.message,
     });
   }

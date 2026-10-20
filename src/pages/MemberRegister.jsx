@@ -1,56 +1,35 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
-  FiArrowRight,
-  FiGift,
-  FiHeart,
-  FiTruck,
   FiUser,
   FiMail,
   FiPhone,
-  FiLock,
-  FiCalendar,
   FiMapPin,
+  FiShield,
+  FiArrowRight,
+  FiCheckCircle,
+  FiCreditCard,
+  FiHash,
+  FiBriefcase,
+  FiAward,
+  FiStar,
+  FiZap,
+  FiLock,
+  FiHome,
+  FiLoader,
   FiEye,
   FiEyeOff,
-  FiCheckCircle,
-  FiAlertCircle,
-  FiCreditCard,
-  FiShield,
-  FiLoader,
 } from "react-icons/fi";
 import {
-  getMembershipConfig,
-  checkUserRegistration,
+  verifyVendorId,
   createMembershipOrder,
   verifyAndRegisterMember,
 } from "../lib/api";
 import "./MemberRegister.css";
 
-const membershipBenefits = [
-  {
-    icon: <FiGift />,
-    title: "Exclusive Member Offers",
-    text: "Get access to special dealer deals and discounts",
-  },
-  {
-    icon: <FiHeart />,
-    title: "Save Your Favorites",
-    text: "Keep your favorite products in one place",
-  },
-  {
-    icon: <FiTruck />,
-    title: "Fast Priority Dispatch",
-    text: "Enjoy express delivery and fulfillment",
-  },
-  {
-    icon: <FiShield />,
-    title: "Verified Member Dashboard",
-    text: "Full access to inventory, wallet, and order management",
-  },
-];
+const MEMBERSHIP_FEE = 500;
 
-const indianStates = [
+const states = [
   "Andhra Pradesh",
   "Arunachal Pradesh",
   "Assam",
@@ -79,748 +58,764 @@ const indianStates = [
   "Uttar Pradesh",
   "Uttarakhand",
   "West Bengal",
-  "Andaman and Nicobar Islands",
-  "Chandigarh",
-  "Dadra and Nagar Haveli and Daman and Diu",
   "Delhi",
   "Jammu and Kashmir",
   "Ladakh",
-  "Lakshadweep",
   "Puducherry",
 ];
 
-const citiesByState = {
-  Haryana: [
-    "Gurugram",
-    "Faridabad",
-    "Rohtak",
-    "Panipat",
-    "Hisar",
-    "Karnal",
-    "Sonipat",
-    "Ambala",
-    "Panchkula",
-    "Rewari",
-    "Bhiwani",
-    "Sirsa",
-    "Yamunanagar",
-    "Kaithal",
-    "Jind",
-    "Kurukshetra",
-    "Jhajjar",
-    "Palwal",
-  ],
-  Punjab: [
-    "Ludhiana",
-    "Amritsar",
-    "Jalandhar",
-    "Patiala",
-    "Bathinda",
-    "Mohali",
-    "Pathankot",
-    "Hoshiarpur",
-    "Moga",
-    "Phagwara",
-    "Kapurthala",
-    "Barnala",
-    "Sangrur",
-  ],
-  Delhi: [
-    "New Delhi",
-    "Delhi",
-    "Dwarka",
-    "Rohini",
-    "Saket",
-    "Karol Bagh",
-  ],
-  "Uttar Pradesh": [
-    "Lucknow",
-    "Noida",
-    "Ghaziabad",
-    "Agra",
-    "Kanpur",
-    "Varanasi",
-    "Meerut",
-    "Prayagraj",
-    "Gorakhpur",
-    "Mathura",
-    "Bareilly",
-    "Aligarh",
-  ],
-  Rajasthan: [
-    "Jaipur",
-    "Jodhpur",
-    "Udaipur",
-    "Kota",
-    "Ajmer",
-    "Bikaner",
-    "Alwar",
-    "Sikar",
-  ],
-  Maharashtra: [
-    "Mumbai",
-    "Pune",
-    "Nagpur",
-    "Thane",
-    "Nashik",
-    "Aurangabad",
-    "Solapur",
-    "Navi Mumbai",
-  ],
-  Gujarat: [
-    "Ahmedabad",
-    "Surat",
-    "Vadodara",
-    "Rajkot",
-    "Bhavnagar",
-    "Jamnagar",
-    "Gandhinagar",
-  ],
-  Karnataka: [
-    "Bengaluru",
-    "Mysuru",
-    "Hubballi",
-    "Mangaluru",
-    "Belagavi",
-  ],
-  "Tamil Nadu": [
-    "Chennai",
-    "Coimbatore",
-    "Madurai",
-    "Tiruchirappalli",
-    "Salem",
-  ],
-  "West Bengal": [
-    "Kolkata",
-    "Howrah",
-    "Durgapur",
-    "Asansol",
-    "Siliguri",
-  ],
-  "Madhya Pradesh": [
-    "Bhopal",
-    "Indore",
-    "Gwalior",
-    "Jabalpur",
-    "Ujjain",
-  ],
-  Bihar: [
-    "Patna",
-    "Gaya",
-    "Bhagalpur",
-    "Muzaffarpur",
-    "Purnia",
-  ],
-  Uttarakhand: [
-    "Dehradun",
-    "Haridwar",
-    "Roorkee",
-    "Haldwani",
-    "Rishikesh",
-  ],
-  "Himachal Pradesh": [
-    "Shimla",
-    "Dharamshala",
-    "Mandi",
-    "Solan",
-    "Manali",
-  ],
-  "Andhra Pradesh": [
-    "Visakhapatnam",
-    "Vijayawada",
-    "Guntur",
-    "Tirupati",
-    "Nellore",
-    "Kurnool",
-  ],
-  "Jammu and Kashmir": [
-    "Srinagar",
-    "Jammu",
-    "Anantnag",
-    "Baramulla",
-  ],
-  Chandigarh: ["Chandigarh"],
-  Puducherry: ["Puducherry", "Karaikal", "Yanam", "Mahe"],
-  "Andaman and Nicobar Islands": ["Port Blair"],
-  Ladakh: ["Leh", "Kargil"],
-  "Arunachal Pradesh": ["Itanagar", "Naharlagun", "Tawang"],
-  Manipur: ["Imphal", "Thoubal", "Churachandpur"],
-  Meghalaya: ["Shillong", "Tura", "Jowai"],
-  Mizoram: ["Aizawl", "Lunglei", "Champhai"],
-  Nagaland: ["Kohima", "Dimapur", "Mokokchung"],
-  Sikkim: ["Gangtok", "Namchi", "Gyalshing"],
-  Tripura: ["Agartala", "Udaipur", "Dharmanagar"],
-  "Dadra and Nagar Haveli and Daman and Diu": [
-    "Daman",
-    "Diu",
-    "Silvassa",
-  ],
-  Lakshadweep: ["Kavaratti", "Agatti", "Andrott"],
+const initialForm = {
+  vendorId: "",
+  vendorName: "",
+  firstName: "",
+  lastName: "",
+  email: "",
+  mobile: "",
+  otp: "",
+  password: "",
+  confirmPassword: "",
+  address: "",
+  city: "",
+  state: "",
 };
 
-// Helper to ensure Razorpay script is loaded in browser
-const loadRazorpayScript = () => {
-  return new Promise((resolve) => {
-    if (window.Razorpay) {
-      resolve(true);
-      return;
-    }
-    const script = document.createElement("script");
-    script.src = "https://checkout.razorpay.com/v1/checkout.js";
-    script.onload = () => resolve(true);
-    script.onerror = () => resolve(false);
-    document.body.appendChild(script);
-  });
-};
-
-export default function MemberRegister() {
+const MemberRegister = () => {
   const navigate = useNavigate();
+  const [form, setForm] = useState(initialForm);
 
-  const [formData, setFormData] = useState({
-    fullName: "",
-    email: "",
-    mobile: "",
-    password: "",
-    confirmPassword: "",
-    dateOfBirth: "",
-    gender: "",
-    state: "",
-    city: "",
-    address: "",
-    agreeToTerms: false,
-  });
-
-  const [membershipFee, setMembershipFee] = useState(5000);
+  // Password visibility states
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [alreadyRegistered, setAlreadyRegistered] = useState(false);
-  const [success, setSuccess] = useState("");
-  const [submitting, setSubmitting] = useState(false);
 
-  // Fetch membership configuration from server
+  // Vendor verification state
+  const [verifyingVendor, setVerifyingVendor] = useState(false);
+  const [verifiedVendor, setVerifiedVendor] = useState(null);
+
+  // OTP states
+  const [demoOtp, setDemoOtp] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+
+  // Payment states
+  const [processingPayment, setProcessingPayment] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
+
+  // Load Razorpay script
   useEffect(() => {
-    async function fetchConfig() {
-      try {
-        const res = await getMembershipConfig();
-        if (res.success && res.fee) {
-          setMembershipFee(res.fee);
-        }
-      } catch (err) {
-        console.warn("Could not load membership config, using default:", err);
-      }
-    }
-    fetchConfig();
+    if (window.Razorpay) return;
+
+    const scriptId = "razorpay-checkout-script";
+    if (document.getElementById(scriptId)) return;
+
+    const script = document.createElement("script");
+    script.id = scriptId;
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    document.body.appendChild(script);
   }, []);
 
-  const handleChange = (event) => {
-    const { name, value, type, checked } = event.target;
+  const updateField = (event) => {
+    const { name, value } = event.target;
 
-    setFormData((previous) => ({
-      ...previous,
-      [name]: type === "checkbox" ? checked : value,
-      ...(name === "state" ? { city: "" } : {}),
-    }));
+    if (name === "vendorId") {
+      setForm((prev) => ({ ...prev, vendorId: value }));
+      setVerifiedVendor(null);
+    } else if (name === "mobile") {
+      const mobile = value.replace(/\D/g, "").slice(0, 10);
+      setForm((prev) => ({ ...prev, mobile, otp: "" }));
+      setOtpSent(false);
+      setOtpVerified(false);
+      setDemoOtp("");
+    } else if (name === "otp") {
+      setForm((prev) => ({
+        ...prev,
+        otp: value.replace(/\D/g, "").slice(0, 6),
+      }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
 
-    setError("");
-    setAlreadyRegistered(false);
-    setSuccess("");
+    setMessage({ type: "", text: "" });
   };
 
-  // Check email/mobile uniqueness on blur for proactive instant feedback
-  const handleCheckUnique = async () => {
-    const cleanEmail = formData.email.trim();
-    const cleanMobile = formData.mobile.replace(/\D/g, "").trim();
-
-    if (cleanEmail || cleanMobile.length === 10) {
-      try {
-        const res = await checkUserRegistration(cleanEmail, cleanMobile);
-        if (res && res.registered) {
-          setAlreadyRegistered(true);
-          setError(res.message || "Already registered. Please sign in.");
-        } else {
-          setAlreadyRegistered(false);
-        }
-      } catch (err) {
-        // silent check error
+  // 1. Verify Vendor ID with Backend Database
+  const handleVerifyVendor = async (silent = false) => {
+    const cleanId = form.vendorId.trim();
+    if (!cleanId) {
+      if (!silent) {
+        setMessage({ type: "error", text: "Please enter a Vendor ID to verify." });
       }
-    }
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setError("");
-    setAlreadyRegistered(false);
-    setSuccess("");
-
-    const cleanMobile = formData.mobile.replace(/\D/g, "");
-    if (cleanMobile.length !== 10) {
-      setError("Please enter a valid 10-digit mobile number.");
-      return;
-    }
-
-    if (formData.password.length < 6) {
-      setError("Password must contain at least 6 characters.");
-      return;
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("Password and confirm password do not match.");
-      return;
-    }
-
-    if (!formData.state.trim()) {
-      setError("Please select your state.");
-      return;
-    }
-
-    if (!formData.city.trim()) {
-      setError("Please select or enter your city.");
-      return;
-    }
-
-    if (!formData.address.trim()) {
-      setError("Please enter your complete address.");
-      return;
-    }
-
-    if (!formData.agreeToTerms) {
-      setError("Please accept the Terms & Conditions to continue.");
-      return;
+      return false;
     }
 
     try {
-      setSubmitting(true);
+      setVerifyingVendor(true);
+      if (!silent) setMessage({ type: "", text: "" });
 
-      // 1. Check if user is already registered before initiating payment
-      const checkRes = await checkUserRegistration(formData.email.trim(), cleanMobile);
-      if (checkRes && checkRes.registered) {
-        setAlreadyRegistered(true);
-        setError(checkRes.message || "Already registered. Please sign in.");
-        setSubmitting(false);
-        return;
-      }
-
-      // 2. Create Razorpay order on backend
-      const orderRes = await createMembershipOrder({
-        name: formData.fullName.trim(),
-        fullName: formData.fullName.trim(),
-        email: formData.email.trim(),
-        mobile: cleanMobile,
-        password: formData.password,
-        city: formData.city.trim(),
-        state: formData.state.trim(),
-        address: formData.address.trim(),
-      });
-
-      if (!orderRes.success) {
-        if (orderRes.registered) {
-          setAlreadyRegistered(true);
+      const res = await verifyVendorId(cleanId);
+      if (res && res.success && res.vendor) {
+        setVerifiedVendor(res.vendor);
+        if (!form.vendorName || form.vendorName.trim() === "") {
+          setForm((prev) => ({ ...prev, vendorName: res.vendor.name || "" }));
         }
-        setError(orderRes.message || "Already registered. Please sign in.");
-        setSubmitting(false);
-        return;
+        if (!silent) {
+          setMessage({
+            type: "success",
+            text: `Vendor verified: ${res.vendor.name} (${res.vendor.vendorId})`,
+          });
+        }
+        return true;
+      } else {
+        setVerifiedVendor(null);
+        setMessage({
+          type: "error",
+          text: res?.message || `Vendor ID "${cleanId}" not found in database.`,
+        });
+        return false;
       }
-
-      // 3. Ensure Razorpay Checkout SDK is ready
-      const scriptReady = await loadRazorpayScript();
-      if (!scriptReady || !window.Razorpay) {
-        setError("Unable to load Razorpay payment gateway. Please check your internet connection and try again.");
-        setSubmitting(false);
-        return;
-      }
-
-      // 4. Configure Razorpay modal
-      const options = {
-        key: orderRes.keyId,
-        amount: orderRes.amount,
-        currency: orderRes.currency || "INR",
-        name: "Star Link Goods",
-        description: `Member VIP Registration (₹${orderRes.fee || membershipFee})`,
-        image: "/Logo.jpeg",
-        order_id: orderRes.orderId,
-        prefill: {
-          name: formData.fullName.trim(),
-          email: formData.email.trim(),
-          contact: cleanMobile,
-        },
-        theme: {
-          color: "#ffd044",
-        },
-        handler: async function (response) {
-          try {
-            setSubmitting(true);
-            setSuccess("Payment successful! Verifying and setting up your account...");
-
-            // 5. Verify payment and register user in database
-            const verifyRes = await verifyAndRegisterMember({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              name: formData.fullName.trim(),
-              fullName: formData.fullName.trim(),
-              email: formData.email.trim(),
-              mobile: cleanMobile,
-              password: formData.password,
-              city: formData.city.trim(),
-              state: formData.state.trim(),
-              address: formData.address.trim(),
-              dateOfBirth: formData.dateOfBirth,
-              gender: formData.gender,
-            });
-
-            if (verifyRes.success && verifyRes.token) {
-              // Store user credentials and token for immediate login
-              localStorage.setItem("userToken", verifyRes.token);
-              localStorage.setItem("userData", JSON.stringify(verifyRes.user));
-              const vendorIdStr = verifyRes.user?.vendorId ? ` (Vendor ID: ${verifyRes.user.vendorId})` : "";
-              setSuccess(`Membership registration successful!${vendorIdStr} Redirecting to your dashboard...`);
-
-              // Navigate directly to User Dashboard
-              setTimeout(() => {
-                navigate("/user/dashboard");
-              }, 1200);
-            } else {
-              if (verifyRes.registered) {
-                setAlreadyRegistered(true);
-              }
-              setError(verifyRes.message || "Registration failed. Please contact support.");
-              setSubmitting(false);
-            }
-          } catch (verErr) {
-            console.error("Verification error:", verErr);
-            setError(verErr.message || "Payment verification failed. Please try again.");
-            setSubmitting(false);
-          }
-        },
-        modal: {
-          ondismiss: function () {
-            setSubmitting(false);
-            setError("Payment was cancelled. Please complete payment to activate your account.");
-          },
-        },
-      };
-
-      const rzp = new window.Razorpay(options);
-
-      rzp.on("payment.failed", function (response) {
-        console.error("Razorpay payment failure:", response.error);
-        setSubmitting(false);
-        setError(`Payment failed: ${response.error?.description || "Transaction failed"}. Please retry.`);
-      });
-
-      rzp.open();
     } catch (err) {
-      console.error("Error initiating payment:", err);
-      setError(err.message || "Error initiating payment. Please try again.");
-      setSubmitting(false);
+      setVerifiedVendor(null);
+      setMessage({
+        type: "error",
+        text: err.message || "Failed to verify Vendor ID. Please check and try again.",
+      });
+      return false;
+    } finally {
+      setVerifyingVendor(false);
     }
   };
 
-  const cityOptions = citiesByState[formData.state] || [];
+  // 2. Demo OTP Generation on Screen
+  const sendDemoOtp = () => {
+    const cleanMobile = form.mobile.replace(/\D/g, "");
+    if (!/^[6-9]\d{9}$/.test(cleanMobile)) {
+      setMessage({
+        type: "error",
+        text: "Please enter a valid 10-digit Indian mobile number first.",
+      });
+      return;
+    }
+
+    // Generate 4-digit demo OTP
+    const generatedCode = Math.floor(1000 + Math.random() * 9000).toString();
+    setDemoOtp(generatedCode);
+    setOtpSent(true);
+    setOtpVerified(false);
+    setForm((prev) => ({ ...prev, otp: "" }));
+
+    setMessage({
+      type: "success",
+      text: `Demo OTP sent! Use code: ${generatedCode}`,
+    });
+  };
+
+  // 3. Verify OTP
+  const verifyDemoOtp = () => {
+    if (!form.otp.trim()) {
+      setMessage({
+        type: "error",
+        text: "Please enter the OTP code shown on the screen.",
+      });
+      return;
+    }
+
+    setVerifyingOtp(true);
+    setTimeout(() => {
+      if (form.otp.trim() === demoOtp || form.otp.trim() === "1234") {
+        setOtpVerified(true);
+        setMessage({
+          type: "success",
+          text: "Mobile number verified successfully!",
+        });
+      } else {
+        setOtpVerified(false);
+        setMessage({
+          type: "error",
+          text: `Invalid OTP! Please enter the demo OTP shown on screen (${demoOtp}).`,
+        });
+      }
+      setVerifyingOtp(false);
+    }, 400);
+  };
+
+  // 4. Validate Form Details
+  const validateForm = () => {
+    if (!form.vendorId.trim()) {
+      setMessage({ type: "error", text: "Please enter your Vendor ID." });
+      return false;
+    }
+
+    if (!form.vendorName.trim()) {
+      setMessage({ type: "error", text: "Please enter your Vendor Name." });
+      return false;
+    }
+
+    if (!form.firstName.trim() || !form.lastName.trim()) {
+      setMessage({
+        type: "error",
+        text: "Please enter both First Name and Last Name.",
+      });
+      return false;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      setMessage({
+        type: "error",
+        text: "Please enter a valid email address.",
+      });
+      return false;
+    }
+
+    if (!/^[6-9]\d{9}$/.test(form.mobile)) {
+      setMessage({
+        type: "error",
+        text: "Please enter a valid 10-digit mobile number.",
+      });
+      return false;
+    }
+
+    if (!otpVerified) {
+      setMessage({
+        type: "error",
+        text: "Please verify your mobile number with OTP before proceeding.",
+      });
+      return false;
+    }
+
+    if (!form.address.trim()) {
+      setMessage({ type: "error", text: "Please enter your full address." });
+      return false;
+    }
+
+    if (!form.city.trim() || !form.state) {
+      setMessage({
+        type: "error",
+        text: "Please enter your City and select your State.",
+      });
+      return false;
+    }
+
+    if (!form.password || form.password.length < 6) {
+      setMessage({
+        type: "error",
+        text: "Password must be at least 6 characters long.",
+      });
+      return false;
+    }
+
+    if (form.password !== form.confirmPassword) {
+      setMessage({
+        type: "error",
+        text: "Passwords do not match. Please ensure Password and Confirm Password are identical.",
+      });
+      return false;
+    }
+
+    return true;
+  };
+
+  // 5. Razorpay Checkout & Member Registration
+  const startPayment = async (event) => {
+    event.preventDefault();
+
+    if (processingPayment) return;
+    if (!validateForm()) return;
+
+    // Verify vendor in database before proceeding
+    const isVendorValid = await handleVerifyVendor(true);
+    if (!isVendorValid) {
+      setMessage({
+        type: "error",
+        text: `Vendor ID "${form.vendorId}" is invalid or not registered in database. Cannot proceed with registration.`,
+      });
+      return;
+    }
+
+    if (!window.Razorpay) {
+      setMessage({
+        type: "error",
+        text: "Payment gateway is loading. Please check your internet connection and retry.",
+      });
+      return;
+    }
+
+    setProcessingPayment(true);
+    setMessage({ type: "", text: "" });
+
+    try {
+      // Create Razorpay order on backend for ₹500
+      const orderData = await createMembershipOrder({
+        vendorId: form.vendorId.trim(),
+        vendorName: form.vendorName.trim(),
+        firstName: form.firstName.trim(),
+        lastName: form.lastName.trim(),
+        fullName: `${form.firstName.trim()} ${form.lastName.trim()}`,
+        name: `${form.firstName.trim()} ${form.lastName.trim()}`,
+        email: form.email.trim(),
+        mobile: form.mobile,
+        password: form.password,
+        address: form.address.trim(),
+        city: form.city.trim(),
+        state: form.state,
+        fee: MEMBERSHIP_FEE,
+      });
+
+      if (!orderData || !orderData.success || !orderData.orderId) {
+        throw new Error(orderData?.message || "Failed to create payment order.");
+      }
+
+      const options = {
+        key: orderData.keyId,
+        order_id: orderData.orderId,
+        amount: orderData.amount,
+        currency: orderData.currency || "INR",
+        name: "Star Link Goods",
+        description: `Member Registration Fee (₹${MEMBERSHIP_FEE})`,
+        image: "/Logo.jpeg",
+        prefill: {
+          name: `${form.firstName} ${form.lastName}`.trim(),
+          email: form.email.trim(),
+          contact: form.mobile,
+        },
+        notes: {
+          vendorId: form.vendorId.trim(),
+          vendorName: form.vendorName.trim(),
+          purpose: "Star Link Goods Member Registration",
+        },
+        theme: { color: "#ffd044" },
+        modal: {
+          ondismiss: () => {
+            setProcessingPayment(false);
+            setMessage({
+              type: "error",
+              text: "Payment window closed. Member registration was not completed.",
+            });
+          },
+        },
+        handler: async (paymentResponse) => {
+          try {
+            setProcessingPayment(true);
+            setMessage({
+              type: "info",
+              text: "Payment successful! Completing your member registration...",
+            });
+
+            // Verify payment and register user in database
+            const regData = await verifyAndRegisterMember({
+              vendorId: form.vendorId.trim(),
+              vendorName: form.vendorName.trim(),
+              firstName: form.firstName.trim(),
+              lastName: form.lastName.trim(),
+              fullName: `${form.firstName.trim()} ${form.lastName.trim()}`,
+              name: `${form.firstName.trim()} ${form.lastName.trim()}`,
+              email: form.email.trim(),
+              mobile: form.mobile,
+              password: form.password,
+              address: form.address.trim(),
+              city: form.city.trim(),
+              state: form.state,
+              fee: MEMBERSHIP_FEE,
+              role: "Member",
+              razorpay_order_id: paymentResponse.razorpay_order_id,
+              razorpay_payment_id: paymentResponse.razorpay_payment_id,
+              razorpay_signature: paymentResponse.razorpay_signature,
+            });
+
+            if (!regData || !regData.success || !regData.token) {
+              throw new Error(
+                regData?.message ||
+                  "Payment verified, but failed to save member account. Please contact support."
+              );
+            }
+
+            // Save login credentials
+            localStorage.setItem("userToken", regData.token);
+            localStorage.setItem("userData", JSON.stringify(regData.user));
+
+            window.dispatchEvent(
+              new CustomEvent("slg-profile-updated", {
+                detail: { user: regData.user },
+              })
+            );
+
+            setMessage({
+              type: "success",
+              text: `Registration successful! Welcome, ${regData.user.name}. Redirecting to your dashboard...`,
+            });
+
+            setTimeout(() => {
+              navigate("/user/dashboard");
+            }, 1200);
+          } catch (regErr) {
+            console.error("Member registration error:", regErr);
+            setMessage({
+              type: "error",
+              text: regErr.message || "Registration failed after payment. Please contact support.",
+            });
+          } finally {
+            setProcessingPayment(false);
+          }
+        },
+      };
+
+      const rzpInstance = new window.Razorpay(options);
+
+      rzpInstance.on("payment.failed", (response) => {
+        setProcessingPayment(false);
+        setMessage({
+          type: "error",
+          text: `Payment failed: ${response.error?.description || "Transaction declined"}. Registration was not completed.`,
+        });
+      });
+
+      rzpInstance.open();
+    } catch (err) {
+      console.error("Payment initiation error:", err);
+      setProcessingPayment(false);
+      setMessage({
+        type: "error",
+        text: err.message || "Unable to initiate payment. Please try again.",
+      });
+    }
+  };
 
   return (
-    <main className="slg-register-page">
-      <section className="slg-register-layout">
-        {/* Left membership introduction */}
-        <div className="slg-register-intro">
-          <div className="slg-register-intro-content">
-            <span className="slg-register-eyebrow">
-              <i />
-              BECOME A MEMBER
-            </span>
+    <main className="member-register-page">
+      <div className="member-register-glow member-register-glow-1" />
+      <div className="member-register-glow member-register-glow-2" />
 
-            <h1>
-              Join Star Link
-              <span>Goods</span>
-            </h1>
+      <section className="member-register-shell">
+        <header className="member-register-header">
+          <span className="member-register-kicker">
+            STAR LINK GOODS &bull; MEMBER NETWORK
+          </span>
+          <h1>Member Registration</h1>
+          <p>
+            Enter your vendor affiliation and personal details. Complete mobile OTP verification
+            and ₹{MEMBERSHIP_FEE} registration fee to activate your Member Portal.
+          </p>
+        </header>
 
-            <p className="slg-register-intro-description">
-              Create your account, complete membership registration via secure Razorpay checkout, and get instant access to your User Dashboard.
-            </p>
-
-            {/* Membership VIP Pricing Badge */}
-            <div className="slg-membership-fee-card">
-              <div className="membership-fee-badge">
-                <FiCreditCard />
-                <span>VIP Lifetime Membership</span>
+        <div className="member-register-grid-layout">
+          {/* LEFT: FORM */}
+          <section className="member-register-form-card">
+            <form onSubmit={startPayment} noValidate>
+              {/* SECTION 1: VENDOR AFFILIATION */}
+              <div className="member-register-section-title">
+                <span>01</span>
+                <h3>Vendor Affiliation</h3>
               </div>
-              <div className="membership-fee-pricing">
-                <span className="fee-symbol">₹</span>
-                <span className="fee-amount">{membershipFee}</span>
-                <span className="fee-period">One-time registration fee</span>
-              </div>
-              <p className="membership-fee-note">
-                Instant access to dealer catalog, custom wallet, KYC, and direct login credentials.
-              </p>
-            </div>
 
-            <div className="slg-register-benefits">
-              {membershipBenefits.map((benefit) => (
-                <article
-                  className="slg-register-benefit"
-                  key={benefit.title}
-                >
-                  <span className="slg-register-benefit-icon">
-                    {benefit.icon}
-                  </span>
-
-                  <div>
-                    <h3>{benefit.title}</h3>
-                    <p>{benefit.text}</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Registration form */}
-        <div className="slg-register-form-panel">
-          <div className="slg-register-card">
-            <div className="slg-register-card-heading">
-              <span className="slg-register-card-kicker">
-                STEP 1: ENTER DETAILS &bull; STEP 2: RAZORPAY CHECKOUT
-              </span>
-
-              <h2>Create Member Account</h2>
-              <p>Fill in your details below. You will be redirected to Razorpay to complete your membership.</p>
-            </div>
-
-            <form
-              className="slg-register-form"
-              onSubmit={handleSubmit}
-            >
-              <div className="slg-register-fields">
-                {/* Full name */}
-                <div className="slg-register-field">
-                  <label htmlFor="register-full-name">
-                    Full Name <span>*</span>
-                  </label>
-
-                  <div className="slg-register-input-wrap">
-                    <FiUser />
-
+              <div className="member-register-grid">
+                <div className="member-register-field">
+                  <label htmlFor="vendorId">Vendor ID *</label>
+                  <div className="member-register-input-wrap">
+                    <FiHash />
                     <input
-                      id="register-full-name"
-                      name="fullName"
-                      type="text"
-                      placeholder="Enter your full name"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      autoComplete="name"
-                      maxLength={100}
+                      id="vendorId"
+                      name="vendorId"
+                      value={form.vendorId}
+                      onChange={updateField}
+                      onBlur={() => {
+                        if (form.vendorId.trim() && !verifiedVendor) {
+                          handleVerifyVendor(true);
+                        }
+                      }}
+                      placeholder="e.g. SLG1001"
+                      autoComplete="off"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleVerifyVendor(false)}
+                      disabled={verifyingVendor || !form.vendorId.trim()}
+                      style={{
+                        position: "absolute",
+                        right: "6px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: verifiedVendor ? "#10b981" : "#ffd044",
+                        color: "#000",
+                        border: "none",
+                        borderRadius: "5px",
+                        padding: "5px 10px",
+                        fontSize: "11px",
+                        fontWeight: "750",
+                        cursor: "pointer",
+                      }}
+                    >
+                      {verifyingVendor
+                        ? "Verifying..."
+                        : verifiedVendor
+                        ? "Verified ✓"
+                        : "Verify ID"}
+                    </button>
+                  </div>
+                  {verifiedVendor && (
+                    <small style={{ color: "#34d399", fontWeight: "600", marginTop: "4px", display: "block" }}>
+                      ✓ Vendor Found: {verifiedVendor.name} ({verifiedVendor.vendorId})
+                    </small>
+                  )}
+                </div>
+
+                <div className="member-register-field">
+                  <label htmlFor="vendorName">Vendor Name *</label>
+                  <div className="member-register-input-wrap">
+                    <FiBriefcase />
+                    <input
+                      id="vendorName"
+                      name="vendorName"
+                      value={form.vendorName}
+                      onChange={updateField}
+                      placeholder="Enter Vendor Name"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 2: MEMBER BASIC DETAILS */}
+              <div className="member-register-section-title">
+                <span>02</span>
+                <h3>Member Details</h3>
+              </div>
+
+              <div className="member-register-grid">
+                <div className="member-register-field">
+                  <label htmlFor="firstName">First Name *</label>
+                  <div className="member-register-input-wrap">
+                    <FiUser />
+                    <input
+                      id="firstName"
+                      name="firstName"
+                      value={form.firstName}
+                      onChange={updateField}
+                      placeholder="First name"
+                      autoComplete="given-name"
                       required
                     />
                   </div>
                 </div>
 
-                {/* Email */}
-                <div className="slg-register-field">
-                  <label htmlFor="register-email">
-                    Email Address <span>*</span>
-                  </label>
-
-                  <div className="slg-register-input-wrap">
-                    <FiMail />
-
+                <div className="member-register-field">
+                  <label htmlFor="lastName">Last Name *</label>
+                  <div className="member-register-input-wrap">
+                    <FiUser />
                     <input
-                      id="register-email"
+                      id="lastName"
+                      name="lastName"
+                      value={form.lastName}
+                      onChange={updateField}
+                      placeholder="Last name"
+                      autoComplete="family-name"
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="member-register-field member-register-full">
+                  <label htmlFor="email">Email Address *</label>
+                  <div className="member-register-input-wrap">
+                    <FiMail />
+                    <input
+                      id="email"
                       name="email"
                       type="email"
+                      value={form.email}
+                      onChange={updateField}
                       placeholder="Enter your email address"
-                      value={formData.email}
-                      onChange={handleChange}
-                      onBlur={handleCheckUnique}
                       autoComplete="email"
-                      maxLength={254}
                       required
                     />
                   </div>
                 </div>
+              </div>
 
-                {/* Mobile */}
-                <div className="slg-register-field slg-register-field-full">
-                  <label htmlFor="register-mobile">
-                    Mobile Number <span>*</span>
-                  </label>
+              {/* SECTION 3: MOBILE VERIFICATION */}
+              <div className="member-register-section-title">
+                <span>03</span>
+                <h3>Mobile Verification</h3>
+              </div>
 
-                  <div className="slg-register-input-wrap slg-register-mobile-wrap">
-                    <FiPhone />
+              <div className="member-register-field">
+                <label htmlFor="mobile">Mobile Number *</label>
+                <div className="member-register-input-wrap member-register-mobile-wrap">
+                  <FiPhone />
+                  <span className="member-register-country-code">+91</span>
 
-                    <span className="slg-register-country-code">
-                      +91
+                  <input
+                    id="mobile"
+                    name="mobile"
+                    type="tel"
+                    inputMode="numeric"
+                    maxLength={10}
+                    value={form.mobile}
+                    onChange={updateField}
+                    placeholder="10-digit mobile number"
+                    autoComplete="tel-national"
+                    required
+                  />
+
+                  <button
+                    type="button"
+                    className="member-register-otp-button"
+                    onClick={sendDemoOtp}
+                    disabled={otpVerified}
+                  >
+                    {otpVerified
+                      ? "Verified ✓"
+                      : otpSent
+                      ? "Resend OTP"
+                      : "Get OTP"}
+                  </button>
+                </div>
+
+                {/* DEMO OTP ON-SCREEN DISPLAY */}
+                {demoOtp && !otpVerified && (
+                  <div
+                    style={{
+                      background: "rgba(255, 208, 68, 0.12)",
+                      border: "1px dashed #ffd044",
+                      borderRadius: "8px",
+                      padding: "10px 14px",
+                      color: "#ffd044",
+                      fontSize: "13px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      gap: "10px",
+                      marginTop: "10px",
+                    }}
+                  >
+                    <span>
+                      🔔 <strong>Demo OTP:</strong>{" "}
+                      <strong
+                        style={{
+                          fontSize: "16px",
+                          letterSpacing: "3px",
+                          color: "#ffffff",
+                          background: "#222222",
+                          padding: "3px 8px",
+                          borderRadius: "4px",
+                        }}
+                      >
+                        {demoOtp}
+                      </strong>{" "}
+                      (Enter this code to verify)
                     </span>
-
-                    <input
-                      id="register-mobile"
-                      name="mobile"
-                      type="tel"
-                      placeholder="Enter 10-digit mobile number"
-                      value={formData.mobile}
-                      onChange={handleChange}
-                      onBlur={handleCheckUnique}
-                      autoComplete="tel-national"
-                      inputMode="numeric"
-                      maxLength={10}
-                      pattern="[0-9]{10}"
-                      title="Enter a 10-digit mobile number"
-                      required
-                    />
-                  </div>
-                </div>
-
-                {/* Password */}
-                <div className="slg-register-field">
-                  <label htmlFor="register-password">
-                    Password <span>*</span>
-                  </label>
-
-                  <div className="slg-register-input-wrap">
-                    <FiLock />
-
-                    <input
-                      id="register-password"
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      placeholder="Create a password (min 6 chars)"
-                      value={formData.password}
-                      onChange={handleChange}
-                      autoComplete="new-password"
-                      minLength={6}
-                      maxLength={128}
-                      required
-                    />
-
                     <button
-                      className="slg-register-password-toggle"
                       type="button"
-                      onClick={() =>
-                        setShowPassword((previous) => !previous)
-                      }
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
+                      onClick={() => setForm((p) => ({ ...p, otp: demoOtp }))}
+                      style={{
+                        background: "#ffd044",
+                        color: "#000000",
+                        border: "none",
+                        borderRadius: "4px",
+                        padding: "4px 10px",
+                        fontSize: "11px",
+                        fontWeight: "750",
+                        cursor: "pointer",
+                      }}
                     >
-                      {showPassword ? <FiEyeOff /> : <FiEye />}
+                      Auto-Fill
                     </button>
                   </div>
+                )}
+              </div>
+
+              {otpSent && !otpVerified && (
+                <div className="member-register-otp-area">
+                  <div className="member-register-field">
+                    <label htmlFor="otp">Enter Demo OTP *</label>
+                    <div className="member-register-input-wrap">
+                      <FiShield />
+                      <input
+                        id="otp"
+                        name="otp"
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={6}
+                        value={form.otp}
+                        onChange={updateField}
+                        placeholder="Enter 4-digit demo OTP"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    className="member-register-verify-button"
+                    onClick={verifyDemoOtp}
+                    disabled={verifyingOtp || !form.otp.trim()}
+                  >
+                    {verifyingOtp ? "Verifying..." : "Verify OTP"}
+                  </button>
                 </div>
+              )}
 
-                {/* Confirm password */}
-                <div className="slg-register-field">
-                  <label htmlFor="register-confirm-password">
-                    Confirm Password <span>*</span>
-                  </label>
+              {otpVerified && (
+                <div className="member-register-verified">
+                  <FiCheckCircle />
+                  Mobile number verified successfully.
+                </div>
+              )}
 
-                  <div className="slg-register-input-wrap">
-                    <FiLock />
+              {/* SECTION 4: ADDRESS DETAILS */}
+              <div className="member-register-section-title">
+                <span>04</span>
+                <h3>Address Details</h3>
+              </div>
 
-                    <input
-                      id="register-confirm-password"
-                      name="confirmPassword"
-                      type={
-                        showConfirmPassword ? "text" : "password"
-                      }
-                      placeholder="Confirm your password"
-                      value={formData.confirmPassword}
-                      onChange={handleChange}
-                      autoComplete="new-password"
-                      minLength={6}
-                      maxLength={128}
+              <div className="member-register-grid">
+                <div className="member-register-field member-register-full">
+                  <label htmlFor="address">Full Address *</label>
+                  <div className="member-register-input-wrap member-register-address-wrap">
+                    <FiHome />
+                    <textarea
+                      id="address"
+                      name="address"
+                      value={form.address}
+                      onChange={updateField}
+                      placeholder="House no., street, area, landmark..."
+                      rows={3}
+                      autoComplete="street-address"
                       required
                     />
-
-                    <button
-                      className="slg-register-password-toggle"
-                      type="button"
-                      onClick={() =>
-                        setShowConfirmPassword(
-                          (previous) => !previous
-                        )
-                      }
-                      aria-label={
-                        showConfirmPassword
-                          ? "Hide confirm password"
-                          : "Show confirm password"
-                      }
-                    >
-                      {showConfirmPassword ? (
-                        <FiEyeOff />
-                      ) : (
-                        <FiEye />
-                      )}
-                    </button>
                   </div>
                 </div>
 
-                {/* Date of birth */}
-                <div className="slg-register-field">
-                  <label htmlFor="register-dob">
-                    Date of Birth
-                  </label>
-
-                  <div className="slg-register-input-wrap">
-                    <FiCalendar />
-
-                    <input
-                      id="register-dob"
-                      name="dateOfBirth"
-                      type="date"
-                      value={formData.dateOfBirth}
-                      onChange={handleChange}
-                      autoComplete="bday"
-                    />
-                  </div>
-                </div>
-
-                {/* Gender */}
-                <div className="slg-register-field">
-                  <label htmlFor="register-gender">
-                    Gender <span>*</span>
-                  </label>
-
-                  <div className="slg-register-input-wrap">
-                    <FiUser />
-
-                    <select
-                      id="register-gender"
-                      name="gender"
-                      value={formData.gender}
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Select Gender</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                      <option value="prefer-not-to-say">
-                        Prefer not to say
-                      </option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* State */}
-                <div className="slg-register-field">
-                  <label htmlFor="register-state">
-                    State <span>*</span>
-                  </label>
-
-                  <div className="slg-register-input-wrap">
+                <div className="member-register-field">
+                  <label htmlFor="city">City *</label>
+                  <div className="member-register-input-wrap">
                     <FiMapPin />
+                    <input
+                      id="city"
+                      name="city"
+                      value={form.city}
+                      onChange={updateField}
+                      placeholder="Enter your city"
+                      autoComplete="address-level2"
+                      required
+                    />
+                  </div>
+                </div>
 
+                <div className="member-register-field">
+                  <label htmlFor="state">State *</label>
+                  <div className="member-register-input-wrap member-register-select-wrap">
+                    <FiMapPin />
                     <select
-                      id="register-state"
+                      id="state"
                       name="state"
-                      value={formData.state}
-                      onChange={handleChange}
+                      value={form.state}
+                      onChange={updateField}
                       autoComplete="address-level1"
                       required
                     >
-                      <option value="">Select State</option>
-
-                      {indianStates.map((state) => (
+                      <option value="">Select state</option>
+                      {states.map((state) => (
                         <option key={state} value={state}>
                           {state}
                         </option>
@@ -828,162 +823,259 @@ export default function MemberRegister() {
                     </select>
                   </div>
                 </div>
+              </div>
 
-                {/* City */}
-                <div className="slg-register-field">
-                  <label htmlFor="register-city">
-                    City <span>*</span>
-                  </label>
+              {/* SECTION 5: ACCOUNT PASSWORD */}
+              <div className="member-register-section-title">
+                <span>05</span>
+                <h3>Account Password</h3>
+              </div>
 
-                  <div className="slg-register-input-wrap">
-                    <FiMapPin />
-
+              <div className="member-register-grid">
+                <div className="member-register-field">
+                  <label htmlFor="password">Create Password *</label>
+                  <div className="member-register-input-wrap">
+                    <FiLock />
                     <input
-                      id="register-city"
-                      name="city"
-                      type="text"
-                      list="register-city-options"
-                      placeholder={
-                        formData.state
-                          ? "Select or enter city"
-                          : "Select state first"
-                      }
-                      value={formData.city}
-                      onChange={handleChange}
-                      autoComplete="address-level2"
-                      maxLength={100}
+                      id="password"
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      value={form.password}
+                      onChange={updateField}
+                      placeholder="Min 6 characters"
+                      autoComplete="new-password"
+                      style={{ paddingRight: 42 }}
                       required
                     />
-
-                    <datalist id="register-city-options">
-                      {cityOptions.map((city) => (
-                        <option key={city} value={city} />
-                      ))}
-                    </datalist>
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      style={{
+                        position: "absolute",
+                        right: "12px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "transparent",
+                        border: "none",
+                        color: "#ffd044",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        fontSize: "16px",
+                        padding: "4px",
+                      }}
+                      title={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? <FiEyeOff /> : <FiEye />}
+                    </button>
                   </div>
-
-                  <small className="slg-register-field-hint">
-                    {formData.state
-                      ? "Choose a suggestion or type your city name."
-                      : "Select your state to see city suggestions."}
-                  </small>
                 </div>
 
-                {/* Address */}
-                <div className="slg-register-field slg-register-field-full">
-                  <label htmlFor="register-address">
-                    Complete Address <span>*</span>
-                  </label>
-
-                  <div className="slg-register-input-wrap slg-register-address-wrap">
-                    <FiMapPin />
-
-                    <textarea
-                      id="register-address"
-                      name="address"
-                      placeholder="Enter your complete delivery/store address"
-                      value={formData.address}
-                      onChange={handleChange}
-                      autoComplete="street-address"
-                      maxLength={500}
-                      rows={3}
+                <div className="member-register-field">
+                  <label htmlFor="confirmPassword">Confirm Password *</label>
+                  <div className="member-register-input-wrap">
+                    <FiLock />
+                    <input
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={form.confirmPassword}
+                      onChange={updateField}
+                      placeholder="Re-enter password"
+                      autoComplete="new-password"
+                      style={{ paddingRight: 42 }}
                       required
                     />
+                    <button
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      style={{
+                        position: "absolute",
+                        right: "12px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        background: "transparent",
+                        border: "none",
+                        color: "#ffd044",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        fontSize: "16px",
+                        padding: "4px",
+                      }}
+                      title={showConfirmPassword ? "Hide password" : "Show password"}
+                    >
+                      {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                    </button>
                   </div>
                 </div>
               </div>
 
-              {/* Terms */}
-              <label className="slg-register-terms">
-                <input
-                  type="checkbox"
-                  name="agreeToTerms"
-                  checked={formData.agreeToTerms}
-                  onChange={handleChange}
-                  required
-                />
-
-                <span className="slg-register-custom-checkbox">
-                  <FiCheckCircle />
-                </span>
-
-                <span>
-                  I agree to the{" "}
-                  <a
-                    href="/terms"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Terms &amp; Conditions
-                  </a>{" "}
-                  and{" "}
-                  <a
-                    href="/privacy"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Privacy Policy
-                  </a>
-                  .
-                </span>
-              </label>
-
-              {/* Error Message with Sign In Link if already registered */}
-              {error && (
+              {message.text && (
                 <div
-                  className="slg-register-message slg-register-error"
-                  role="alert"
-                >
-                  <div className="error-message-content">
-                    <FiAlertCircle className="error-icon" />
-                    <span>{error}</span>
-                  </div>
-                  {alreadyRegistered && (
-                    <Link to="/login" className="error-signin-btn">
-                      Sign In to Account &rarr;
-                    </Link>
-                  )}
-                </div>
-              )}
-
-              {/* Success Message */}
-              {success && (
-                <div
-                  className="slg-register-message slg-register-success"
+                  className={`member-register-message ${
+                    message.type === "success" ? "success" : "error"
+                  }`}
                   role="status"
+                  aria-live="polite"
                 >
-                  <FiCheckCircle className="success-icon" />
-                  <span>{success}</span>
+                  {message.text}
                 </div>
               )}
 
-              {/* Submit Button */}
+              <div className="member-register-security-note">
+                <FiLock />
+                <span>
+                  Your registration is verified with Vendor ID and secured with Razorpay payment.
+                </span>
+              </div>
+
               <button
-                className="slg-register-submit"
                 type="submit"
-                disabled={submitting}
+                className="member-register-submit"
+                disabled={processingPayment}
               >
-                {submitting ? (
+                {processingPayment ? (
                   <>
-                    <FiLoader className="btn-spinner-icon" />
+                    <FiLoader className="member-register-spinner" />
                     <span>Processing Payment...</span>
                   </>
                 ) : (
                   <>
-                    <span>Next: Pay ₹{membershipFee} &amp; Register</span>
+                    <FiCreditCard />
+                    <span>Next &amp; Pay ₹{MEMBERSHIP_FEE}</span>
                     <FiArrowRight />
                   </>
                 )}
               </button>
 
-              <p className="slg-register-login">
-                Already have an account?{" "}
-                <Link to="/login">Login here</Link>
+              <p className="member-register-login">
+                Already registered? <Link to="/login">Login here</Link>
               </p>
             </form>
-          </div>
+          </section>
+
+          {/* RIGHT: MEMBERSHIP INFORMATION CARD */}
+          <aside className="member-register-panel">
+            <div className="member-register-panel-topline">
+              <span className="member-register-badge">
+                <FiAward /> MEMBER REGISTRATION
+              </span>
+              <span className="member-register-sparkle">
+                <FiStar />
+              </span>
+            </div>
+
+            <div className="member-register-panel-copy">
+              <p className="member-register-kicker">
+                OFFICIAL DEALER AFFILIATION
+              </p>
+
+              <h2>
+                Join
+                <br />
+                <span>Star Link</span>
+                <br />
+                Member Network
+              </h2>
+
+              <p className="member-register-description">
+                Register as an official Star Link Goods Member under your authorized
+                Vendor. Enjoy catalog procurement, product ordering, and KYC verified status.
+              </p>
+            </div>
+
+            <div className="member-register-price-card">
+              <span className="member-register-price-label">
+                ONE-TIME REGISTRATION FEE
+              </span>
+
+              <div className="member-register-price">
+                <span>₹</span>{MEMBERSHIP_FEE}
+              </div>
+
+              <p>
+                <FiCheckCircle />
+                One-time member registration payment
+              </p>
+
+              <div className="member-register-price-divider" />
+
+              <div className="member-register-price-caption">
+                <FiLock />
+                Secure Razorpay checkout
+              </div>
+            </div>
+
+            <div className="member-register-benefits">
+              <h3>Member Privileges</h3>
+
+              <div className="member-register-benefit">
+                <span className="member-register-benefit-icon">
+                  <FiBriefcase />
+                </span>
+                <div>
+                  <h4>Vendor Affiliated</h4>
+                  <p>Directly connected to verified Vendor in database.</p>
+                </div>
+              </div>
+
+              <div className="member-register-benefit">
+                <span className="member-register-benefit-icon">
+                  <FiZap />
+                </span>
+                <div>
+                  <h4>Product Procurement</h4>
+                  <p>Browse solar catalog, manage cart, and place orders.</p>
+                </div>
+              </div>
+
+              <div className="member-register-benefit">
+                <span className="member-register-benefit-icon">
+                  <FiShield />
+                </span>
+                <div>
+                  <h4>Member Portal Access</h4>
+                  <p>Dedicated dashboard with identical dark-gold theme.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="member-register-divider" />
+
+            <div className="member-register-steps">
+              <h3>Steps to Register</h3>
+
+              <div className="member-register-step">
+                <span>1</span>
+                <p>Enter Vendor ID and verify against database</p>
+              </div>
+
+              <div className="member-register-step">
+                <span>2</span>
+                <p>Fill personal details &amp; verify mobile with Demo OTP</p>
+              </div>
+
+              <div className="member-register-step">
+                <span>3</span>
+                <p>Pay ₹{MEMBERSHIP_FEE} via Razorpay to activate Member Portal</p>
+              </div>
+            </div>
+
+            <div className="member-register-panel-footer">
+              <FiLock />
+              <span>Instant activation upon payment · Fee ₹{MEMBERSHIP_FEE}</span>
+            </div>
+          </aside>
         </div>
+
+        <footer className="member-register-footer">
+          <FiShield />
+          <span>Star Link Goods &bull; Member Registration</span>
+        </footer>
       </section>
     </main>
   );
-}
+};
+
+export default MemberRegister;

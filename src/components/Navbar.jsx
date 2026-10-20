@@ -160,8 +160,8 @@ export default function Navbar() {
           <div className="header-actions">
             {/* Member Register */}
             <Link
-              to="/vendor-register"
-              className="register-button vendor-register-button"
+              to="/member-register"
+              className="register-button member-register-button"
               onClick={closeMenu}
             >
               <FiUser className="register-icon" />
@@ -170,8 +170,8 @@ export default function Navbar() {
 
             {/* Vendor Register */}
             <Link
-              to="/member-register"
-              className="register-button member-register-button"
+              to="/vendor-register"
+              className="register-button vendor-register-button"
               onClick={closeMenu}
             >
               <FiUsers className="register-icon" />

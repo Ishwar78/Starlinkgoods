@@ -108,6 +108,59 @@ router.post("/check-user", async (req, res) => {
 });
 
 /**
+ * POST /api/membership/verify-vendor
+ * Verify if Vendor ID exists in database
+ */
+router.post("/verify-vendor", async (req, res) => {
+  try {
+    const { vendorId } = req.body;
+    const cleanId = (vendorId || "").trim();
+
+    if (!cleanId) {
+      return res.status(400).json({
+        success: false,
+        message: "Vendor ID is required.",
+      });
+    }
+
+    const conditions = [
+      { vendorId: cleanId.toUpperCase() },
+      { vendorId: cleanId },
+    ];
+    if (cleanId.match(/^[0-9a-fA-F]{24}$/)) {
+      conditions.push({ _id: cleanId });
+    }
+
+    const vendor = await Vendor.findOne({ $or: conditions });
+
+    if (!vendor) {
+      return res.status(404).json({
+        success: false,
+        message: `Vendor ID "${cleanId}" not found in database. Please enter a valid registered Vendor ID.`,
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Vendor verified successfully.",
+      vendor: {
+        vendorId: vendor.vendorId || cleanId,
+        name: vendor.name,
+        email: vendor.email,
+        mobile: vendor.mobile,
+      },
+    });
+  } catch (error) {
+    console.error("Error verifying vendor:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error while verifying vendor ID.",
+      error: error.message,
+    });
+  }
+});
+
+/**
  * POST /api/membership/create-order
  * Validate registration details, verify uniqueness, and create Razorpay Order
  */
@@ -116,23 +169,47 @@ router.post("/create-order", async (req, res) => {
     const {
       name,
       fullName,
+      firstName,
+      lastName,
       email,
       mobile,
       city,
       state,
       address,
       password,
+      vendorId,
+      vendorName,
+      fee,
     } = req.body;
 
-    const userName = (name || fullName || "").trim();
+    const userName = (name || fullName || `${firstName || ""} ${lastName || ""}`).trim();
     const cleanEmail = (email || "").toLowerCase().trim();
     const cleanMobile = (mobile || "").replace(/\D/g, "").trim();
+
+    // Verify Vendor ID if provided (or mandatory for Member Register)
+    const cleanVendorId = (vendorId || "").trim();
+    if (cleanVendorId) {
+      const conditions = [
+        { vendorId: cleanVendorId.toUpperCase() },
+        { vendorId: cleanVendorId },
+      ];
+      if (cleanVendorId.match(/^[0-9a-fA-F]{24}$/)) {
+        conditions.push({ _id: cleanVendorId });
+      }
+      const existingVendor = await Vendor.findOne({ $or: conditions });
+      if (!existingVendor) {
+        return res.status(400).json({
+          success: false,
+          message: `Vendor ID "${cleanVendorId}" is invalid or does not exist in database.`,
+        });
+      }
+    }
 
     // Required fields check
     if (!userName) {
       return res.status(400).json({
         success: false,
-        message: "Please enter your full name.",
+        message: "Please enter your name.",
       });
     }
 
@@ -171,10 +248,10 @@ router.post("/create-order", async (req, res) => {
       });
     }
 
-    if (!password || password.length < 6) {
+    if (password && password.length < 6) {
       return res.status(400).json({
         success: false,
-        message: "Password must be at least 6 characters.",
+        message: "Password must be at least 6 characters long.",
       });
     }
 
@@ -188,8 +265,10 @@ router.post("/create-order", async (req, res) => {
       if (existing.email === cleanEmail && existing.mobile === cleanMobile) {
         msg = "This email and mobile number are already registered. Please sign in.";
       } else if (existing.email === cleanEmail) {
+        field = "email";
         msg = "This email is already registered. Please sign in.";
       } else if (existing.mobile === cleanMobile) {
+        field = "mobile";
         msg = "This mobile number is already registered. Please sign in.";
       }
 
@@ -202,7 +281,7 @@ router.post("/create-order", async (req, res) => {
 
     // Initialize Razorpay
     const razorpay = getRazorpayInstance();
-    const membershipFee = Number(process.env.MEMBERSHIP_FEE) || 5000;
+    const membershipFee = Number(fee) || 500; // Fixed ₹500 for member registration
     const currency = process.env.RAZORPAY_CURRENCY || "INR";
     const amountInPaise = Math.round(membershipFee * 100);
 
@@ -214,7 +293,9 @@ router.post("/create-order", async (req, res) => {
         customer_name: userName,
         customer_email: cleanEmail,
         customer_mobile: cleanMobile,
-        purpose: "Star Link Goods Membership Registration",
+        vendorId: cleanVendorId,
+        vendorName: vendorName || "",
+        purpose: "Star Link Goods Member Registration (₹500)",
       },
     };
 
@@ -250,6 +331,8 @@ router.post("/verify-and-register", async (req, res) => {
       razorpay_signature,
       name,
       fullName,
+      firstName,
+      lastName,
       email,
       mobile,
       city,
@@ -258,6 +341,10 @@ router.post("/verify-and-register", async (req, res) => {
       password,
       dateOfBirth,
       gender,
+      vendorId,
+      vendorName,
+      fee,
+      role = "Member",
     } = req.body;
 
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
@@ -290,18 +377,38 @@ router.post("/verify-and-register", async (req, res) => {
     }
 
     // 2. Validate User Data
-    const userName = (name || fullName || "").trim();
+    const userName = (name || fullName || `${firstName || ""} ${lastName || ""}`).trim();
     const cleanEmail = (email || "").toLowerCase().trim();
     const cleanMobile = (mobile || "").replace(/\D/g, "").trim();
 
-    if (!userName || !cleanEmail || !cleanMobile || !password) {
+    if (!userName || !cleanEmail || !cleanMobile) {
       return res.status(400).json({
         success: false,
-        message: "Incomplete user registration data.",
+        message: "Incomplete user registration data (Name, Email, Mobile).",
       });
     }
 
-    // 3. Double-check uniqueness
+    // 3. Verify Parent Vendor if vendorId provided
+    let parentVendor = null;
+    const cleanVendorId = (vendorId || "").trim();
+    if (cleanVendorId) {
+      const conditions = [
+        { vendorId: cleanVendorId.toUpperCase() },
+        { vendorId: cleanVendorId },
+      ];
+      if (cleanVendorId.match(/^[0-9a-fA-F]{24}$/)) {
+        conditions.push({ _id: cleanVendorId });
+      }
+      parentVendor = await Vendor.findOne({ $or: conditions });
+      if (!parentVendor) {
+        return res.status(400).json({
+          success: false,
+          message: `Vendor ID "${cleanVendorId}" is invalid or does not exist in database.`,
+        });
+      }
+    }
+
+    // 4. Double-check uniqueness
     const existing = await Vendor.findOne({
       $or: [{ email: cleanEmail }, { mobile: cleanMobile }],
     });
@@ -314,17 +421,24 @@ router.post("/verify-and-register", async (req, res) => {
       });
     }
 
-    const membershipFee = Number(process.env.MEMBERSHIP_FEE) || 5000;
+    const membershipFee = Number(fee) || 500;
+    const isMemberRegistration = role === "Member" || !!cleanVendorId;
+    let newMemberId;
+    if (isMemberRegistration && cleanVendorId) {
+      newMemberId = await Vendor.generateMemberIdForVendor(parentVendor ? parentVendor.vendorId : cleanVendorId);
+    } else {
+      newMemberId = await Vendor.generateUniqueVendorId();
+    }
 
-    const newVendorId = await Vendor.generateUniqueVendorId();
+    // 5. Create and Save the Member
+    const finalPassword = password && password.length >= 6 ? password : `SLG@${cleanMobile.slice(-4)}`;
 
-    // 4. Create and Save the Vendor / User
     const newVendor = new Vendor({
-      vendorId: newVendorId,
+      vendorId: newMemberId,
       name: userName,
       email: cleanEmail,
       mobile: cleanMobile,
-      password: password, // Mongoose pre-save hook handles bcrypt hashing
+      password: finalPassword, // Mongoose pre-save hook handles bcrypt hashing
       city: (city || "").trim(),
       state: (state || "").trim(),
       address: (address || "").trim(),
@@ -335,13 +449,15 @@ router.post("/verify-and-register", async (req, res) => {
       razorpayPaymentId: razorpay_payment_id,
       razorpaySignature: razorpay_signature,
       paymentStatus: "Paid",
-      role: "Vendor",
+      role: role || "Member",
+      parentVendorId: parentVendor ? parentVendor.vendorId : (cleanVendorId.toUpperCase() || ""),
+      parentVendorName: parentVendor ? parentVendor.name : (vendorName || ""),
       status: "Active",
     });
 
     await newVendor.save();
 
-    // 5. Generate Auth JWT Token for immediate login
+    // 6. Generate Auth JWT Token for immediate login
     const token = jwt.sign(
       {
         id: newVendor._id,
@@ -358,7 +474,7 @@ router.post("/verify-and-register", async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Payment verified and membership activated successfully!",
+      message: "Payment verified and member registration completed successfully!",
       token,
       user: newVendor.toJSON(),
     });

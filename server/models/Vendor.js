@@ -10,6 +10,17 @@ const vendorSchema = new mongoose.Schema(
       trim: true,
       uppercase: true,
     },
+    parentVendorId: {
+      type: String,
+      default: "",
+      trim: true,
+      uppercase: true,
+    },
+    parentVendorName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     name: {
       type: String,
       required: [true, "Name is required"],
@@ -142,6 +153,52 @@ vendorSchema.statics.generateUniqueVendorId = async function () {
   while (await VendorModel.findOne({ vendorId: candidateId })) {
     nextNum++;
     candidateId = `SLG${nextNum}`;
+  }
+
+  return candidateId;
+};
+
+// Unique Member ID Generator under a specific Vendor (e.g. SLG1002-01, SLG1002-02, etc.)
+vendorSchema.statics.generateMemberIdForVendor = async function (parentVendorId) {
+  const VendorModel = this;
+  const cleanParentId = (parentVendorId || "").trim().toUpperCase();
+
+  if (!cleanParentId) {
+    return await VendorModel.generateUniqueVendorId();
+  }
+
+  const escapedParentId = cleanParentId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const regex = new RegExp(`^${escapedParentId}-(\\d+)$`, "i");
+
+  const existingMembers = await VendorModel.find(
+    {
+      $or: [
+        { vendorId: { $regex: regex } },
+        { parentVendorId: cleanParentId },
+      ],
+    },
+    { vendorId: 1 }
+  );
+
+  let maxSeq = 0;
+  for (const m of existingMembers) {
+    if (m.vendorId) {
+      const match = m.vendorId.match(regex);
+      if (match && match[1]) {
+        const num = parseInt(match[1], 10);
+        if (!isNaN(num) && num > maxSeq) {
+          maxSeq = num;
+        }
+      }
+    }
+  }
+
+  let nextSeq = maxSeq + 1;
+  let candidateId = `${cleanParentId}-${String(nextSeq).padStart(2, "0")}`;
+
+  while (await VendorModel.findOne({ vendorId: candidateId })) {
+    nextSeq++;
+    candidateId = `${cleanParentId}-${String(nextSeq).padStart(2, "0")}`;
   }
 
   return candidateId;

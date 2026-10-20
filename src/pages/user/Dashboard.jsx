@@ -41,6 +41,8 @@ export default function Dashboard() {
       return {};
     }
   });
+  const isMember = (userData?.role || "").toLowerCase() === "member";
+  
 
   const [kycStatus, setKycStatus] = useState("Loading...");
   const [myUsersCount, setMyUsersCount] = useState(0);
@@ -355,8 +357,16 @@ export default function Dashboard() {
           </div>
           <div className="vendor-info-item">
             <span className="vendor-info-label">Account Role</span>
-            <strong className="vendor-info-value">{userData.role || "Vendor"}</strong>
+            <strong className="vendor-info-value">{isMember ? "Member" : (userData.role || "Vendor")}</strong>
           </div>
+          {userData.parentVendorId && (
+            <div className="vendor-info-item">
+              <span className="vendor-info-label">Affiliated Vendor</span>
+              <strong className="vendor-info-value" style={{ color: "#ffd044" }}>
+                {userData.parentVendorName ? `${userData.parentVendorName} (${userData.parentVendorId})` : userData.parentVendorId}
+              </strong>
+            </div>
+          )}
           <div className="vendor-info-item">
             <span className="vendor-info-label">KYC Status</span>
             <strong
@@ -401,21 +411,36 @@ export default function Dashboard() {
 
       {/* Summary KPI Cards */}
       <section className="user-stats-grid">
-        <article className="user-stat-card">
-          <div className="user-stat-icon wallet-icon"><FiCreditCard /></div>
-          <span className="user-stat-label">Wallet Balance</span>
-          <h3>₹{(walletBalance || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
-          <Link to="/user/wallet">Manage wallet <FiArrowRight /></Link>
-        </article>
+        {!isMember && (
+          <article className="user-stat-card">
+            <div className="user-stat-icon wallet-icon"><FiCreditCard /></div>
+            <span className="user-stat-label">Wallet Balance</span>
+            <h3>₹{(walletBalance || 0).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h3>
+            <Link to="/user/wallet">Manage wallet <FiArrowRight /></Link>
+          </article>
+        )}
 
-        <article className="user-stat-card">
-          <div className="user-stat-icon" style={{ background: "rgba(52, 152, 219, 0.12)", color: "#3498db" }}>
-            <FiUsers />
-          </div>
-          <span className="user-stat-label">Users Added By You</span>
-          <h3>{myUsersCount}</h3>
-          <Link to="/user/add-user">Manage users <FiArrowRight /></Link>
-        </article>
+        {!isMember && (
+          <article className="user-stat-card">
+            <div className="user-stat-icon" style={{ background: "rgba(52, 152, 219, 0.12)", color: "#3498db" }}>
+              <FiUsers />
+            </div>
+            <span className="user-stat-label">Users Added By You</span>
+            <h3>{myUsersCount}</h3>
+            <Link to="/user/add-user">Manage users <FiArrowRight /></Link>
+          </article>
+        )}
+
+        {isMember && (
+          <article className="user-stat-card">
+            <div className="user-stat-icon" style={{ background: "rgba(255, 208, 68, 0.15)", color: "#ffd044" }}>
+              <FiUser />
+            </div>
+            <span className="user-stat-label">Affiliated Vendor</span>
+            <h3 style={{ fontSize: "16px" }}>{userData.parentVendorName || userData.parentVendorId || "SLG Vendor"}</h3>
+            <span style={{ fontSize: "12px", color: "#a89d8d" }}>ID: {userData.parentVendorId || "Verified"}</span>
+          </article>
+        )}
 
         <article className="user-stat-card">
           <div className="user-stat-icon kyc-icon"><FiShield /></div>
@@ -443,9 +468,20 @@ export default function Dashboard() {
         <article className="user-stat-card">
           <div className="user-stat-icon orders-icon"><FiShoppingBag /></div>
           <span className="user-stat-label">Total Orders</span>
-          <h3>12</h3>
+          <h3>{userData.ordersCount || 0}</h3>
           <Link to="/user/orders">Track orders <FiArrowRight /></Link>
         </article>
+
+        {isMember && (
+          <article className="user-stat-card">
+            <div className="user-stat-icon" style={{ background: "rgba(52, 211, 153, 0.15)", color: "#34d399" }}>
+              <FiShoppingBag />
+            </div>
+            <span className="user-stat-label">Products Catalog</span>
+            <h3 style={{ fontSize: "16px" }}>Catalog Orders</h3>
+            <Link to="/user/products">Browse Catalog <FiArrowRight /></Link>
+          </article>
+        )}
       </section>
 
       {/* Recent Orders Panel */}

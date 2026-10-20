@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Outlet, useLocation, Link } from "react-router-dom";
+import { Outlet, useLocation, Link, useNavigate } from "react-router-dom";
 import {
   FiMenu,
   FiBell,
@@ -27,6 +27,7 @@ const pageNames = {
 export default function UserDashboardLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const pageTitle = pageNames[location.pathname] || "User Dashboard";
 
@@ -80,6 +81,14 @@ export default function UserDashboardLayout() {
     window.addEventListener("slg-profile-updated", onProfileUpdate);
     return () => window.removeEventListener("slg-profile-updated", onProfileUpdate);
   }, []);
+
+  const isMember = (userData?.role || "").toLowerCase() === "member";
+
+  useEffect(() => {
+    if (isMember && (location.pathname === "/user/wallet" || location.pathname === "/user/add-user")) {
+      navigate("/user/dashboard", { replace: true });
+    }
+  }, [isMember, location.pathname, navigate]);
 
   const userName = userData.name || "Vendor User";
   const userInitial = userName.charAt(0).toUpperCase();
