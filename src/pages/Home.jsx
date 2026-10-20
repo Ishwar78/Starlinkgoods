@@ -19,7 +19,11 @@ import {
 } from "react-icons/fi";
 import "./Home.css";
 import Footer from "../components/Footer";
-import { getCategories, getProducts, formatImageUrl } from "../lib/api.js";
+import { 
+  getCategories, 
+  getProducts, 
+  formatImageUrl 
+} from "../lib/api.js";
 
 const fallbackCategories = [
   { name: "Sofa Sets", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=500&q=85" },
@@ -34,22 +38,6 @@ const fallbackCategories = [
 ];
 
 const fallbackProducts = [
-  {
-    id: 1,
-    name: "Modern 3 Seater Sofa",
-    category: "Sofa Sets",
-    price: 24999,
-    oldPrice: 32999,
-    badge: "Best Seller",
-    rating: "4.8",
-    reviews: 120,
-    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=700&q=85"
-  },
-  { id: 2, name: "King Size Storage Bed", category: "Beds", price: 28999, oldPrice: 35999, badge: "10% OFF", rating: "4.7", reviews: 85, image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=700&q=85" },
-  { id: 3, name: "Orthopedic Mattress", category: "Mattresses", price: 15999, oldPrice: 22000, badge: "Popular", rating: "4.6", reviews: 92, image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=700&q=85" },
-  { id: 4, name: "6 Seater Dining Set", category: "Dining Sets", price: 26999, oldPrice: 34999, badge: "Best Seller", rating: "4.8", reviews: 64, image: "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=700&q=85" },
-  { id: 5, name: "Premium Accent Chair", category: "Chairs", price: 8999, oldPrice: 12499, badge: "10% OFF", rating: "4.5", reviews: 48, image: "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=700&q=85" },
-  { id: 6, name: "Modern TV Unit", category: "TV Units", price: 13999, oldPrice: 18999, badge: "New", rating: "4.7", reviews: 76, image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=700&q=85" },
 ];
 
 const testimonials = [

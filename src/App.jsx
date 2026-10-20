@@ -24,7 +24,7 @@ import MemberRegister from "./pages/MemberRegister.jsx";
 
 
 
-
+import ScrollToTop from "./components/ScrollToTop.jsx";
 
 
 import AdminLogin from "./pages/AdminLogin.jsx";
@@ -60,7 +60,7 @@ export default function App() {
 
   return (
     <>
-    
+        <ScrollToTop />
       {!hideNavbar && <Navbar />}
       
       <Routes>
