@@ -67,6 +67,20 @@ const orderSchema = new mongoose.Schema(
       default: "",
     },
 
+    // Order User (Customer Account)
+    orderUserId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "OrderUser",
+      required: false,
+      default: null,
+    },
+    orderUserEmail: {
+      type: String,
+      default: "",
+      lowercase: true,
+      trim: true,
+    },
+
     // Customer details filled during checkout (fresh, not prefilled)
     customerDetails: {
       fullName: {
@@ -195,6 +209,8 @@ const orderSchema = new mongoose.Schema(
 );
 
 orderSchema.index({ vendorId: 1, createdAt: -1 });
+orderSchema.index({ orderUserId: 1, createdAt: -1 });
+orderSchema.index({ orderUserEmail: 1, createdAt: -1 });
 orderSchema.index({ orderStatus: 1, createdAt: -1 });
 
 const Order = mongoose.model("Order", orderSchema);

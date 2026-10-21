@@ -20,6 +20,7 @@ const kycRoutes = require("./routes/kycRoutes");
 const membershipRoutes = require("./routes/membershipRoutes");
 const walletRequestRoutes = require("./routes/walletRequestRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const orderUserRoutes = require("./routes/orderUserRoutes");
 const Vendor = require("./models/Vendor");
 
 const app = express();
@@ -75,6 +76,9 @@ app.use("/api/wallet-requests", walletRequestRoutes);
 
 // Orders Routes
 app.use("/api/orders", orderRoutes);
+
+// Order Customer / User Routes
+app.use("/api/order-users", orderUserRoutes);
 
 const startServer = async () => {
   try {

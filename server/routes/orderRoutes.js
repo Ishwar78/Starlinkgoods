@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 const Order = require("../models/Order");
 const Vendor = require("../models/Vendor");
 const VendorUser = require("../models/VendorUser");
+const OrderUser = require("../models/OrderUser");
 
 const JWT_SECRET =
   process.env.JWT_SECRET || "starlink_super_secret_admin_jwt_key_2026";
@@ -376,6 +377,62 @@ router.post("/", orderUploadFields, async (req, res) => {
     const randomSuffix = Math.floor(1000 + Math.random() * 9000);
     const orderId = `SLG-ORD-${Date.now().toString().slice(-6)}-${randomSuffix}`;
 
+    // 5. Create or Update Customer OrderUser Account in Database
+    const cleanCustomerEmail = (customerDetails.email || "").toLowerCase().trim();
+    const customerPassword = customerDetails.password || req.body.password || "";
+    let orderUser = null;
+    let orderUserToken = null;
+
+    if (cleanCustomerEmail) {
+      try {
+        orderUser = await OrderUser.findOne({ email: cleanCustomerEmail });
+
+        if (!orderUser) {
+          orderUser = new OrderUser({
+            name: customerDetails.fullName.trim(),
+            email: cleanCustomerEmail,
+            mobile: customerDetails.mobile.trim(),
+            password: customerPassword || `Solar@${customerDetails.mobile.slice(-4) || "1234"}`,
+            address: customerDetails.address.trim(),
+            city: (customerDetails.city || "").trim(),
+            state: (customerDetails.state || "").trim(),
+            pincode: (customerDetails.pincode || "").trim(),
+            isHouseOwner: customerDetails.isHouseOwner === "Yes" ? "Yes" : "No",
+            vendorId: user ? user._id : null,
+            vendorName: user ? user.name : "",
+          });
+          await orderUser.save();
+        } else {
+          if (customerPassword) {
+            orderUser.password = customerPassword;
+          }
+          if (customerDetails.fullName) orderUser.name = customerDetails.fullName.trim();
+          if (customerDetails.mobile) orderUser.mobile = customerDetails.mobile.trim();
+          if (customerDetails.address) orderUser.address = customerDetails.address.trim();
+          if (customerDetails.city) orderUser.city = customerDetails.city.trim();
+          if (customerDetails.state) orderUser.state = customerDetails.state.trim();
+          if (customerDetails.pincode) orderUser.pincode = customerDetails.pincode.trim();
+          if (customerDetails.isHouseOwner) {
+            orderUser.isHouseOwner = customerDetails.isHouseOwner === "Yes" ? "Yes" : "No";
+          }
+          await orderUser.save();
+        }
+
+        // Generate customer login token
+        orderUserToken = jwt.sign(
+          {
+            id: orderUser._id,
+            role: "OrderCustomer",
+            email: orderUser.email,
+          },
+          JWT_SECRET,
+          { expiresIn: "30d" }
+        );
+      } catch (userCreateErr) {
+        console.error("Warning: Could not create/update OrderUser:", userCreateErr);
+      }
+    }
+
     const payableAmount = 1000; // Fixed token payable amount as requested
     const remainingAmount = Math.max(0, totalAmount - payableAmount);
 
@@ -386,10 +443,12 @@ router.post("/", orderUploadFields, async (req, res) => {
       vendorName: user ? user.name : (req.body.vendorName || "Direct / Vendor"),
       vendorEmail: user ? user.email : (req.body.vendorEmail || ""),
       vendorMobile: user ? user.mobile : (req.body.vendorMobile || ""),
+      orderUserId: orderUser ? orderUser._id : null,
+      orderUserEmail: cleanCustomerEmail,
       customerDetails: {
         fullName: customerDetails.fullName.trim(),
         mobile: customerDetails.mobile.trim(),
-        email: (customerDetails.email || "").trim(),
+        email: cleanCustomerEmail,
         address: customerDetails.address.trim(),
         city: (customerDetails.city || "").trim(),
         state: (customerDetails.state || "").trim(),
@@ -418,6 +477,18 @@ router.post("/", orderUploadFields, async (req, res) => {
       message: "Order placed successfully! ₹1,000 online payment verified via Razorpay.",
       order: newOrder,
       orderId: newOrder.orderId,
+      orderUser: orderUser
+        ? {
+            id: orderUser._id,
+            name: orderUser.name,
+            email: orderUser.email,
+            mobile: orderUser.mobile,
+            address: orderUser.address,
+            city: orderUser.city,
+            state: orderUser.state,
+          }
+        : null,
+      orderUserToken,
     });
   } catch (error) {
     cleanUploadedFiles(req.files);

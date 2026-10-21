@@ -38,10 +38,19 @@ export default function Navbar() {
   const location = useLocation();
 
   const userToken = localStorage.getItem("userToken");
+  const orderUserToken = localStorage.getItem("orderUserToken");
 
   const userData = (() => {
     try {
       return JSON.parse(localStorage.getItem("userData") || "{}");
+    } catch {
+      return {};
+    }
+  })();
+
+  const orderUserData = (() => {
+    try {
+      return JSON.parse(localStorage.getItem("orderUserData") || "{}");
     } catch {
       return {};
     }
@@ -218,15 +227,45 @@ export default function Navbar() {
                     : "Dashboard"}
                 </span>
               </Link>
-            ) : (
+            ) : orderUserToken ? (
               <Link
-                to="/login"
+                to="/order-user/dashboard"
                 className="login-button"
                 onClick={closeMenu}
+                title={`Logged in as Customer: ${orderUserData.name || "Customer"}`}
               >
                 <FiUser className="login-icon" />
-                <span>Login</span>
+                <span>
+                  {orderUserData.name
+                    ? orderUserData.name.split(" ")[0]
+                    : "My Orders"}
+                </span>
               </Link>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <Link
+                  to="/login"
+                  className="login-button"
+                  onClick={closeMenu}
+                >
+                  <FiUser className="login-icon" />
+                  <span>Login</span>
+                </Link>
+
+                <Link
+                  to="/order-user/login"
+                  className="login-button"
+                  onClick={closeMenu}
+                  style={{
+                    background: "rgba(255, 208, 68, 0.15)",
+                    border: "1px solid rgba(255, 208, 68, 0.35)",
+                    color: "#ffd044",
+                  }}
+                  title="Track Order / Customer Login"
+                >
+                  <span>Track Order</span>
+                </Link>
+              </div>
             )}
           </div>
         </div>

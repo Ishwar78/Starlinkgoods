@@ -1,0 +1,263 @@
+/* OrderUserSidebar.css */
+
+.order-user-sidebar {
+  width: 270px;
+  background: #0f1420;
+  border-right: 1px solid rgba(255, 208, 68, 0.15);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  padding: 24px 18px;
+  box-sizing: border-box;
+  transition: transform 0.3s ease;
+}
+
+.order-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.order-brand-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.order-brand-tag {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: #ffd044;
+}
+
+.order-brand-title {
+  margin: 2px 0 0 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+
+.order-sidebar-close-btn {
+  display: none;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* User Card */
+.order-sidebar-user-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: #151d2d;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.order-avatar-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 208, 68, 0.15);
+  color: #ffd044;
+  border: 1px solid rgba(255, 208, 68, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.order-user-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 2px;
+}
+
+.order-user-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-user-email {
+  font-size: 11.5px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.order-user-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #34d399;
+  margin-top: 2px;
+}
+
+/* Navigation */
+.order-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.nav-group-title {
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.8px;
+  color: #64748b;
+  margin-bottom: 4px;
+  padding-left: 6px;
+}
+
+.order-nav-button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  color: #cbd5e1;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.order-nav-button:hover {
+  background: #182233;
+  color: #ffd044;
+}
+
+.order-nav-button.active {
+  background: #ffd044;
+  color: #0b101b;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(255, 208, 68, 0.25);
+}
+
+.order-nav-icon {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+}
+
+.order-nav-label {
+  flex: 1;
+}
+
+.order-nav-badge {
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: #1e293b;
+  color: #ffd044;
+}
+
+.order-nav-badge.active {
+  background: #000000;
+  color: #ffd044;
+}
+
+/* Footer Links */
+.order-sidebar-footer {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-footer-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  color: #94a3b8;
+  font-size: 13px;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.order-footer-link:hover {
+  background: #182233;
+  color: #ffffff;
+}
+
+.order-logout-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 8px;
+  color: #f87171;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.order-logout-button:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+/* Mobile Responsiveness */
+.order-sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 49;
+}
+
+@media (max-width: 900px) {
+  .order-user-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+  }
+
+  .order-user-sidebar.mobile-open {
+    transform: translateX(0);
+  }
+
+  .order-sidebar-close-btn {
+    display: block;
+  }
+}
+

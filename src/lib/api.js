@@ -19,6 +19,11 @@ export async function apiFetch(endpoint, options = {}) {
 
   const adminToken = localStorage.getItem("adminToken");
   const userToken = localStorage.getItem("userToken");
+  const orderUserToken = localStorage.getItem("orderUserToken");
+
+  const isOrderUserContext =
+    (typeof window !== "undefined" && window.location.pathname.startsWith("/order-user")) ||
+    endpoint.includes("/api/order-users");
 
   const isUserContext =
     (typeof window !== "undefined" && window.location.pathname.startsWith("/user")) ||
@@ -31,9 +36,11 @@ export async function apiFetch(endpoint, options = {}) {
     endpoint.includes("/api/wallet-requests/my-requests") ||
     (endpoint.includes("/api/wallet-requests") && !endpoint.includes("/api/wallet-requests/all"));
 
-  const authToken = isUserContext
+  const authToken = isOrderUserContext
+    ? (orderUserToken || userToken || adminToken)
+    : isUserContext
     ? (userToken || adminToken)
-    : (adminToken || userToken);
+    : (adminToken || userToken || orderUserToken);
 
   const isFormData = typeof FormData !== "undefined" && options.body instanceof FormData;
 
@@ -487,5 +494,32 @@ export async function updateOrderStatus(orderId, { orderStatus, adminNotes }) {
     body: JSON.stringify({ orderStatus, adminNotes }),
   });
 }
+
+/* =======================================
+   Order User (Customer) API Methods
+======================================= */
+
+export async function orderUserLogin(email, password) {
+  return apiFetch("/api/order-users/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
+}
+
+export async function getOrderUserProfile() {
+  return apiFetch("/api/order-users/me");
+}
+
+export async function getOrderUserOrders() {
+  return apiFetch("/api/order-users/my-orders");
+}
+
+export async function submitOrderUserSupport(payload) {
+  return apiFetch("/api/order-users/support", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
 
 

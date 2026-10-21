@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   FiShoppingCart,
   FiTrash2,
@@ -12,6 +12,10 @@ import {
   FiTruck,
   FiPackage,
   FiX,
+  FiEye,
+  FiEyeOff,
+  FiUser,
+  FiLock,
 } from "react-icons/fi";
 
 import {
@@ -51,6 +55,8 @@ const initialCustomerInfo = () => ({
   fullName: "",
   mobile: "",
   email: "",
+  password: "",
+  confirmPassword: "",
   address: "",
   city: "",
   state: "",
@@ -66,6 +72,7 @@ const initialDocuments = {
 };
 
 export default function UserCart() {
+  const navigate = useNavigate();
   const [userData] = useState(() => getLoggedInUser() || {});
   const [cartItems, setCartItems] = useState([]);
 
@@ -74,6 +81,8 @@ export default function UserCart() {
   const [orderNotes, setOrderNotes] = useState("");
   const [placingOrder, setPlacingOrder] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Fresh, blank customer info for every order
   const [shippingInfo, setShippingInfo] = useState(initialCustomerInfo);
@@ -189,6 +198,27 @@ export default function UserCart() {
       return false;
     }
 
+    if (!shippingInfo.email.trim()) {
+      setFormError("Please enter customer's Email ID (required for customer login and dashboard).");
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(shippingInfo.email.trim())) {
+      setFormError("Please enter a valid Email ID.");
+      return false;
+    }
+
+    if (!shippingInfo.password || shippingInfo.password.length < 6) {
+      setFormError("Password is required and must be at least 6 characters.");
+      return false;
+    }
+
+    if (shippingInfo.password !== shippingInfo.confirmPassword) {
+      setFormError("Password and Confirm Password do not match.");
+      return false;
+    }
+
     if (!shippingInfo.address.trim()) {
       setFormError("Please enter complete Delivery / Installation Address.");
       return false;
@@ -294,6 +324,7 @@ export default function UserCart() {
                 fullName: shippingInfo.fullName.trim(),
                 mobile: shippingInfo.mobile.trim(),
                 email: (shippingInfo.email || "").trim(),
+                password: shippingInfo.password,
                 address: shippingInfo.address.trim(),
                 city: shippingInfo.city.trim(),
                 state: shippingInfo.state.trim(),
@@ -340,6 +371,14 @@ export default function UserCart() {
 
             if (!result.success) {
               throw new Error(result.message || "Failed to confirm and place order.");
+            }
+
+            // Store Customer OrderUser auth credentials for customer dashboard
+            if (result.orderUserToken) {
+              localStorage.setItem("orderUserToken", result.orderUserToken);
+            }
+            if (result.orderUser) {
+              localStorage.setItem("orderUserData", JSON.stringify(result.orderUser));
             }
 
             const serverOrder = result.order || {};
@@ -540,6 +579,15 @@ export default function UserCart() {
             </div>
 
             <div>
+              <span>Customer Account:</span>
+              <strong style={{ color: "#ffd044" }}>
+                {orderSuccess.customerDetails?.email ||
+                  orderSuccess.shippingInfo?.email ||
+                  "Registered with Order"}
+              </strong>
+            </div>
+
+            <div>
               <span>Deliver To:</span>
               <strong>
                 {orderSuccess.customerDetails?.city ||
@@ -551,13 +599,39 @@ export default function UserCart() {
             </div>
           </div>
 
+          <div
+            style={{
+              margin: "18px 0",
+              padding: "16px 20px",
+              background: "rgba(255, 208, 68, 0.08)",
+              border: "1px dashed rgba(255, 208, 68, 0.4)",
+              borderRadius: "12px",
+              textAlign: "left",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: "10px", color: "#ffd044", fontWeight: "700", marginBottom: "6px" }}>
+              <FiUser /> Customer Account Created &amp; Connected!
+            </div>
+            <p style={{ margin: 0, fontSize: "13px", color: "#e2e8f0", lineHeight: "1.6" }}>
+              User can directly log in using their email (<strong>{orderSuccess.customerDetails?.email || orderSuccess.shippingInfo?.email}</strong>) and password at the Customer Login portal to check order status, delivery tracking, and contact customer support.
+            </p>
+          </div>
+
           <div className="success-action-btns">
-            <Link to="/user/orders" className="cart-primary-button">
-              <FiPackage /> View My Orders
+            <Link
+              to="/order-user/dashboard"
+              className="cart-primary-button"
+              style={{ background: "#ffd044", color: "#000", fontWeight: "800" }}
+            >
+              <FiUser /> Go to Customer Dashboard
+            </Link>
+
+            <Link to="/user/orders" className="cart-outline-button">
+              <FiPackage /> Vendor Orders
             </Link>
 
             <Link to="/user/products" className="cart-outline-button">
-              Browse More Products
+              Browse Products
             </Link>
 
             <button
@@ -956,8 +1030,9 @@ export default function UserCart() {
                   </div>
 
                   <div className="form-group">
-                    <label>Email ID (Optional)</label>
+                    <label>Email ID * (Account &amp; Login)</label>
                     <input
+                      required
                       type="email"
                       value={shippingInfo.email}
                       onChange={(event) =>
@@ -965,6 +1040,82 @@ export default function UserCart() {
                       }
                       placeholder="customer@example.com"
                     />
+                  </div>
+
+                  <div className="form-group">
+                    <label>Customer Password * (Min 6 Chars)</label>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        required
+                        type={showPassword ? "text" : "password"}
+                        value={shippingInfo.password}
+                        onChange={(event) =>
+                          updateShippingInfo("password", event.target.value)
+                        }
+                        placeholder="Create login password"
+                        style={{ paddingRight: "42px" }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        style={{
+                          position: "absolute",
+                          right: "12px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "none",
+                          border: "none",
+                          color: "#ffd044",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "17px",
+                          padding: "4px",
+                        }}
+                        title={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? <FiEyeOff /> : <FiEye />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label>Confirm Password *</label>
+                    <div style={{ position: "relative" }}>
+                      <input
+                        required
+                        type={showConfirmPassword ? "text" : "password"}
+                        value={shippingInfo.confirmPassword}
+                        onChange={(event) =>
+                          updateShippingInfo("confirmPassword", event.target.value)
+                        }
+                        placeholder="Re-enter password"
+                        style={{ paddingRight: "42px" }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        style={{
+                          position: "absolute",
+                          right: "12px",
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          background: "none",
+                          border: "none",
+                          color: "#ffd044",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "17px",
+                          padding: "4px",
+                        }}
+                        title={showConfirmPassword ? "Hide password" : "Show password"}
+                      >
+                        {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="form-group" style={{ gridColumn: "1 / -1" }}>

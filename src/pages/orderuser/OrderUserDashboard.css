@@ -1,0 +1,129 @@
+/* OrderUserDashboard.css */
+
+.order-dashboard-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background: #090d16;
+  color: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.order-dashboard-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: radial-gradient(circle at 100% 0%, rgba(255, 208, 68, 0.04) 0%, transparent 40%), #090d16;
+}
+
+/* Topbar */
+.order-dashboard-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 32px;
+  background: #0f1420;
+  border-bottom: 1px solid rgba(255, 208, 68, 0.12);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+@media (max-width: 768px) {
+  .order-dashboard-topbar {
+    padding: 14px 18px;
+  }
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topbar-menu-toggle {
+  display: none;
+  background: #182233;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  font-size: 20px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 900px) {
+  .topbar-menu-toggle {
+    display: flex;
+  }
+}
+
+.topbar-welcome {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #ffd044;
+}
+
+.topbar-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topbar-customer-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #151d2d;
+  border: 1px solid rgba(255, 208, 68, 0.25);
+  padding: 6px 14px;
+  border-radius: 999px;
+}
+
+.pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+}
+
+.pill-icon {
+  color: #ffd044;
+  font-size: 15px;
+}
+
+.pill-name {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #e2e8f0;
+}
+
+/* Content */
+.order-dashboard-content {
+  flex: 1;
+  padding: 32px;
+  max-width: 1300px;
+  width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .order-dashboard-content {
+    padding: 20px 16px;
+  }
+}
+

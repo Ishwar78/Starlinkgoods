@@ -52,11 +52,17 @@ import UserAddUser from "./pages/user/AddUser.jsx";
 import UserOrders from "./pages/user/Orders.jsx";
 import UserCart from "./pages/user/Cart.jsx";
 
+// Order User / Customer Dashboard & Login Pages
+import OrderUserLogin from "./pages/orderuser/OrderUserLogin.jsx";
+import OrderUserDashboard from "./pages/orderuser/OrderUserDashboard.jsx";
+import OrderUserProtectedRoute from "./pages/orderuser/OrderUserProtectedRoute.jsx";
+
 export default function App() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith("/admin");
   const isUserRoute = location.pathname.startsWith("/user");
-  const hideNavbar = isAdminRoute || isUserRoute;
+  const isOrderUserRoute = location.pathname.startsWith("/order-user");
+  const hideNavbar = isAdminRoute || isUserRoute || isOrderUserRoute;
 
   return (
     <>
@@ -109,6 +115,16 @@ export default function App() {
 
         {/* Public Admin Login Route */}
         <Route path="/admin/login" element={<AdminLogin />} />
+
+        {/* Public Order Customer Login Route */}
+        <Route path="/order-user/login" element={<OrderUserLogin />} />
+
+        {/* Protected Order Customer Dashboard Routes */}
+        <Route element={<OrderUserProtectedRoute />}>
+          <Route path="/order-user/dashboard" element={<OrderUserDashboard />} />
+          <Route path="/order-user/orders" element={<OrderUserDashboard defaultTab="orders" />} />
+          <Route path="/order-user/support" element={<OrderUserDashboard defaultTab="support" />} />
+        </Route>
 
         {/* Protected Admin Routes (Requires Login) */}
         <Route element={<AdminProtectedRoute />}>
