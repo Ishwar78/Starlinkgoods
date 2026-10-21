@@ -1540,3 +1540,369 @@
     animation-duration: 1.5s;
   }
 }
+
+
+
+
+
+
+
+
+/* ==========================================
+   VENDOR DATA MODAL — DESIGN FIX
+   Add at the END of VendorData.css
+========================================== */
+
+/* Darker, cleaner backdrop */
+.vd-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+/* Compact modal with controlled height */
+.vd-modal-window {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 680px);
+  max-height: calc(100vh - 48px);
+  max-height: calc(100dvh - 48px);
+  margin: auto;
+  overflow: hidden;
+  background: #101010;
+  color: #f5f5f5;
+  border: 1px solid rgba(234, 176, 0, 0.55);
+  border-radius: 16px;
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.65),
+    0 0 30px rgba(234, 176, 0, 0.07);
+}
+
+/* Header remains visible */
+.vd-modal-header {
+  position: relative;
+  top: auto;
+  z-index: 2;
+  flex-shrink: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px 24px;
+  background: #151515;
+  border-bottom: 1px solid rgba(234, 176, 0, 0.25);
+}
+
+.vd-modal-header h3 {
+  margin: 0 0 6px;
+  color: #f8c51c;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.45rem;
+  line-height: 1.3;
+}
+
+.vd-modal-header p {
+  margin: 0;
+  color: #a9a9a9;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.vd-modal-close {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  color: #dedede;
+  background: #222;
+  border: 1px solid #3a3a3a;
+  border-radius: 9px;
+}
+
+.vd-modal-close:hover {
+  color: #080808;
+  background: #eab000;
+  border-color: #eab000;
+}
+
+/* Only the form body scrolls */
+.vd-modal-form {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 22px 24px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #725700 #151515;
+}
+
+.vd-modal-form::-webkit-scrollbar {
+  width: 6px;
+}
+
+.vd-modal-form::-webkit-scrollbar-track {
+  background: #151515;
+}
+
+.vd-modal-form::-webkit-scrollbar-thumb {
+  background: #725700;
+  border-radius: 10px;
+}
+
+.vd-modal-form::-webkit-scrollbar-thumb:hover {
+  background: #eab000;
+}
+
+/* Better spacing and aligned fields */
+.vd-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px 18px;
+}
+
+.vd-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+
+.vd-form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.vd-form-group label {
+  color: #ededed;
+  font-size: 0.87rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.vd-form-group .req-star {
+  color: #ff6565;
+}
+
+.vd-form-group input,
+.vd-form-group select,
+.vd-form-group textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 11px 13px;
+  color: #f5f5f5;
+  background: #1a1a1a;
+  border: 1px solid #3a3a3a;
+  border-radius: 9px;
+  outline: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.vd-form-group input,
+.vd-form-group select {
+  min-height: 44px;
+}
+
+.vd-form-group textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.vd-form-group input::placeholder,
+.vd-form-group textarea::placeholder {
+  color: #858585;
+  opacity: 1;
+}
+
+.vd-form-group select option {
+  color: #fff;
+  background: #1a1a1a;
+}
+
+.vd-form-group input:hover,
+.vd-form-group select:hover,
+.vd-form-group textarea:hover {
+  border-color: #575757;
+}
+
+.vd-form-group input:focus,
+.vd-form-group select:focus,
+.vd-form-group textarea:focus {
+  background: #1d1d1d;
+  border-color: #eab000;
+  box-shadow: 0 0 0 3px rgba(234, 176, 0, 0.12);
+}
+
+/* Footer stays visible while form scrolls */
+.vd-modal-actions {
+  position: sticky;
+  bottom: -1px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 11px;
+  flex-shrink: 0;
+  margin-top: 22px;
+  padding: 17px 0 2px;
+  background: #101010;
+  border-top: 1px solid #303030;
+}
+
+.vd-modal-actions .admin-secondary-button,
+.vd-modal-actions .admin-primary-button {
+  min-height: 43px;
+  padding: 10px 17px;
+  border-radius: 9px;
+}
+
+/* Tablet */
+@media (max-width: 700px) {
+  .vd-modal-backdrop {
+    padding: 16px;
+  }
+
+  .vd-modal-window {
+    width: 100%;
+    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
+    border-radius: 13px;
+  }
+
+  .vd-modal-header {
+    padding: 17px 18px;
+  }
+
+  .vd-modal-header h3 {
+    font-size: 1.3rem;
+  }
+
+  .vd-modal-form {
+    padding: 19px 18px;
+  }
+
+  .vd-form-grid {
+    gap: 15px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .vd-modal-backdrop {
+    align-items: center;
+    padding: 10px;
+  }
+
+  .vd-modal-window {
+    max-height: calc(100vh - 20px);
+    max-height: calc(100dvh - 20px);
+    border-radius: 12px;
+  }
+
+  .vd-modal-header {
+    padding: 15px;
+    gap: 10px;
+  }
+
+  .vd-modal-header h3 {
+    font-size: 1.2rem;
+  }
+
+  .vd-modal-header p {
+    font-size: 0.8rem;
+  }
+
+  .vd-modal-close {
+    width: 33px;
+    height: 33px;
+  }
+
+  .vd-modal-form {
+    padding: 17px 15px;
+  }
+
+  .vd-form-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .vd-form-group.full-width {
+    grid-column: auto;
+  }
+
+  .vd-form-group input,
+  .vd-form-group select,
+  .vd-form-group textarea {
+    font-size: 16px;
+  }
+
+  .vd-form-group textarea {
+    min-height: 78px;
+  }
+
+  .vd-modal-actions {
+    gap: 9px;
+    margin-top: 18px;
+    padding-top: 14px;
+  }
+
+  .vd-modal-actions .admin-secondary-button,
+  .vd-modal-actions .admin-primary-button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 10px;
+    white-space: normal;
+    font-size: 0.82rem;
+  }
+}
+
+/* Short screens: preserve room for header and footer */
+@media (max-height: 650px) {
+  .vd-modal-backdrop {
+    align-items: flex-start;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .vd-modal-window {
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
+  }
+
+  .vd-modal-header {
+    padding-top: 13px;
+    padding-bottom: 13px;
+  }
+
+  .vd-modal-form {
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+
+  .vd-form-grid {
+    gap: 12px 16px;
+  }
+
+  .vd-form-group textarea {
+    min-height: 65px;
+  }
+
+  .vd-modal-actions {
+    margin-top: 15px;
+    padding-top: 12px;
+  }
+}
