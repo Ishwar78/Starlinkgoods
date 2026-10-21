@@ -234,6 +234,7 @@ router.put("/:id", (req, res) => {
       }
 
       const { name, slug, description, status } = req.body;
+      const oldName = category.name;
 
       if (name && name.trim()) {
         // If name changed, check uniqueness
@@ -290,6 +291,18 @@ router.put("/:id", (req, res) => {
       }
 
       await category.save();
+
+      // If category name changed, cascade update all products referencing the old category name
+      if (oldName && category.name && oldName.trim().toLowerCase() !== category.name.trim().toLowerCase()) {
+        try {
+          await Product.updateMany(
+            { category: { $regex: new RegExp(`^${oldName.trim()}$`, "i") } },
+            { $set: { category: category.name.trim() } }
+          );
+        } catch (cascadeErr) {
+          console.warn("Could not cascade category name change to products:", cascadeErr.message);
+        }
+      }
 
       res.json({
         success: true,

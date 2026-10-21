@@ -25,20 +25,8 @@ import {
   formatImageUrl 
 } from "../lib/api.js";
 
-const fallbackCategories = [
-  { name: "Sofa Sets", image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=500&q=85" },
-  { name: "Beds", image: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=500&q=85" },
-  { name: "Mattresses", image: "https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=500&q=85" },
-  { name: "Dining Sets", image: "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=500&q=85" },
-  { name: "Chairs", image: "https://images.unsplash.com/photo-1503602642458-232111445657?auto=format&fit=crop&w=500&q=85" },
-  { name: "Wardrobes", image: "https://images.unsplash.com/photo-1595428774223-ef52624120d2?auto=format&fit=crop&w=500&q=85" },
-  { name: "TV Units", image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=500&q=85" },
-  { name: "Storage", image: "https://images.unsplash.com/photo-1591129841117-3adfd313e34f?auto=format&fit=crop&w=500&q=85" },
-  { name: "Home Decor", image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&fit=crop&w=500&q=85" },
-];
-
-const fallbackProducts = [
-];
+const fallbackCategories = [];
+const fallbackProducts = [];
 
 const testimonials = [
   { name: "Anjali Sharma", city: "Jaipur", quote: "Amazing quality and designs! The sofa set is super comfortable and looks beautiful in my living room." },
@@ -81,6 +69,30 @@ const workItems = [
       "We encourage community participation, compassionate dialogue and access to resources that help people move forward.",
     image:
       "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1100&q=85",
+  },
+];
+
+/* HERO SLIDES - SINGLE IMAGE SLIDER (CLEAN, NO TEXT / NO OVERLAY) */
+const heroSlides = [
+  {
+    image:
+      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1920&q=90",
+    alt: "Modern Living Furniture",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1920&q=85",
+    alt: "Premium Sofa Sets",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1920&q=85",
+    alt: "Luxury Beds and Mattresses",
+  },
+  {
+    image:
+      "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=1920&q=85",
+    alt: "Designer Dining Sets",
   },
 ];
 
@@ -167,8 +179,8 @@ export default function Home() {
   const [notice, setNotice] = useState("");
   const [activeTestimonial, setActiveTestimonial] = useState(0);
   const [activeWork, setActiveWork] = useState(0);
-  const [categories, setCategories] = useState(fallbackCategories);
-  const [productsList, setProductsList] = useState(fallbackProducts);
+  const [categories, setCategories] = useState([]);
+  const [productsList, setProductsList] = useState([]);
 
   useEffect(() => {
     let isMounted = true;
@@ -180,11 +192,13 @@ export default function Home() {
         ]);
 
         if (isMounted) {
-          if (catRes?.success && Array.isArray(catRes.categories) && catRes.categories.length > 0) {
+          if (catRes?.success && Array.isArray(catRes.categories)) {
             setCategories(catRes.categories);
+          } else {
+            setCategories([]);
           }
 
-          if (prodRes?.success && Array.isArray(prodRes.products) && prodRes.products.length > 0) {
+          if (prodRes?.success && Array.isArray(prodRes.products)) {
             const formattedDbProducts = prodRes.products.map((p) => ({
               id: p._id,
               _id: p._id,
@@ -192,17 +206,17 @@ export default function Home() {
               category: p.category,
               price: p.price,
               oldPrice: p.oldPrice || Math.round(p.price * 1.25),
+              stock: p.stock ?? 10,
               badge: p.badge || (p.stock < 5 ? "Limited" : "In Stock"),
               rating: p.rating || "4.8",
-              reviews: p.reviews || 60,
+              reviews: p.reviews || 0,
               image: formatImageUrl(p.image),
+              description: p.description || "",
+              status: p.status || "In Stock",
             }));
-
-            const existingNames = new Set(formattedDbProducts.map((p) => p.name.toLowerCase()));
-            const nonDuplicateFallbacks = fallbackProducts.filter(
-              (p) => !existingNames.has(p.name.toLowerCase())
-            );
-            setProductsList([...formattedDbProducts, ...nonDuplicateFallbacks]);
+            setProductsList(formattedDbProducts);
+          } else {
+            setProductsList([]);
           }
         }
       } catch (err) {
@@ -237,6 +251,25 @@ export default function Home() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
+
+  /* HERO SLIDER STATE & AUTOPLAY */
+  const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
+
+  const nextHeroSlide = () => {
+    setCurrentHeroSlide((curr) => (curr + 1) % heroSlides.length);
+  };
+
+  const prevHeroSlide = () => {
+    setCurrentHeroSlide((curr) => (curr - 1 + heroSlides.length) % heroSlides.length);
+  };
+
+  useEffect(() => {
+    const heroTimer = window.setInterval(() => {
+      setCurrentHeroSlide((curr) => (curr + 1) % heroSlides.length);
+    }, 5000);
+
+    return () => window.clearInterval(heroTimer);
   }, []);
 
   const [activeImpactSlide, setActiveImpactSlide] = useState(0);
@@ -318,102 +351,104 @@ export default function Home() {
           </div>
         )}
 
-        {/* HERO SECTION */}
-        <section className="hero container" aria-label="Featured furniture">
-          <a className="side-promo promo-sofa" href="#products">
-            <span className="promo-kicker">COMFORT MEETS STYLE</span>
-            <strong>Premium<br />Sofa Sets</strong>
-            <span className="promo-button">
-              Shop Now <FiArrowRight />
-            </span>
-            <img
-              src="https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=650&q=85"
-              alt="Modern sofa"
-            />
-          </a>
-
-          <div className="hero-main">
-            <img
-              src="https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1600&q=90"
-              alt="Contemporary living room"
-            />
-
-            <div className="hero-overlay">
-              <span className="eyebrow">
-                MODERN FURNITURE FOR MODERN LIVING
-              </span>
-              <h1>Transform<br />Your Home</h1>
-              <p>Stylish · Comfortable · Affordable</p>
-              <a className="primary-btn" href="#products">
-                Shop Collection <FiArrowRight />
-              </a>
+        {/* HERO SECTION - SINGLE SLIDER */}
+        <section className="hero container" aria-label="Featured collection">
+          <div className="hero-single-slider">
+            <div
+              className="hero-slider-track"
+              style={{ transform: `translateX(-${currentHeroSlide * 100}%)` }}
+            >
+              {heroSlides.map((slide, index) => (
+                <div key={index} className="hero-slide-item">
+                  <img
+                    src={slide.image}
+                    alt={slide.alt || `Slide ${index + 1}`}
+                    loading={index === 0 ? "eager" : "lazy"}
+                  />
+                </div>
+              ))}
             </div>
 
+            {/* Navigation Arrows */}
+            <button
+              type="button"
+              className="hero-nav-arrow prev"
+              onClick={prevHeroSlide}
+              aria-label="Previous slide"
+            >
+              <FiChevronLeft />
+            </button>
+            <button
+              type="button"
+              className="hero-nav-arrow next"
+              onClick={nextHeroSlide}
+              aria-label="Next slide"
+            >
+              <FiChevronRight />
+            </button>
+
+            {/* Slider Dots */}
             <div className="hero-dots">
-              <i className="selected" />
-              <i />
-              <i />
-            </div>
-          </div>
-
-          <a className="side-promo promo-bed" href="#categories">
-            <span className="promo-kicker">REST. RELAX. RECHARGE.</span>
-            <strong>Luxury<br />Mattresses</strong>
-            <span className="promo-button">
-              Shop Now <FiArrowRight />
-            </span>
-            <img
-              src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=650&q=85"
-              alt="Luxury bedroom"
-            />
-          </a>
-        </section>
-
-
-        {/* CATEGORIES */}
-        <section className="hs-category-section" id="categories">
-          <div className="hs-category-container">
-            <div className="hs-category-heading">
-              <h2>Shop by Category</h2>
-              <p>
-                Find the perfect pieces for every corner of your home
-              </p>
-            </div>
-
-            <div className="hs-category-grid">
-              {categories.map((category) => (
+              {heroSlides.map((_, index) => (
                 <button
+                  key={index}
                   type="button"
-                  className={`hs-category-card ${selectedCategory.trim().toLowerCase() === (category.name || "").trim().toLowerCase()
-                      ? "hs-category-active"
-                      : ""
-                    }`}
-                  key={category._id || category.name}
-                  onClick={() => {
-                    setSelectedCategory(category.name);
-                    document
-                      .getElementById("products")
-                      ?.scrollIntoView({ behavior: "smooth" });
-                  }}
-                >
-                  <span className="hs-category-image">
-                    <img
-                      src={formatImageUrl(category.image)}
-                      alt={category.name}
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.src =
-                          "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=500&q=85";
-                      }}
-                    />
-                  </span>
-
-                  <strong>{category.name}</strong>
-                </button>
+                  className={`hero-dot-btn ${currentHeroSlide === index ? "selected" : ""}`}
+                  onClick={() => setCurrentHeroSlide(index)}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
               ))}
             </div>
           </div>
         </section>
+
+
+        {/* CATEGORIES */}
+        {categories.length > 0 && (
+          <section className="hs-category-section" id="categories">
+            <div className="hs-category-container">
+              <div className="hs-category-heading">
+                <h2>Shop by Category</h2>
+                <p>
+                  Find the perfect pieces for every corner of your home
+                </p>
+              </div>
+
+              <div className="hs-category-grid">
+                {categories.map((category) => (
+                  <button
+                    type="button"
+                    className={`hs-category-card ${selectedCategory.trim().toLowerCase() === (category.name || "").trim().toLowerCase()
+                        ? "hs-category-active"
+                        : ""
+                      }`}
+                    key={category._id || category.name}
+                    onClick={() => {
+                      setSelectedCategory(category.name);
+                      document
+                        .getElementById("products")
+                        ?.scrollIntoView({ behavior: "smooth" });
+                    }}
+                  >
+                    <span className="hs-category-image">
+                      <img
+                        src={formatImageUrl(category.image)}
+                        alt={category.name}
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.src =
+                            "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=500&q=85";
+                        }}
+                      />
+                    </span>
+
+                    <strong>{category.name}</strong>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
 
 
@@ -545,19 +580,23 @@ export default function Home() {
                 <div className="fp-empty">
                   <h3>No products found</h3>
                   <p>
-                    Try another search or browse our complete furniture collection.
+                    {productsList.length === 0
+                      ? "Products added by the admin will appear here."
+                      : "Try another search or browse our complete furniture collection."}
                   </p>
 
-                  <button
-                    type="button"
-                    className="fp-empty-button"
-                    onClick={() => {
-                      setSearchTerm("");
-                      setSelectedCategory("All");
-                    }}
-                  >
-                    Show All Products
-                  </button>
+                  {productsList.length > 0 && (
+                    <button
+                      type="button"
+                      className="fp-empty-button"
+                      onClick={() => {
+                        setSearchTerm("");
+                        setSelectedCategory("All");
+                      }}
+                    >
+                      Show All Products
+                    </button>
+                  )}
                 </div>
               )}
             </div>

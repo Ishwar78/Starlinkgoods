@@ -378,8 +378,12 @@ router.post("/", orderUploadFields, async (req, res) => {
     const orderId = `SLG-ORD-${Date.now().toString().slice(-6)}-${randomSuffix}`;
 
     // 5. Create or Update Customer OrderUser Account in Database
-    const cleanCustomerEmail = (customerDetails.email || "").toLowerCase().trim();
-    const customerPassword = customerDetails.password || req.body.password || "";
+    const cleanCustomerEmail = (customerDetails.email || req.body.email || "").toLowerCase().trim();
+    const rawCustomerPassword = (customerDetails.password || req.body.password || "").trim();
+    const finalPassword = rawCustomerPassword.length >= 6
+      ? rawCustomerPassword
+      : `Solar@${(customerDetails.mobile || "1234").replace(/\D/g, "").slice(-4) || "1234"}`;
+
     let orderUser = null;
     let orderUserToken = null;
 
@@ -392,7 +396,7 @@ router.post("/", orderUploadFields, async (req, res) => {
             name: customerDetails.fullName.trim(),
             email: cleanCustomerEmail,
             mobile: customerDetails.mobile.trim(),
-            password: customerPassword || `Solar@${customerDetails.mobile.slice(-4) || "1234"}`,
+            password: finalPassword,
             address: customerDetails.address.trim(),
             city: (customerDetails.city || "").trim(),
             state: (customerDetails.state || "").trim(),
@@ -403,8 +407,8 @@ router.post("/", orderUploadFields, async (req, res) => {
           });
           await orderUser.save();
         } else {
-          if (customerPassword) {
-            orderUser.password = customerPassword;
+          if (rawCustomerPassword.length >= 6) {
+            orderUser.password = rawCustomerPassword;
           }
           if (customerDetails.fullName) orderUser.name = customerDetails.fullName.trim();
           if (customerDetails.mobile) orderUser.mobile = customerDetails.mobile.trim();
@@ -428,6 +432,29 @@ router.post("/", orderUploadFields, async (req, res) => {
           JWT_SECRET,
           { expiresIn: "30d" }
         );
+
+        // Also sync into VendorUser for Admin Panel (/admin/vendor-users) visibility
+        try {
+          let vUser = await VendorUser.findOne({ email: cleanCustomerEmail });
+          if (!vUser) {
+            vUser = new VendorUser({
+              name: customerDetails.fullName.trim(),
+              email: cleanCustomerEmail,
+              mobile: customerDetails.mobile.trim(),
+              city: (customerDetails.city || "N/A").trim(),
+              state: (customerDetails.state || "N/A").trim(),
+              vendorId: user ? user._id : null,
+              vendorName: user ? user.name : "Direct Order",
+              vendorEmail: user ? user.email : "",
+              vendorMobile: user ? user.mobile : "",
+              role: "Customer",
+              status: "Active",
+            });
+            await vUser.save();
+          }
+        } catch (vErr) {
+          console.warn("VendorUser sync notice:", vErr.message);
+        }
       } catch (userCreateErr) {
         console.error("Warning: Could not create/update OrderUser:", userCreateErr);
       }

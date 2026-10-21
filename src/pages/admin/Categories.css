@@ -281,9 +281,9 @@
 }
 
 .cat-action-btn.edit:hover {
-  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  background: #e5aa0a;
   color: #080808;
-  border-color: #f6c635;
+  border-color: #e5aa0a;
 }
 
 .cat-action-btn.delete {
@@ -460,7 +460,7 @@
   gap: 6px;
   padding: 8px 14px;
   border-radius: 6px;
-  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  background: #e5aa0a;
   color: #080808;
   border: none;
   font-size: 12.5px;

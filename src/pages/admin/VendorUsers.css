@@ -40,21 +40,22 @@
   gap: 8px;
   min-height: 40px;
   padding: 0 18px;
-  border: 1px solid #f6c635;
+  border: 1px solid #e5aa0a;
   border-radius: 8px;
   color: #080808;
-  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  background: #e5aa0a;
   font-size: 13.5px;
   font-weight: 800;
   cursor: pointer;
-  box-shadow: 0 4px 14px rgba(255, 196, 34, 0.25);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  box-shadow: 0 4px 14px rgba(229, 170, 10, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .vu-refresh-button:hover {
-  background: linear-gradient(135deg, #ffea9f, #f0b71b);
+  background: #cc9608;
+  border-color: #cc9608;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(255, 196, 34, 0.4);
+  box-shadow: 0 6px 18px rgba(229, 170, 10, 0.4);
 }
 
 .vu-refresh-button:active {
@@ -290,7 +291,7 @@
   width: 38px;
   height: 38px;
   border-radius: 9px;
-  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  background: #e5aa0a;
   color: #080808;
   font-size: 15px;
   font-weight: 800;

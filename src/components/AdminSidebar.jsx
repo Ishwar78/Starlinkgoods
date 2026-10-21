@@ -15,12 +15,14 @@ import {
   FiUserCheck,
   FiMapPin,
   FiCreditCard,
+  FiDatabase,
 } from "react-icons/fi";
 
 import "./AdminSidebar.css";
 
 const sidebarItems = [
   { label: "Dashboard", path: "/admin/dashboard", icon: FiGrid },
+  { label: "Vendor Data", path: "/admin/vendor-data", icon: FiDatabase },
   { label: "Vendor", path: "/admin/users", icon: FiUsers },
   { label: "Vendor Users", path: "/admin/vendor-users", icon: FiUserCheck },
   { label: "Wallet Requests", path: "/admin/wallet-requests", icon: FiCreditCard },
@@ -63,19 +65,16 @@ export default function AdminSidebar({ open, onClose }) {
       <aside className={`admin-sidebar ${open ? "is-open" : ""}`}>
         <div className="admin-sidebar-brand-row">
           <Link
-            to="/admin/dashboard"
-            className="admin-sidebar-brand"
-            onClick={onClose}
-          >
-            <span className="admin-sidebar-brand-icon">
-              <FiShield />
-            </span>
-
-            <span className="admin-sidebar-brand-copy">
-              <strong>SLG</strong>
-              <small>ADMIN PANEL</small>
-            </span>
-          </Link>
+  to="/admin/dashboard"
+  className="admin-sidebar-brand"
+  onClick={onClose}
+>
+  <img
+    src="/Logo-1.png"
+    alt="Starlink Goods"
+    className="admin-sidebar-logo"
+  />
+</Link>
 
           <button
             type="button"

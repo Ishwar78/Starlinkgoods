@@ -87,6 +87,18 @@ export default function Categories() {
     });
   }, [categories, search, statusFilter]);
 
+  // Close modal and reset form
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setEditingCategory(null);
+    setName("");
+    setSlug("");
+    setDescription("");
+    setStatus("Active");
+    setImageFile(null);
+    setImagePreview("");
+  };
+
   // Open modal for Create
   const handleOpenCreate = () => {
     setEditingCategory(null);
@@ -160,8 +172,9 @@ export default function Categories() {
       }
 
       let res;
-      if (editingCategory) {
-        res = await updateCategory(editingCategory._id, formData);
+      const targetId = editingCategory?._id || editingCategory?.id;
+      if (editingCategory && targetId) {
+        res = await updateCategory(targetId, formData);
         setMessage(`Category "${name.trim()}" updated successfully!`);
       } else {
         res = await createCategory(formData);
@@ -169,7 +182,7 @@ export default function Categories() {
       }
 
       setMessageType("success");
-      setShowModal(false);
+      handleCloseModal();
       await fetchCategoryList();
     } catch (err) {
       console.error("Save error:", err);
@@ -469,7 +482,7 @@ export default function Categories() {
 
       {/* Add / Edit Category Modal */}
       {showModal && (
-        <div className="cat-modal-backdrop" onClick={() => setShowModal(false)}>
+        <div className="cat-modal-backdrop" onClick={handleCloseModal}>
           <div
             className="cat-modal-window"
             onClick={(e) => e.stopPropagation()}
@@ -488,7 +501,7 @@ export default function Categories() {
               <button
                 type="button"
                 className="modal-close-icon"
-                onClick={() => setShowModal(false)}
+                onClick={handleCloseModal}
               >
                 <FiX />
               </button>
@@ -617,7 +630,7 @@ export default function Categories() {
                 <button
                   type="button"
                   className="admin-secondary-button"
-                  onClick={() => setShowModal(false)}
+                  onClick={handleCloseModal}
                   disabled={submitting}
                 >
                   Cancel

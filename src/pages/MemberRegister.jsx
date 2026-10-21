@@ -27,7 +27,7 @@ import {
 } from "../lib/api";
 import "./MemberRegister.css";
 
-const MEMBERSHIP_FEE = 500;
+const MEMBERSHIP_FEE = 1000;
 
 const states = [
   "Andhra Pradesh",

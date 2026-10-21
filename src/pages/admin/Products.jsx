@@ -409,7 +409,7 @@ export default function AdminProducts() {
     }
   };
 
-  // Distinct category names list from DB
+  // Distinct category names list from admin categories
   const categoryNames = useMemo(() => {
     const list = [];
     const seen = new Set();
@@ -419,14 +419,8 @@ export default function AdminProducts() {
         list.push(cat.name);
       }
     });
-    products.forEach((p) => {
-      if (p.category && !seen.has(p.category.toLowerCase())) {
-        seen.add(p.category.toLowerCase());
-        list.push(p.category);
-      }
-    });
     return list;
-  }, [categories, products]);
+  }, [categories]);
 
   // Filtered Products
   const filteredProducts = useMemo(() => {

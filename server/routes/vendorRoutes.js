@@ -7,6 +7,7 @@ const crypto = require("crypto");
 const Razorpay = require("razorpay");
 const Vendor = require("../models/Vendor");
 const VendorUser = require("../models/VendorUser");
+const OrderUser = require("../models/OrderUser");
 
 const router = express.Router();
 
@@ -84,46 +85,84 @@ router.post("/login", async (req, res) => {
       ],
     });
 
-    if (!vendor) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid email/mobile number or password.",
-      });
-    }
+    if (vendor && vendor.status === "Active") {
+      const isVendorMatch = await vendor.comparePassword(password);
+      if (isVendorMatch) {
+        const token = jwt.sign(
+          {
+            id: vendor._id,
+            email: vendor.email,
+            mobile: vendor.mobile,
+            role: vendor.role || "Vendor",
+          },
+          process.env.JWT_SECRET || "starlink_super_secret_admin_jwt_key_2026",
+          {
+            expiresIn: "7d",
+          }
+        );
 
-    if (vendor.status !== "Active") {
-      return res.status(403).json({
-        success: false,
-        message: "Your account is currently inactive. Please contact the administrator.",
-      });
-    }
-
-    const isMatch = await vendor.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid email/mobile number or password.",
-      });
-    }
-
-    const token = jwt.sign(
-      {
-        id: vendor._id,
-        email: vendor.email,
-        mobile: vendor.mobile,
-        role: vendor.role || "Vendor",
-      },
-      process.env.JWT_SECRET || "starlink_super_secret_admin_jwt_key_2026",
-      {
-        expiresIn: "7d",
+        return res.status(200).json({
+          success: true,
+          message: "Login successful!",
+          token,
+          user: vendor.toJSON(),
+        });
       }
-    );
+    }
 
-    return res.status(200).json({
-      success: true,
-      message: "Login successful!",
-      token,
-      user: vendor.toJSON(),
+    // Fallback: Check OrderUser (Customer Account)
+    const orderUser = await OrderUser.findOne({
+      $or: [
+        { email: cleanInput },
+        { mobile: loginInput },
+      ],
+    });
+
+    if (orderUser) {
+      if (orderUser.status === "Blocked") {
+        return res.status(403).json({
+          success: false,
+          message: "Your customer account has been suspended. Please contact support.",
+        });
+      }
+
+      const isMatch = await orderUser.comparePassword(password);
+      if (isMatch) {
+        const token = jwt.sign(
+          {
+            id: orderUser._id,
+            email: orderUser.email,
+            mobile: orderUser.mobile,
+            role: "OrderCustomer",
+          },
+          process.env.JWT_SECRET || "starlink_super_secret_admin_jwt_key_2026",
+          { expiresIn: "30d" }
+        );
+
+        return res.status(200).json({
+          success: true,
+          message: `Welcome back, ${orderUser.name}!`,
+          token,
+          role: "OrderCustomer",
+          user: {
+            id: orderUser._id,
+            _id: orderUser._id,
+            name: orderUser.name,
+            email: orderUser.email,
+            mobile: orderUser.mobile,
+            address: orderUser.address,
+            city: orderUser.city,
+            state: orderUser.state,
+            pincode: orderUser.pincode,
+            role: "OrderCustomer",
+          },
+        });
+      }
+    }
+
+    return res.status(401).json({
+      success: false,
+      message: "Invalid email/mobile number or password.",
     });
   } catch (error) {
     console.error("Vendor login error:", error);
@@ -442,7 +481,7 @@ router.post("/verify-and-create", async (req, res) => {
       password,
       role: role || "Vendor",
       status: status || "Active",
-      membershipFee: Number(fee) || 5000,
+      membershipFee: Number(fee) || 10000,
       razorpayOrderId: razorpay_order_id,
       razorpayPaymentId: razorpay_payment_id,
       razorpaySignature: razorpay_signature,
@@ -493,7 +532,7 @@ router.post("/", async (req, res) => {
       razorpay_order_id,
       razorpay_payment_id,
       razorpay_signature,
-      fee = 5000,
+      fee = 10000,
     } = req.body;
 
     // Validate required fields
@@ -576,7 +615,7 @@ router.post("/", async (req, res) => {
       password,
       role: role || "Vendor",
       status: status || "Active",
-      membershipFee: Number(fee) || 5000,
+      membershipFee: Number(fee) || 10000,
       razorpayOrderId: razorpay_order_id || "",
       razorpayPaymentId: razorpay_payment_id || "",
       razorpaySignature: razorpay_signature || "",
@@ -756,7 +795,7 @@ router.get("/:id/members", async (req, res) => {
         city: vu.city,
         state: vu.state,
         address: vu.address || "",
-        membershipFee: 500,
+        membershipFee: 1000,
         paymentStatus: "Paid",
         role: "Member",
         status: vu.status || "Active",

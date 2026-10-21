@@ -21,6 +21,7 @@ const membershipRoutes = require("./routes/membershipRoutes");
 const walletRequestRoutes = require("./routes/walletRequestRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const orderUserRoutes = require("./routes/orderUserRoutes");
+const vendorDataRoutes = require("./routes/vendorDataRoutes");
 const Vendor = require("./models/Vendor");
 
 const app = express();
@@ -80,12 +81,16 @@ app.use("/api/orders", orderRoutes);
 // Order Customer / User Routes
 app.use("/api/order-users", orderUserRoutes);
 
+// Admin Vendor Data Records Routes
+app.use("/api/vendor-data", vendorDataRoutes);
+
 const startServer = async () => {
   try {
     await connectDB();
     await seedAdmin();
-    await seedCategories();
-    await seedProducts();
+    // Seeding disabled so only admin-created categories and products appear
+    // await seedCategories();
+    // await seedProducts();
     await Vendor.migrateExistingVendors();
 
     app.listen(PORT, () => {

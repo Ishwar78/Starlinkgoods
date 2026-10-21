@@ -223,6 +223,30 @@
   flex-shrink: 0;
 }
 
+.orders-page .admin-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  background: #e5aa0a;
+  color: #080808;
+  border: 1px solid #e5aa0a;
+  font-size: 13.5px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(229, 170, 10, 0.25);
+  transition: all 0.2s ease;
+}
+
+.orders-page .admin-btn-primary:hover:not(:disabled) {
+  background: #cc9608;
+  border-color: #cc9608;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(229, 170, 10, 0.35);
+}
+
 @media (max-width: 650px) {
   .orders-page .admin-modal-overlay {
     padding: 12px 8px;

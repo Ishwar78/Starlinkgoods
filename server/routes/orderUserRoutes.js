@@ -179,19 +179,62 @@ router.get("/me", requireOrderUser, async (req, res) => {
 
 /**
  * GET /api/order-users/my-orders
- * Get all orders placed by or for this user
+ * Get all orders placed by or for this user (robust matching by ID, email, and phone)
  */
-router.get("/my-orders", requireOrderUser, async (req, res) => {
+router.get("/my-orders", async (req, res) => {
   try {
-    const user = req.user;
+    let user = null;
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      try {
+        const token = authHeader.split(" ")[1];
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded && decoded.id) {
+          user = await OrderUser.findById(decoded.id);
+        }
+      } catch (e) {}
+    }
 
-    const orders = await Order.find({
-      $or: [
-        { orderUserId: user._id },
-        { orderUserEmail: user.email },
-        { "customerDetails.email": user.email },
-      ],
-    }).sort({ createdAt: -1 });
+    const emailQuery = (
+      req.query.email ||
+      req.query.customerEmail ||
+      (user ? user.email : "")
+    )
+      .toLowerCase()
+      .trim();
+
+    const mobileQuery = (
+      req.query.mobile ||
+      req.query.phone ||
+      (user ? user.mobile : "")
+    ).trim();
+
+    if (!user && !emailQuery && !mobileQuery) {
+      return res.status(401).json({
+        success: false,
+        message: "Authorization required. Please log in to view your orders.",
+      });
+    }
+
+    const conditions = [];
+
+    if (user) {
+      conditions.push({ orderUserId: user._id });
+    }
+
+    if (emailQuery) {
+      const escaped = emailQuery.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      const emailRegex = new RegExp(`^${escaped}$`, "i");
+      conditions.push({ orderUserEmail: emailRegex });
+      conditions.push({ "customerDetails.email": emailRegex });
+      conditions.push({ vendorEmail: emailRegex });
+    }
+
+    if (mobileQuery) {
+      conditions.push({ "customerDetails.mobile": mobileQuery });
+    }
+
+    const orders = await Order.find({ $or: conditions }).sort({ createdAt: -1 });
 
     return res.status(200).json({
       success: true,

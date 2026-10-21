@@ -6,6 +6,7 @@ import {
   FiDollarSign,
   FiArrowUpRight,
   FiArrowRight,
+  FiDatabase,
 } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
@@ -181,6 +182,17 @@ export default function Dashboard() {
           </div>
 
           <div className="dashboard-shortcuts">
+            <Link to="/admin/vendor-data">
+              <span className="shortcut-icon">
+                <FiDatabase />
+              </span>
+              <span>
+                <strong>Vendor Data</strong>
+                <small>Save &amp; manage vendor directory</small>
+              </span>
+              <FiArrowRight />
+            </Link>
+
             <Link to="/admin/products">
               <span className="shortcut-icon">
                 <FiPackage />

@@ -54,6 +54,20 @@ export default function Login() {
       const res = await vendorLogin(loginId, formData.password);
 
       if (res.success && res.token) {
+        if (res.role === "OrderCustomer" || res.user?.role === "OrderCustomer") {
+          localStorage.setItem("orderUserToken", res.token);
+          localStorage.setItem("orderUserData", JSON.stringify(res.user));
+          if (rememberMe) {
+            localStorage.setItem("rememberOrderUser", "true");
+          }
+          setMessage(res.message || "Login successful! Redirecting to customer dashboard...");
+          setMessageType("success");
+          setTimeout(() => {
+            navigate("/order-user/dashboard");
+          }, 500);
+          return;
+        }
+
         localStorage.setItem("userToken", res.token);
         localStorage.setItem("userData", JSON.stringify(res.user));
         if (rememberMe) {

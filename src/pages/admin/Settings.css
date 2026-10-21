@@ -26,9 +26,9 @@
   height: 42px;
   border-radius: 11px;
   color: #080808;
-  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  background: #e5aa0a;
   font-size: 20px;
-  box-shadow: 0 4px 12px rgba(255, 196, 34, 0.25);
+  box-shadow: 0 4px 12px rgba(229, 170, 10, 0.25);
 }
 
 .settings-heading h3 {

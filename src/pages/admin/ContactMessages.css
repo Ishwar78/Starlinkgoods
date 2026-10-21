@@ -66,19 +66,21 @@
   align-items: center;
   gap: 6px;
   padding: 7px 12px;
-  border: 1px solid #f6c635;
+  border: 1px solid #e5aa0a;
   border-radius: 7px;
   color: #080808;
-  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  background: #e5aa0a;
   font-size: 12px;
   font-weight: 800;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
 }
 
 .message-view-button:hover {
+  background: #cc9608;
+  border-color: #cc9608;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255, 196, 34, 0.3);
+  box-shadow: 0 4px 12px rgba(229, 170, 10, 0.3);
 }
 
 .message-modal-backdrop {

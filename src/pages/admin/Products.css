@@ -84,23 +84,24 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: linear-gradient(135deg, #ffd044, #e5b325);
+  background: #e5aa0a;
   color: #121008;
-  border: 1px solid #ffd044;
+  border: 1px solid #e5aa0a;
   padding: 11px 20px;
   border-radius: 9px;
   font-size: 14px;
   font-weight: 700;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(255, 208, 68, 0.22);
+  box-shadow: 0 4px 14px rgba(229, 170, 10, 0.22);
   white-space: nowrap;
 }
 
 .admin-prod-primary-btn:hover:not(:disabled) {
-  background: linear-gradient(135deg, #ffe27a, #ffd044);
+  background: #cc9608;
+  border-color: #cc9608;
   transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(255, 208, 68, 0.35);
+  box-shadow: 0 6px 18px rgba(229, 170, 10, 0.35);
 }
 
 .admin-prod-primary-btn:disabled {

@@ -166,8 +166,8 @@
   width: min(25px, 75%);
   min-height: 5px;
   border-radius: 5px 5px 0 0;
-  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
-  box-shadow: 0 0 10px rgba(255, 199, 45, 0.25);
+  background: #e5aa0a;
+  box-shadow: 0 0 10px rgba(229, 170, 10, 0.25);
   transition: opacity 0.2s;
 }
 
@@ -219,9 +219,9 @@
   height: 38px;
   border-radius: 10px;
   color: #080808;
-  background: linear-gradient(135deg, #ffe58a, #e5aa0a);
+  background: #e5aa0a;
   font-size: 18px;
-  box-shadow: 0 3px 10px rgba(255, 196, 34, 0.25);
+  box-shadow: 0 3px 10px rgba(229, 170, 10, 0.25);
 }
 
 .dashboard-shortcuts a > span:nth-child(2) {

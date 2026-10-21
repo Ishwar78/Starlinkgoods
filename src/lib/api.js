@@ -510,14 +510,64 @@ export async function getOrderUserProfile() {
   return apiFetch("/api/order-users/me");
 }
 
-export async function getOrderUserOrders() {
-  return apiFetch("/api/order-users/my-orders");
+export async function getOrderUserOrders(params = {}) {
+  const query = new URLSearchParams();
+  if (params.email) query.append("email", params.email);
+  if (params.mobile) query.append("mobile", params.mobile);
+  if (!params.email) {
+    try {
+      const stored = JSON.parse(localStorage.getItem("orderUserData") || "{}");
+      if (stored.email) query.append("email", stored.email);
+      if (stored.mobile) query.append("mobile", stored.mobile);
+    } catch {}
+  }
+  const qs = query.toString();
+  return apiFetch(`/api/order-users/my-orders${qs ? `?${qs}` : ""}`);
 }
 
 export async function submitOrderUserSupport(payload) {
   return apiFetch("/api/order-users/support", {
     method: "POST",
     body: JSON.stringify(payload),
+  });
+}
+
+/* =======================================
+   Vendor Data Management API Methods
+======================================= */
+
+export async function getVendorDataList(params = {}) {
+  const query = new URLSearchParams();
+  if (params.search) query.append("search", params.search);
+  if (params.city && params.city !== "All") query.append("city", params.city);
+  if (params.state && params.state !== "All") query.append("state", params.state);
+  if (params.status && params.status !== "All") query.append("status", params.status);
+
+  const qs = query.toString();
+  return apiFetch(`/api/vendor-data${qs ? `?${qs}` : ""}`);
+}
+
+export async function getVendorDataById(id) {
+  return apiFetch(`/api/vendor-data/${id}`);
+}
+
+export async function createVendorData(data) {
+  return apiFetch("/api/vendor-data", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateVendorData(id, data) {
+  return apiFetch(`/api/vendor-data/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteVendorData(id) {
+  return apiFetch(`/api/vendor-data/${id}`, {
+    method: "DELETE",
   });
 }
 

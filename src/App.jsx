@@ -33,6 +33,7 @@ import AdminProtectedRoute from "./components/AdminProtectedRoute.jsx";
 import UserProtectedRoute from "./components/UserProtectedRoute.jsx";
 import Dashboard from "./pages/admin/Dashboard.jsx";
 import Users from "./pages/admin/Users.jsx";
+import VendorData from "./pages/admin/VendorData.jsx";
 import VendorUsers from "./pages/admin/VendorUsers.jsx";
 import AdminWalletRequests from "./pages/admin/WalletRequests.jsx";
 import Products from "./pages/admin/Products.jsx";
@@ -131,6 +132,7 @@ export default function App() {
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Navigate to="dashboard" replace />} />
             <Route path="dashboard" element={<Dashboard />} />
+            <Route path="vendor-data" element={<VendorData />} />
             <Route path="users" element={<Users />} />
             <Route path="vendor-users" element={<VendorUsers />} />
             <Route path="wallet-requests" element={<AdminWalletRequests />} />
