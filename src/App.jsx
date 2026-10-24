@@ -18,11 +18,18 @@ import Testimonials from "./pages/Testimonials.jsx";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 
+import MediaCoverage from "./pages/MediaCoverage";
+import InformationalVideos from "./pages/InformationalVideos";
+import Judgments from "./pages/Judgments";
+import Podcast from "./pages/Podcast";
+
+import OurHeroes from "./pages/OurHeroes";
+import UnderConstruction from "./pages/UnderConstruction";
 
 import VendorRegister from "./pages/VendorRegister.jsx";
 import MemberRegister from "./pages/MemberRegister.jsx";
 
-
+import EnquireNow from "./pages/EnquireNow";
 
 import ScrollToTop from "./components/ScrollToTop.jsx";
 
@@ -37,6 +44,7 @@ import VendorData from "./pages/admin/VendorData.jsx";
 import VendorUsers from "./pages/admin/VendorUsers.jsx";
 import AdminWalletRequests from "./pages/admin/WalletRequests.jsx";
 import Products from "./pages/admin/Products.jsx";
+import Banners from "./pages/admin/Banners.jsx";
 import Categories from "./pages/admin/Categories.jsx";
 import AdminKYC from "./pages/admin/KYC.jsx";
 import Orders from "./pages/admin/Orders.jsx";
@@ -80,19 +88,35 @@ export default function App() {
         <Route path="/our-team" element={<OurTeam />} />
         <Route path="/blog" element={<Blog />} />
         <Route path="/blog/:slug" element={<BlogDetail />} />
+        <Route path="/podcast" element={<Podcast />} />
         <Route path="/making-deference" element={<MakingADifference />} />
         <Route path="/our-impact" element={<OurImpact />} />
         <Route path="/testimonial" element={<Testimonials />} />
+
+        <Route path="/our-heroes" element={<OurHeroes />} />
+<Route path="/our-heroes/:slug" element={<OurHeroes />} />
 
         <Route
   path="/privacy-policy"
   element={<PrivacyPolicy />}
 />
-
+<Route path="/enquire-now" element={<EnquireNow />} />
 <Route
   path="/terms-conditions"
   element={<TermsConditions />}
+  
 />
+<Route
+  path="/in-news/media-coverage"
+  element={<MediaCoverage />}
+/>
+<Route
+  path="/informational-videos"
+  element={<InformationalVideos />}
+/>
+
+<Route path="/judgments" element={<Judgments />} />
+<Route path="/under-construction" element={<UnderConstruction />} />
 
         <Route path="/member-register" element={<MemberRegister />} />
         <Route path="/vendor-register" element={<VendorRegister />} />
@@ -138,6 +162,7 @@ export default function App() {
             <Route path="wallet-requests" element={<AdminWalletRequests />} />
             <Route path="kyc" element={<AdminKYC />} />
             <Route path="products" element={<Products />} />
+            <Route path="banners" element={<Banners />} />
             <Route path="categories" element={<Categories />} />
             <Route path="orders" element={<Orders />} />
             <Route path="messages" element={<ContactMessages />} />

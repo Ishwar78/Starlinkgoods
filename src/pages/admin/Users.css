@@ -958,3 +958,491 @@
     transition: none;
   }
 }
+
+
+/* =========================================================
+   ADD VENDOR FORM UPGRADE & FULL DETAILS VIEW MODAL
+========================================================= */
+
+/* Action Button: Eye View Button */
+.admin-view-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  background: rgba(229, 170, 10, 0.12);
+  color: #e5aa0a;
+  border: 1px solid rgba(229, 170, 10, 0.35);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.admin-view-action-btn:hover {
+  background: #e5aa0a;
+  color: #0d0c0a;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(229, 170, 10, 0.35);
+}
+
+/* Form Sections */
+.vendor-form-section {
+  background: #141310;
+  border: 1px solid rgba(229, 170, 10, 0.16);
+  border-radius: 10px;
+  padding: 18px 20px;
+  margin-bottom: 22px;
+}
+
+.vendor-section-title {
+  margin: 0 0 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+}
+
+.section-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e5aa0a;
+  color: #0b0906;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.optional-tag {
+  font-size: 12px;
+  font-weight: normal;
+  color: #a89d8d;
+}
+
+/* Input With Action Button (OTP / Verification) */
+.input-with-action-wrap {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.input-with-action-wrap input {
+  flex: 1;
+  min-width: 0;
+}
+
+.admin-otp-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 16px;
+  border-radius: 7px;
+  font-size: 12.5px;
+  font-weight: 700;
+  background: #e5aa0a;
+  color: #0c0a06;
+  border: 1px solid #e5aa0a;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.admin-otp-btn:hover:not(:disabled) {
+  background: #f7bb1e;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(229, 170, 10, 0.35);
+}
+
+.admin-otp-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.admin-otp-btn.reset {
+  background: rgba(255, 255, 255, 0.08);
+  color: #d1c7bc;
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.admin-otp-btn.reset:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+}
+
+/* Verified Badge */
+.verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1px solid rgba(74, 222, 128, 0.35);
+}
+
+.detecting-label {
+  margin-left: 8px;
+  color: #e5aa0a;
+  font-size: 11px;
+  font-style: italic;
+}
+
+.pincode-feedback {
+  display: block;
+  margin-top: 5px;
+  font-size: 11.5px;
+}
+
+.pincode-feedback.success {
+  color: #4ade80;
+  font-weight: 600;
+}
+
+.pincode-feedback.muted {
+  color: #a89d8d;
+}
+
+/* OTP Verification Card */
+.otp-verification-card {
+  margin-top: 10px;
+  padding: 12px 14px;
+  background: rgba(229, 170, 10, 0.06);
+  border: 1px solid rgba(229, 170, 10, 0.28);
+  border-radius: 8px;
+}
+
+.demo-otp-banner {
+  font-size: 12.5px;
+  color: #d5cbbe;
+  margin-bottom: 9px;
+}
+
+.demo-otp-banner strong {
+  color: #e5aa0a;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  background: rgba(229, 170, 10, 0.15);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.otp-input-row {
+  display: flex;
+  gap: 8px;
+  max-width: 320px;
+}
+
+.otp-input-row input {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-align: center;
+  padding: 7px 10px;
+  min-height: 38px;
+}
+
+.otp-verify-action {
+  padding: 7px 14px;
+  min-height: 38px;
+  font-size: 12px;
+}
+
+.otp-error-msg {
+  margin: 7px 0 0;
+  color: #f87171;
+  font-size: 11.5px;
+}
+
+/* Document Upload Grid */
+.admin-doc-upload-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.doc-upload-box {
+  background: #191815;
+  border: 1px dashed rgba(229, 170, 10, 0.3);
+  border-radius: 8px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s ease;
+}
+
+.doc-upload-box:hover {
+  border-color: #e5aa0a;
+}
+
+.doc-upload-box label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 2px;
+}
+
+.doc-sub {
+  margin: 0 0 12px;
+  font-size: 11px;
+  color: #8c8376;
+}
+
+.doc-file-action {
+  margin-top: auto;
+}
+
+.admin-file-picker-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: rgba(229, 170, 10, 0.1);
+  color: #e5aa0a;
+  border: 1px solid rgba(229, 170, 10, 0.3);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.admin-file-picker-btn:hover {
+  background: #e5aa0a;
+  color: #0b0906;
+}
+
+.uploaded-file-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(74, 222, 128, 0.1);
+  color: #4ade80;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.uploaded-file-indicator span {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-remove-btn {
+  background: transparent;
+  border: none;
+  color: #f87171;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+}
+
+/* Payment CTA Banner */
+.vendor-payment-cta-box {
+  background: rgba(229, 170, 10, 0.08);
+  border: 1px solid rgba(229, 170, 10, 0.28);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.payment-cta-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 550px;
+}
+
+.cta-icon {
+  color: #e5aa0a;
+  flex-shrink: 0;
+}
+
+.payment-cta-info strong {
+  display: block;
+  font-size: 15px;
+  color: #ffffff;
+  margin-bottom: 3px;
+}
+
+.payment-cta-info p {
+  margin: 0;
+  font-size: 12px;
+  color: #b5aba0;
+}
+
+/* View Vendor Details Modal */
+.vendor-details-modal-card {
+  max-width: 900px;
+  width: 95%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.vendor-details-modal-body {
+  overflow-y: auto;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-height: calc(90vh - 140px);
+}
+
+.vendor-id-pill {
+  background: rgba(229, 170, 10, 0.15);
+  color: #e5aa0a;
+  border: 1px solid rgba(229, 170, 10, 0.35);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: monospace;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.vendor-profile-detail-card {
+  background: #171613;
+  border: 1px solid rgba(229, 170, 10, 0.18);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.vendor-profile-detail-card h4 {
+  margin: 0 0 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #e5aa0a;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid rgba(229, 170, 10, 0.12);
+  padding-bottom: 8px;
+}
+
+.detail-rows-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px 16px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.d-label {
+  font-size: 11px;
+  color: #8c8376;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-weight: 600;
+}
+
+.d-val {
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.d-val.email-val {
+  word-break: break-all;
+}
+
+.d-val.wallet-highlight {
+  color: #e5aa0a;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.pan-code {
+  font-family: monospace;
+  letter-spacing: 0.8px;
+  font-weight: 700;
+  color: #f7bb1e;
+}
+
+.verified-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(74, 222, 128, 0.15);
+  color: #4ade80;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  vertical-align: middle;
+}
+
+.docs-preview-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.doc-preview-item {
+  background: #111110;
+  border: 1px solid rgba(229, 170, 10, 0.14);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.doc-preview-label {
+  font-size: 11px;
+  color: #a89d8d;
+  font-weight: 600;
+}
+
+.doc-view-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #e5aa0a;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.doc-view-link:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.doc-empty-label {
+  font-size: 11.5px;
+  color: #6a645c;
+  font-style: italic;
+}

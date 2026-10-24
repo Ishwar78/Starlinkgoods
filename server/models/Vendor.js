@@ -59,6 +59,113 @@ const vendorSchema = new mongoose.Schema(
       required: [true, "Password is required"],
       minlength: [6, "Password must be at least 6 characters"],
     },
+    firstName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    lastName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    pincode: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    houseNo: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    landmark: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    alternateMobile: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    dob: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    aadharNo: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    panNo: {
+      type: String,
+      default: "",
+      trim: true,
+      uppercase: true,
+    },
+    bankName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    accountNumber: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    ifscCode: {
+      type: String,
+      default: "",
+      trim: true,
+      uppercase: true,
+    },
+    nomineeFirstName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    nomineeLastName: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    nomineeRelation: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    nomineeMobile: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    nomineeDob: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    isMobileVerified: {
+      type: Boolean,
+      default: false,
+    },
+    isNomineeMobileVerified: {
+      type: Boolean,
+      default: false,
+    },
+    aadharCardFile: {
+      type: String,
+      default: "",
+    },
+    panCardFile: {
+      type: String,
+      default: "",
+    },
+    passbookFile: {
+      type: String,
+      default: "",
+    },
     dateOfBirth: {
       type: String,
       default: "",

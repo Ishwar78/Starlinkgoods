@@ -111,7 +111,7 @@ export default function Dashboard() {
       // 1. Refresh latest user profile
       if (userToken) {
         try {
-          const meRes = await fetch("http://localhost:5000/api/vendors/me", {
+          const meRes = await fetch("http://localhost:6065/api/vendors/me", {
             headers: { Authorization: `Bearer ${userToken}` },
           }).then((r) => r.json());
 

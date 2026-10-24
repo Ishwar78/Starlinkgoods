@@ -6,7 +6,7 @@
 export const API_BASE_URL = (
   import.meta.env.VITE_API_URL ||
   import.meta.env.VITE_API_BASE_URL ||
-  "http://localhost:5000"
+  "http://localhost:6065"
 ).replace(/\/+$/, "");
 
 /**
@@ -98,6 +98,13 @@ export async function createVendor(vendorData) {
   return apiFetch("/api/vendors", {
     method: "POST",
     body: JSON.stringify(vendorData),
+  });
+}
+
+export async function uploadVendorDocument(formData) {
+  return apiFetch("/api/vendors/upload-document", {
+    method: "POST",
+    body: formData,
   });
 }
 
@@ -573,3 +580,41 @@ export async function deleteVendorData(id) {
 
 
 
+
+
+/* =======================================
+   Hero Banners Management API Methods
+======================================= */
+
+export async function getBanners(params = {}) {
+  const query = new URLSearchParams();
+  if (params.status && params.status !== "All") query.append("status", params.status);
+  const qs = query.toString();
+  return apiFetch(`/api/banners${qs ? `?${qs}` : ""}`);
+}
+
+export async function getBannerById(id) {
+  return apiFetch(`/api/banners/${id}`);
+}
+
+export async function createBanner(formDataOrData) {
+  const isFormData = typeof FormData !== "undefined" && formDataOrData instanceof FormData;
+  return apiFetch("/api/banners", {
+    method: "POST",
+    body: isFormData ? formDataOrData : JSON.stringify(formDataOrData),
+  });
+}
+
+export async function updateBanner(id, formDataOrData) {
+  const isFormData = typeof FormData !== "undefined" && formDataOrData instanceof FormData;
+  return apiFetch(`/api/banners/${id}`, {
+    method: "PUT",
+    body: isFormData ? formDataOrData : JSON.stringify(formDataOrData),
+  });
+}
+
+export async function deleteBanner(id) {
+  return apiFetch(`/api/banners/${id}`, {
+    method: "DELETE",
+  });
+}

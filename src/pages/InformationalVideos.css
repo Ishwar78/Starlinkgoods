@@ -1,0 +1,556 @@
+
+/* =========================================
+   INFORMATIONAL VIDEOS PAGE
+   ========================================= */
+
+.info-videos-page {
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+  color: #171717;
+  background:
+    radial-gradient(
+      ellipse at 90% 65%,
+      rgba(255, 190, 35, 0.09),
+      transparent 35%
+    ),
+    #fffdf8;
+  font-family: "Montserrat", Arial, sans-serif;
+}
+
+.info-videos-page * {
+  box-sizing: border-box;
+}
+
+.info-videos-page a {
+  text-decoration: none;
+}
+
+/* =========================================
+   HERO BANNER
+   ========================================= */
+
+.iv-hero {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 420px;
+  min-height: 300px;
+  overflow: hidden;
+  background-image:
+    linear-gradient(
+      90deg,
+      rgba(5, 7, 12, 0.75),
+      rgba(5, 7, 12, 0.35),
+      rgba(5, 7, 12, 0.78)
+    ),
+    url("/images/informational-videos-banner.jpg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.iv-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.15) 0%,
+    rgba(0, 0, 0, 0.12) 45%,
+    rgba(0, 0, 0, 0.4) 100%
+  );
+}
+
+.iv-hero-title {
+  position: relative;
+  z-index: 1;
+  max-width: calc(100% - 32px);
+  padding: 17px 35px;
+  margin-bottom: 0;
+  text-align: center;
+  background: rgba(105, 100, 110, 0.65);
+  border-radius: 9px 9px 0 0;
+  backdrop-filter: blur(5px);
+}
+
+.iv-hero-title h1 {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(30px, 3vw, 48px);
+  line-height: 1.2;
+  font-weight: 750;
+  letter-spacing: -0.7px;
+}
+
+/* =========================================
+   MAIN CONTENT
+   ========================================= */
+
+.iv-content {
+  width: 100%;
+  padding: 35px 0 65px;
+}
+
+.iv-container {
+  width: min(1530px, calc(100% - 64px));
+  margin: 0 auto;
+}
+
+/* =========================================
+   CATEGORY NAVIGATION
+   ========================================= */
+
+.iv-category-nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0 0 60px;
+}
+
+.iv-category-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 9px 15px;
+  border: 1px solid #ffb900;
+  border-radius: 5px;
+  background: rgba(255, 249, 234, 0.95);
+  color: #777;
+  font-size: 17px;
+  font-weight: 450;
+  line-height: 1.35;
+  white-space: nowrap;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.iv-category-link:hover {
+  color: #151515;
+  background: #ffe2a0;
+  transform: translateY(-1px);
+}
+
+.iv-category-link.active {
+  color: #080808;
+  background: #ffb900;
+  border-color: #ffb900;
+  font-weight: 550;
+}
+
+/* =========================================
+   VIDEO GRID
+   ========================================= */
+
+.iv-video-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 24px;
+  row-gap: 30px;
+}
+
+.iv-video-card {
+  min-width: 0;
+  overflow: hidden;
+  background: transparent;
+  border-radius: 9px;
+}
+
+.iv-video-image-link {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.62 / 1;
+  overflow: hidden;
+  border-radius: 9px;
+  background: #e8e4dc;
+}
+
+.iv-video-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0.4s ease;
+}
+
+.iv-video-card:hover .iv-video-image {
+  transform: scale(1.045);
+}
+
+.iv-play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  color: #151515;
+  background: rgba(255, 185, 0, 0.95);
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -42%);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+}
+
+.iv-play-button svg {
+  width: 23px;
+  height: 23px;
+  margin-left: 3px;
+  fill: currentColor;
+}
+
+.iv-video-card:hover .iv-play-button,
+.iv-video-image-link:focus-visible .iv-play-button {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+.iv-video-title {
+  margin: 10px 0 0;
+  color: #111;
+  font-size: 18px;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+.iv-video-title a {
+  color: inherit;
+  transition: color 0.2s ease;
+}
+
+.iv-video-title a:hover {
+  color: #bd8500;
+}
+
+/* =========================================
+   LOAD MORE
+   ========================================= */
+
+.iv-load-more-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 45px;
+}
+
+.iv-load-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  min-width: 200px;
+  min-height: 58px;
+  padding: 14px 24px;
+  border: 1px solid #333;
+  border-radius: 6px;
+  background: #fff;
+  color: #111;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 550;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    color 0.25s ease;
+}
+
+.iv-load-more svg {
+  width: 22px;
+  height: 22px;
+}
+
+.iv-load-more:hover {
+  background: #ffb900;
+  border-color: #ffb900;
+  color: #111;
+}
+
+/* =========================================
+   DONATION BANNER
+   ========================================= */
+
+.iv-donation-banner {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: min(1560px, calc(100% - 64px));
+  min-height: 300px;
+  margin: 55px auto 0;
+  overflow: hidden;
+  border-radius: 11px;
+  background-color: #ffb900;
+  background-image: radial-gradient(
+    circle,
+    rgba(220, 146, 0, 0.28) 2px,
+    transparent 2.8px
+  );
+  background-size: 17px 17px;
+}
+
+.iv-donation-content {
+  position: relative;
+  z-index: 2;
+  width: 65%;
+  padding: 40px 60px;
+}
+
+.iv-donation-content h2 {
+  margin: 0 0 20px;
+  color: #171717;
+  font-size: clamp(24px, 2vw, 31px);
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.iv-donation-content p {
+  max-width: 650px;
+  margin: 0 0 24px;
+  color: #171717;
+  font-size: 16px;
+  line-height: 1.9;
+}
+
+.iv-donation-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 60px;
+  padding: 15px 27px;
+  border: 1px solid #191919;
+  border-radius: 11px;
+  background: #191919;
+  color: #fff;
+  font-size: 19px;
+  font-weight: 650;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.iv-donation-button > svg:first-child {
+  width: 22px;
+  height: 22px;
+  color: #ed2949;
+  fill: #ed2949;
+}
+
+.iv-donation-arrow {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.25s ease;
+}
+
+.iv-donation-button:hover {
+  background: #fff;
+  color: #191919;
+  transform: translateY(-2px);
+}
+
+.iv-donation-button:hover .iv-donation-arrow {
+  transform: translateX(4px);
+}
+
+.iv-donation-image {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 43%;
+  height: 100%;
+  background-image: url("/images/donation-heart.jpg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center 43%;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 18%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 18%
+  );
+}
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+@media (max-width: 1024px) {
+  .iv-hero {
+    height: 350px;
+  }
+
+  .iv-container {
+    width: calc(100% - 40px);
+  }
+
+  .iv-category-nav {
+    margin-bottom: 38px;
+  }
+
+  .iv-video-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 26px 20px;
+  }
+
+  .iv-video-title {
+    font-size: 17px;
+  }
+
+  .iv-donation-banner {
+    width: calc(100% - 40px);
+    min-height: 280px;
+  }
+
+  .iv-donation-content {
+    width: 70%;
+    padding: 32px;
+  }
+
+  .iv-donation-image {
+    width: 40%;
+  }
+}
+
+/* =========================================
+   MOBILE
+   ========================================= */
+
+@media (max-width: 600px) {
+  .iv-hero {
+    height: 290px;
+    min-height: 250px;
+    background-position: center;
+  }
+
+  .iv-hero-title {
+    max-width: calc(100% - 24px);
+    padding: 14px 18px;
+  }
+
+  .iv-hero-title h1 {
+    font-size: 28px;
+  }
+
+  .iv-content {
+    padding: 25px 0 35px;
+  }
+
+  .iv-container {
+    width: calc(100% - 28px);
+  }
+
+  .iv-category-nav {
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+
+  .iv-category-link {
+    min-height: 38px;
+    padding: 8px 10px;
+    font-size: 13px;
+    white-space: normal;
+  }
+
+  .iv-video-grid {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .iv-video-image-link {
+    aspect-ratio: 1.62 / 1;
+  }
+
+  .iv-play-button {
+    width: 46px;
+    height: 46px;
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+
+  .iv-video-title {
+    margin-top: 9px;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .iv-load-more-wrap {
+    margin-top: 30px;
+  }
+
+  .iv-load-more {
+    min-height: 50px;
+    min-width: 175px;
+    font-size: 14px;
+  }
+
+  .iv-donation-banner {
+    align-items: flex-start;
+    width: calc(100% - 28px);
+    min-height: 350px;
+    margin-top: 35px;
+  }
+
+  .iv-donation-content {
+    width: 100%;
+    padding: 27px 22px 175px;
+  }
+
+  .iv-donation-content h2 {
+    margin-bottom: 15px;
+    font-size: 24px;
+  }
+
+  .iv-donation-content p {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .iv-donation-button {
+    min-height: 49px;
+    padding: 12px 15px;
+    font-size: 15px;
+    gap: 8px;
+  }
+
+  .iv-donation-image {
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    height: 155px;
+    background-position: center 40%;
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 35%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black 35%
+    );
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .info-videos-page *,
+  .info-videos-page *::before,
+  .info-videos-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

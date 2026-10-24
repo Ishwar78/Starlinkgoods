@@ -6,9 +6,11 @@ import {
   FaPinterestP,
   FaYoutube,
   FaXTwitter,
+  FaTelegram,
+  FaWhatsapp,
 } from "react-icons/fa6";
+
 import {
-  FiArrowRight,
   FiArrowUpRight,
   FiMapPin,
   FiPhone,
@@ -16,14 +18,15 @@ import {
   FiClock,
   FiCheckCircle,
 } from "react-icons/fi";
+
 import "./Footer.css";
 
 const exploreLinks = [
   ["Home", "/"],
   ["About Us", "/about"],
-  ["Brands", "#brands"],
-  ["Special Offers", "#offers"],
   ["Contact Us", "/contact"],
+  ["Customer Login", "/order-user/login"],
+  ["Member Register", "/member-register"],
 ];
 
 const categoryLinks = [
@@ -45,17 +48,47 @@ const supportLinks = [
 ];
 
 const socialLinks = [
-  { label: "Instagram", url: "https://www.instagram.com/", icon: <FaInstagram /> },
-  { label: "Facebook", url: "https://www.facebook.com/", icon: <FaFacebookF /> },
-  { label: "Pinterest", url: "https://www.pinterest.com/", icon: <FaPinterestP /> },
-  { label: "YouTube", url: "https://www.youtube.com/", icon: <FaYoutube /> },
-  { label: "X", url: "https://x.com/", icon: <FaXTwitter /> },
+  {
+    label: "Instagram",
+    url: "https://www.instagram.com/",
+    icon: <FaInstagram />,
+  },
+  {
+    label: "Facebook",
+    url: "https://www.facebook.com/",
+    icon: <FaFacebookF />,
+  },
+  {
+    label: "Pinterest",
+    url: "https://www.pinterest.com/",
+    icon: <FaPinterestP />,
+  },
+  {
+    label: "YouTube",
+    url: "https://www.youtube.com/",
+    icon: <FaYoutube />,
+  },
+  {
+    label: "X",
+    url: "https://x.com/",
+    icon: <FaXTwitter />,
+  },
 ];
+
+/*
+ * Replace these placeholder URLs with your actual
+ * Telegram group and WhatsApp community invite links.
+ */
+const communityLinks = {
+  telegram: "https://t.me/YOUR_TELEGRAM_GROUP",
+  whatsapp: "https://chat.whatsapp.com/YOUR_WHATSAPP_INVITE",
+};
 
 function LinkColumn({ title, links }) {
   return (
     <div className="slg-footer-column">
       <h3>{title}</h3>
+
       <ul>
         {links.map(([label, href]) => (
           <li key={label}>
@@ -77,7 +110,7 @@ export default function Footer() {
   const handleSubscribe = (event) => {
     event.preventDefault();
 
-    // Connect this form to your newsletter API to save subscribers.
+    // Connect your newsletter API here to save subscribers.
     setSubscribed(true);
     setEmail("");
   };
@@ -86,11 +119,58 @@ export default function Footer() {
     <footer className="slg-footer" id="footer">
       <div className="slg-footer-accent" />
 
+      {/* COMMUNITY JOIN BAR */}
+      <section
+        className="slg-community-bar"
+        aria-label="Join our community"
+      >
+        <a href="/" className="slg-community-logo">
+          <img
+            src="/Logo-1.png"
+            alt="Star Link Goods"
+          />
+        </a>
+
+        <div className="slg-community-content">
+          <p>
+            Become Part of Our Community:
+            <span>Join Today</span>
+          </p>
+
+          <div className="slg-community-actions">
+            <a
+              href={communityLinks.telegram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="slg-community-button"
+              aria-label="Join our Telegram community"
+            >
+              <FaTelegram className="slg-community-icon" />
+              <span>JOIN US</span>
+            </a>
+
+            <a
+              href={communityLinks.whatsapp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="slg-community-button"
+              aria-label="Join our WhatsApp community"
+            >
+              <FaWhatsapp className="slg-community-icon" />
+              <span>JOIN US</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* MAIN FOOTER */}
       <div className="slg-footer-main">
-        {/* Brand */}
         <div className="slg-footer-brand">
-          <a href="#home" className="slg-footer-logo">
-            <img src="/Logo-1.png" alt="SLG - Star Link Goods" />
+          <a href="/" className="slg-footer-logo">
+            <img
+              src="/Logo-1.png"
+              alt="SLG - Star Link Goods"
+            />
           </a>
 
           <p className="slg-footer-description">
@@ -99,7 +179,9 @@ export default function Footer() {
             pieces that make your house feel like home.
           </p>
 
-          <h4 className="slg-social-title">FOLLOW OUR JOURNEY</h4>
+          <h4 className="slg-social-title">
+            FOLLOW OUR JOURNEY
+          </h4>
 
           <div className="slg-social-links">
             {socialLinks.map((social) => (
@@ -107,7 +189,7 @@ export default function Footer() {
                 key={social.label}
                 href={social.url}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 aria-label={social.label}
                 title={social.label}
               >
@@ -118,15 +200,28 @@ export default function Footer() {
 
           <div className="slg-brand-promise">
             <FiCheckCircle />
-            <span>Style, comfort & quality for every home.</span>
+            <span>
+              Style, comfort & quality for every home.
+            </span>
           </div>
         </div>
 
-        <LinkColumn title="Explore" links={exploreLinks} />
-        <LinkColumn title="Shop Categories" links={categoryLinks} />
-        <LinkColumn title="Customer Care" links={supportLinks} />
+        <LinkColumn
+          title="Explore"
+          links={exploreLinks}
+        />
 
-        {/* Contact */}
+        <LinkColumn
+          title="Shop Categories"
+          links={categoryLinks}
+        />
+
+        <LinkColumn
+          title="Customer Care"
+          links={supportLinks}
+        />
+
+        {/* CONTACT */}
         <div className="slg-footer-column slg-contact-column">
           <h3>Get In Touch</h3>
 
@@ -135,7 +230,9 @@ export default function Footer() {
           </p>
 
           <a className="slg-contact-item" href="#contact">
-            <span className="slg-contact-icon"><FiMapPin /></span>
+            <span className="slg-contact-icon">
+              <FiMapPin />
+            </span>
             <span>
               <small>Our Location</small>
               <strong>View store location</strong>
@@ -143,7 +240,9 @@ export default function Footer() {
           </a>
 
           <a className="slg-contact-item" href="#contact">
-            <span className="slg-contact-icon"><FiPhone /></span>
+            <span className="slg-contact-icon">
+              <FiPhone />
+            </span>
             <span>
               <small>Call Us</small>
               <strong>Contact our team</strong>
@@ -151,7 +250,9 @@ export default function Footer() {
           </a>
 
           <a className="slg-contact-item" href="#contact">
-            <span className="slg-contact-icon"><FiMail /></span>
+            <span className="slg-contact-icon">
+              <FiMail />
+            </span>
             <span>
               <small>Email Support</small>
               <strong>Send us a message</strong>
@@ -159,7 +260,9 @@ export default function Footer() {
           </a>
 
           <div className="slg-contact-item">
-            <span className="slg-contact-icon"><FiClock /></span>
+            <span className="slg-contact-icon">
+              <FiClock />
+            </span>
             <span>
               <small>Support Hours</small>
               <strong>Check our availability</strong>
@@ -168,8 +271,7 @@ export default function Footer() {
         </div>
       </div>
 
-     
-      {/* Copyright */}
+      {/* COPYRIGHT */}
       <div className="slg-footer-bottom">
         <p>
           © {new Date().getFullYear()}{" "}
@@ -179,7 +281,9 @@ export default function Footer() {
         <div className="slg-legal-links">
           <a href="/privacy-policy">Privacy Policy</a>
           <span>|</span>
-          <a href="/terms-conditions">Terms & Conditions</a>
+          <a href="/terms-conditions">
+            Terms & Conditions
+          </a>
         </div>
 
         <a className="slg-back-top" href="#home">

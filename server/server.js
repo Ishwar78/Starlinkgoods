@@ -22,6 +22,7 @@ const walletRequestRoutes = require("./routes/walletRequestRoutes");
 const orderRoutes = require("./routes/orderRoutes");
 const orderUserRoutes = require("./routes/orderUserRoutes");
 const vendorDataRoutes = require("./routes/vendorDataRoutes");
+const bannerRoutes = require("./routes/bannerRoutes");
 const Vendor = require("./models/Vendor");
 
 const app = express();
@@ -83,6 +84,9 @@ app.use("/api/order-users", orderUserRoutes);
 
 // Admin Vendor Data Records Routes
 app.use("/api/vendor-data", vendorDataRoutes);
+
+// Admin Hero Banners Routes
+app.use("/api/banners", bannerRoutes);
 
 const startServer = async () => {
   try {

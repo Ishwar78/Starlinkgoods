@@ -1,0 +1,304 @@
+
+/* =========================================
+   PODCAST PAGE
+========================================= */
+
+.podcast-page {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #fff;
+  color: #171717;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* =========================================
+   HERO BANNER
+========================================= */
+
+.podcast-hero {
+  position: relative;
+  width: 100%;
+  height: auto;
+  min-height: 260px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #171717;
+  border-bottom: 5px solid #ed171f;
+}
+
+.podcast-hero-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 260px;
+  max-height: 440px;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* =========================================
+   PODCAST LIST
+========================================= */
+
+.podcast-list {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: #fff;
+}
+
+.podcast-video-section {
+  position: relative;
+  width: 100%;
+  margin: 0;
+  padding: 36px 28px 30px;
+  border-bottom: 4px solid #ed171f;
+  background: #fff;
+}
+
+.podcast-video-content {
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* =========================================
+   YOUTUBE PLAYER
+========================================= */
+
+.podcast-player {
+  position: relative;
+  width: min(100%, 512px);
+  aspect-ratio: 16 / 9;
+  margin: 0 auto 26px;
+  overflow: hidden;
+  background: #111;
+}
+
+.podcast-player iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.podcast-thumbnail-link {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #111;
+  text-decoration: none;
+}
+
+.podcast-thumbnail {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.podcast-thumbnail-link:hover .podcast-thumbnail {
+  transform: scale(1.025);
+}
+
+.podcast-play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+  border-radius: 12px;
+  background: #ff0033;
+  color: #fff;
+  font-size: 24px;
+  padding-left: 4px;
+  transition: background 0.2s ease;
+}
+
+.podcast-thumbnail-link:hover .podcast-play-button {
+  background: #cc0028;
+}
+
+.podcast-watch-label {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 6px 10px;
+  border-radius: 4px;
+  background: rgb(0 0 0 / 65%);
+  color: #fff;
+  font-size: 14px;
+}
+
+/* =========================================
+   VIDEO TITLE AND DESCRIPTION
+========================================= */
+
+.podcast-video-details {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.podcast-video-details h2 {
+  width: 100%;
+  margin: 0;
+  padding: 0 0 3px;
+  color: #151515;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.podcast-description {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: #171717;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.podcast-description.description-expanded {
+  display: block;
+}
+
+.podcast-description:not(.description-expanded) {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+/* =========================================
+   EXPAND / COLLAPSE BUTTON
+========================================= */
+
+.podcast-expand-button {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 21px;
+  padding: 0;
+  transform: translateY(-50%);
+  border: none;
+  border-radius: 4px 0 0 4px;
+  background: #1765cc;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.podcast-expand-button:hover {
+  background: #084da8;
+}
+
+.podcast-expand-button:focus-visible {
+  outline: 2px solid #ffb900;
+  outline-offset: 2px;
+}
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 1024px) {
+  .podcast-hero {
+    min-height: 200px;
+  }
+
+  .podcast-hero-image {
+    min-height: 200px;
+  }
+
+  .podcast-video-section {
+    padding: 30px 22px 26px;
+  }
+
+  .podcast-player {
+    width: min(100%, 512px);
+    margin-bottom: 22px;
+  }
+
+  .podcast-video-details h2,
+  .podcast-description {
+    font-size: 17px;
+  }
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 600px) {
+  .podcast-hero {
+    min-height: 0;
+    border-bottom-width: 4px;
+  }
+
+  .podcast-hero-image {
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    object-fit: contain;
+  }
+
+  .podcast-video-section {
+    padding: 24px 16px 22px;
+    border-bottom-width: 3px;
+  }
+
+  .podcast-player {
+    width: 100%;
+    margin-bottom: 18px;
+  }
+
+  .podcast-play-button {
+    width: 54px;
+    height: 38px;
+    font-size: 21px;
+  }
+
+  .podcast-watch-label {
+    right: 7px;
+    bottom: 7px;
+    font-size: 11px;
+  }
+
+  .podcast-video-details h2 {
+    padding-right: 0;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .podcast-description {
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .podcast-expand-button {
+    top: 50%;
+    width: 19px;
+    height: 22px;
+  }
+}

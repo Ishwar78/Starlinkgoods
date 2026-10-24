@@ -61,6 +61,61 @@ const profileUpload = multer({
  * POST /api/vendors/login
  * Vendor / User Login using email or mobile + password
  */
+
+// Vendor documents upload directory (Aadhar, PAN, Passbook, etc.)
+const docUploadDir = path.join(__dirname, "../uploads/documents");
+if (!fs.existsSync(docUploadDir)) {
+  fs.mkdirSync(docUploadDir, { recursive: true });
+}
+
+const docStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, docUploadDir);
+  },
+  filename: function (req, file, cb) {
+    const cleanName = file.originalname.replace(/[^a-zA-Z0-9.]/g, "-");
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e6);
+    const ext = path.extname(cleanName);
+    const base = path.basename(cleanName, ext).substring(0, 20);
+    cb(null, `doc-${base}-${uniqueSuffix}${ext}`);
+  },
+});
+
+const docUpload = multer({
+  storage: docStorage,
+  limits: { fileSize: 15 * 1024 * 1024 }, // 15MB
+});
+
+/**
+ * POST /api/vendors/upload-document
+ * Upload a document (Aadhar, PAN, Passbook, etc.)
+ */
+router.post("/upload-document", docUpload.single("document"), (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No document file provided. Please choose a file to upload.",
+      });
+    }
+
+    const filePath = `/uploads/documents/${req.file.filename}`;
+    return res.status(200).json({
+      success: true,
+      message: "Document uploaded successfully!",
+      filePath,
+      originalName: req.file.originalname,
+      fileName: req.file.filename,
+    });
+  } catch (error) {
+    console.error("Document upload error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Failed to upload document file.",
+    });
+  }
+});
+
 router.post("/login", async (req, res) => {
   try {
     const { identifier, email, mobile, password } = req.body;

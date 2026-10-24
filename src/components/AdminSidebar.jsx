@@ -16,6 +16,7 @@ import {
   FiMapPin,
   FiCreditCard,
   FiDatabase,
+  FiImage,
 } from "react-icons/fi";
 
 import "./AdminSidebar.css";
@@ -28,6 +29,7 @@ const sidebarItems = [
   { label: "Wallet Requests", path: "/admin/wallet-requests", icon: FiCreditCard },
   { label: "KYC Verification", path: "/admin/kyc", icon: FiShield },
   { label: "Products", path: "/admin/products", icon: FiPackage },
+  { label: "Banners", path: "/admin/banners", icon: FiImage },
   { label: "Categories", path: "/admin/categories", icon: FiLayers },
   { label: "Orders", path: "/admin/orders", icon: FiShoppingBag },
   {

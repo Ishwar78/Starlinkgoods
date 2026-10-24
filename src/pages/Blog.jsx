@@ -5,6 +5,8 @@ import {
   FiChevronLeft,
   FiChevronRight,
 } from "react-icons/fi";
+
+import Footer from "../components/Footer";
 import "./Blog.css";
 
 /*
@@ -348,7 +350,7 @@ const Blog = () => {
         </div>
       </section>
     </main>
-   
+   <Footer />
       </>
   );
 };

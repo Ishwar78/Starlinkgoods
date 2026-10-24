@@ -6,6 +6,9 @@ import {
   FiArrowRight,
   FiChevronRight,
 } from "react-icons/fi";
+
+
+import Footer from "../components/Footer";
 import "./BlogDetail.css";
 
 const blogs = [
@@ -197,6 +200,7 @@ const BlogDetail = () => {
     .slice(0, 4);
 
   return (
+    <>
     <main className="bd-page">
       {/* Top banner */}
       <section className="bd-hero">
@@ -329,6 +333,8 @@ const BlogDetail = () => {
         </aside>
       </div>
     </main>
+<Footer />
+    </>
   );
 };
 

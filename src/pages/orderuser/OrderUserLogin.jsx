@@ -16,6 +16,8 @@ import {
 import { orderUserLogin } from "../../lib/api";
 import "./OrderUserLogin.css";
 
+import Navbar from "../../components/Navbar";
+
 export default function OrderUserLogin() {
   const navigate = useNavigate();
 
@@ -79,6 +81,8 @@ export default function OrderUserLogin() {
   };
 
   return (
+    <>
+    <Navbar />
     <div className="order-login-page">
       <div className="order-login-overlay"></div>
 
@@ -205,6 +209,7 @@ export default function OrderUserLogin() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

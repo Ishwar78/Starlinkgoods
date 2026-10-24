@@ -1,8 +1,7 @@
 
 /* =====================================================
    STAR LINK GOODS — MEMBER REGISTRATION
-   Complete Responsive CSS
-   Theme: Black, Gold & White
+   Responsive black, gold and white theme
 ===================================================== */
 
 .member-register-page {
@@ -26,6 +25,8 @@
   background: #f7f6f2;
   color: var(--mr-text);
   font-family: "Montserrat", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
   box-sizing: border-box;
 }
 
@@ -39,10 +40,22 @@
 .member-register-page input,
 .member-register-page textarea,
 .member-register-page select {
-  font-family: inherit;
+  font: inherit;
 }
 
-/* BACKGROUND DECORATION */
+.member-register-page button {
+  cursor: pointer;
+}
+
+.member-register-page button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.member-register-page a {
+  color: inherit;
+  text-decoration: none;
+}
 
 .member-register-glow {
   position: absolute;
@@ -73,7 +86,7 @@
   );
 }
 
-/* MAIN CONTAINER */
+/* Page header */
 
 .member-register-shell {
   width: 100%;
@@ -82,17 +95,13 @@
   margin: 0 auto;
 }
 
-/* =====================================================
-   PAGE HEADER
-===================================================== */
-
 .member-register-header {
   max-width: 760px;
   margin: 0 auto 35px;
   text-align: center;
 }
 
-.member-register-header .member-register-kicker {
+.member-register-kicker {
   display: inline-block;
   margin-bottom: 12px;
   color: #a77b20;
@@ -111,22 +120,23 @@
   letter-spacing: -1px;
 }
 
+.member-register-header h1 span {
+  color: #b98b1f;
+}
+
 .member-register-header > p {
   max-width: 700px;
   margin: 14px auto 0;
   color: #737373;
   font-size: 13px;
-  font-weight: 400;
   line-height: 1.9;
 }
 
-/* =====================================================
-   TWO COLUMN LAYOUT
-===================================================== */
+/* Main layout */
 
 .member-register-grid-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.24fr) minmax(290px, 0.76fr);
+  grid-template-columns: minmax(0, 1.24fr) minmax(280px, 0.76fr);
   align-items: start;
   gap: 25px;
   width: 100%;
@@ -137,9 +147,7 @@
   min-width: 0;
 }
 
-/* =====================================================
-   FORM CARD
-===================================================== */
+/* Form card */
 
 .member-register-form-card {
   width: 100%;
@@ -147,7 +155,7 @@
   padding: 30px;
   border: 1px solid #ebe6da;
   border-radius: 16px;
-  background: #ffffff;
+  background: #fff;
   box-shadow: 0 16px 45px rgba(0, 0, 0, 0.055);
 }
 
@@ -157,7 +165,40 @@
   margin: 0;
 }
 
-/* SECTION HEADINGS */
+.mr-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #eee8dc;
+}
+
+.mr-card-heading-icon {
+  display: grid;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--mr-gold-soft);
+  color: #997017;
+  font-size: 20px;
+}
+
+.mr-card-heading h2 {
+  margin: 0;
+  color: #171717;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.mr-card-heading p {
+  margin: 3px 0 0;
+  color: #777;
+  font-size: 12px;
+}
+
+/* Section headings */
 
 .member-register-section-title {
   display: flex;
@@ -193,15 +234,20 @@
   line-height: 1.6;
 }
 
-/* =====================================================
-   FORM GRID
-===================================================== */
+.member-register-section-title h3 small {
+  color: #8a8174;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* Fields */
 
 .member-register-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 19px 16px;
   width: 100%;
+  min-width: 0;
 }
 
 .member-register-field {
@@ -214,7 +260,7 @@
   grid-column: 1 / -1;
 }
 
-.member-register-field label {
+.member-register-field > label:not(.mr-upload-box) {
   display: block;
   margin: 0 0 8px;
   color: #292929;
@@ -223,9 +269,18 @@
   line-height: 1.6;
 }
 
-/* =====================================================
-   INPUT BOXES
-===================================================== */
+.mr-required {
+  color: #a77b20;
+}
+
+.mr-optional {
+  margin-left: 5px;
+  color: #8a8174;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* Input wrappers */
 
 .member-register-input-wrap {
   position: relative;
@@ -238,11 +293,8 @@
   padding: 0 13px;
   border: 1px solid #e5e2dc;
   border-radius: 8px;
-  background: #ffffff;
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .member-register-input-wrap:hover {
@@ -262,12 +314,12 @@
 }
 
 .member-register-input-wrap input,
-.member-register-input-wrap select,
-.member-register-input-wrap textarea {
+.member-register-input-wrap select {
   display: block;
   width: 100%;
   min-width: 0;
   max-width: 100%;
+  height: 49px;
   margin: 0;
   padding: 0;
   border: 0;
@@ -280,70 +332,37 @@
   box-shadow: none;
 }
 
-.member-register-input-wrap input,
-.member-register-input-wrap select {
-  height: 49px;
-}
-
-.member-register-input-wrap input::placeholder,
-.member-register-input-wrap textarea::placeholder {
+.member-register-input-wrap input::placeholder {
   color: #a09d97;
   opacity: 1;
-}
-
-.member-register-input-wrap input:focus,
-.member-register-input-wrap select:focus,
-.member-register-input-wrap textarea:focus {
-  outline: none;
-  box-shadow: none;
 }
 
 .member-register-input-wrap select {
   cursor: pointer;
 }
 
-.member-register-input-wrap input:disabled,
-.member-register-input-wrap select:disabled {
-  cursor: not-allowed;
-  opacity: 0.7;
+.member-register-input-wrap input:focus,
+.member-register-input-wrap select:focus {
+  outline: none;
+  box-shadow: none;
 }
 
-/* ADDRESS TEXTAREA */
+/* Vendor ID verification */
 
-.member-register-address-wrap {
-  align-items: flex-start;
-  padding-top: 13px;
-  padding-bottom: 12px;
+.mr-vendor-wrap {
+  padding-right: 88px;
 }
 
-.member-register-address-wrap > svg {
-  margin-top: 3px;
-}
-
-.member-register-address-wrap textarea {
-  min-height: 75px;
-  resize: vertical;
-  line-height: 1.7;
-}
-
-/* =====================================================
-   VENDOR ID FIELD AND VERIFY BUTTON
-===================================================== */
-
-.member-register-input-wrap:has(input[name="vendorId"]) {
-  padding-right: 86px;
-}
-
-.member-register-input-wrap input[name="vendorId"] {
+.mr-vendor-wrap input {
   padding-right: 2px;
 }
 
-.member-register-input-wrap:has(input[name="vendorId"]) > button {
+.mr-vendor-wrap > button {
   position: absolute;
   top: 50%;
   right: 6px;
   transform: translateY(-50%);
-  padding: 9px 10px;
+  padding: 8px 10px;
   border: 0;
   border-radius: 6px;
   background: var(--mr-gold);
@@ -351,30 +370,29 @@
   font-size: 10px;
   font-weight: 800;
   white-space: nowrap;
-  cursor: pointer;
   transition: background 0.2s ease;
 }
 
-.member-register-input-wrap:has(input[name="vendorId"]) > button:hover:not(:disabled) {
+.mr-vendor-wrap > button:hover:not(:disabled) {
   background: #f0bd24;
 }
 
-.member-register-input-wrap:has(input[name="vendorId"]) > button:disabled {
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.member-register-field small {
-  display: block;
+.mr-verified-vendor {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   margin-top: 7px;
+  color: #16804a;
   font-size: 11px;
-  line-height: 1.7;
+  font-weight: 700;
   overflow-wrap: anywhere;
 }
 
-/* =====================================================
-   MOBILE NUMBER FIELD
-===================================================== */
+.mr-verified-vendor svg {
+  flex: 0 0 auto;
+}
+
+/* Mobile and OTP */
 
 .member-register-mobile-wrap {
   gap: 9px;
@@ -384,7 +402,7 @@
   flex: 0 0 auto;
   padding-right: 9px;
   border-right: 1px solid #e7e2d8;
-  color: #333333;
+  color: #333;
   font-size: 11px;
   font-weight: 800;
 }
@@ -392,8 +410,6 @@
 .member-register-mobile-wrap input {
   flex: 1;
 }
-
-/* GET / RESEND OTP BUTTON */
 
 .member-register-otp-button {
   flex: 0 0 auto;
@@ -405,22 +421,11 @@
   font-size: 10px;
   font-weight: 800;
   white-space: nowrap;
-  cursor: pointer;
-  transition: background 0.2s ease;
 }
 
 .member-register-otp-button:hover:not(:disabled) {
   background: #373024;
 }
-
-.member-register-otp-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
-}
-
-/* =====================================================
-   OTP VERIFICATION AREA
-===================================================== */
 
 .member-register-otp-area {
   display: grid;
@@ -434,10 +439,6 @@
   background: #fffaf0;
 }
 
-.member-register-otp-area .member-register-field {
-  min-width: 0;
-}
-
 .member-register-verify-button {
   min-height: 49px;
   padding: 0 17px;
@@ -448,17 +449,10 @@
   font-size: 10px;
   font-weight: 800;
   white-space: nowrap;
-  cursor: pointer;
-  transition: background 0.2s ease;
 }
 
 .member-register-verify-button:hover:not(:disabled) {
   background: #ffe6a0;
-}
-
-.member-register-verify-button:disabled {
-  cursor: not-allowed;
-  opacity: 0.65;
 }
 
 .member-register-verified {
@@ -477,9 +471,69 @@
   font-size: 17px;
 }
 
-/* =====================================================
-   STATUS MESSAGES
-===================================================== */
+/* Upload documents */
+
+.mr-upload-note {
+  margin: -7px 0 15px;
+  color: #777;
+  font-size: 11px;
+}
+
+.mr-upload-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 78px;
+  padding: 13px;
+  border: 1px dashed #d8c28d;
+  border-radius: 9px;
+  background: #fffcf5;
+  color: #9a751e;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.mr-upload-box:hover {
+  border-color: #b98b1f;
+  background: #fff7e3;
+}
+
+.mr-upload-box > svg {
+  flex: 0 0 auto;
+  font-size: 21px;
+}
+
+.mr-upload-box span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mr-upload-box strong {
+  color: #242424;
+  font-size: 11px;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+
+.mr-upload-box small {
+  color: #827866;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.mr-upload-box input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+/* Status messages */
 
 .member-register-message {
   width: 100%;
@@ -499,108 +553,102 @@
 }
 
 .member-register-message.error {
-  border-color: #f0c7c7;
-  background: #fff3f3;
-  color: #a32626;
+  border-color: #f1c5c5;
+  background: #fff1f1;
+  color: #a52828;
 }
 
 .member-register-message.info {
-  border-color: #e8d7a9;
-  background: #fffae9;
-  color: #795b17;
+  border-color: #e8d8a7;
+  background: #fff9e9;
+  color: #785a12;
 }
 
-/* =====================================================
-   SECURITY NOTE
-===================================================== */
+/* Payment */
 
-.member-register-security-note {
+.member-register-payment-note {
   display: flex;
   align-items: flex-start;
-  gap: 9px;
-  margin-top: 22px;
-  color: #77736b;
-  font-size: 10px;
-  line-height: 1.9;
+  gap: 10px;
+  margin-top: 23px;
+  padding: 14px;
+  border: 1px solid #eee4ca;
+  border-radius: 8px;
+  background: #fffcf5;
+  color: #78643b;
 }
 
-.member-register-security-note > svg {
+.member-register-payment-note > svg {
   flex: 0 0 auto;
   margin-top: 2px;
-  color: #a17a34;
-  font-size: 16px;
+  color: #a77b20;
+  font-size: 17px;
 }
 
-/* =====================================================
-   PAYMENT SUMMARY — ₹500
-===================================================== */
+.member-register-payment-note p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.8;
+}
 
-.member-register-payment-summary {
+.mr-fee-summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  width: 100%;
-  margin-top: 18px;
-  padding: 15px 16px;
-  border: 1px solid #eee2c6;
+  gap: 15px;
+  margin-top: 17px;
+  padding: 16px;
+  border: 1px solid #e9dfc7;
   border-radius: 9px;
-  background: #fcfaf4;
+  background: #fffaf0;
 }
 
-.member-register-payment-summary span {
-  color: #686154;
-  font-size: 11px;
-  font-weight: 650;
-  line-height: 1.7;
+.mr-fee-summary > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.member-register-payment-summary strong {
-  color: #8f681b;
-  font-size: 23px;
+.mr-fee-summary span {
+  color: #292929;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.mr-fee-summary small {
+  color: #807665;
+  font-size: 10px;
+}
+
+.mr-fee-summary > strong {
+  color: #171717;
+  font-size: 25px;
   font-weight: 850;
   white-space: nowrap;
 }
-
-/* =====================================================
-   MAIN SUBMIT / PAY BUTTON
-===================================================== */
 
 .member-register-submit {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 11px;
   width: 100%;
-  min-height: 55px;
-  margin-top: 13px;
-  padding: 14px 16px;
-  border: 1px solid #cda326;
+  min-height: 53px;
+  margin-top: 15px;
+  padding: 12px 18px;
+  border: 1px solid #d8a91e;
   border-radius: 8px;
-  background: linear-gradient(110deg, #151515, #30271a);
-  color: #ffdc79;
-  font-family: inherit;
+  background: var(--mr-gold);
+  color: #171717;
   font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
+  font-weight: 850;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 .member-register-submit:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(153, 112, 21, 0.2);
-}
-
-.member-register-submit:active:not(:disabled) {
-  transform: translateY(0);
-}
-
-.member-register-submit:disabled {
-  cursor: wait;
-  opacity: 0.7;
+  transform: translateY(-1px);
+  background: #f0bd24;
 }
 
 .member-register-submit > svg {
@@ -609,569 +657,221 @@
 }
 
 .member-register-submit > span {
-  flex: 1;
-  text-align: center;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
-
-/* SPINNER */
-
-.member-register-spinner {
-  animation: member-register-spin 1s linear infinite;
-}
-
-@keyframes member-register-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* LOGIN LINK */
 
 .member-register-login {
   margin: 18px 0 0;
-  color: #777777;
+  color: #777;
+  font-size: 12px;
   text-align: center;
-  font-size: 11px;
-  line-height: 1.9;
 }
 
 .member-register-login a {
-  color: #98712f;
+  color: #987018;
   font-weight: 800;
-  text-decoration: none;
 }
 
-.member-register-login a:hover {
-  text-decoration: underline;
-}
+/* Membership side panel */
 
-/* =====================================================
-   RIGHT SIDE MEMBERSHIP PANEL
-===================================================== */
-
-.member-register-panel {
-  position: relative;
-  width: 100%;
-  min-width: 0;
-  padding: 30px 26px 24px;
-  overflow: hidden;
-  border: 1px solid rgba(214, 173, 96, 0.4);
+.member-register-membership {
+  position: sticky;
+  top: 25px;
+  padding: 30px 25px;
+  border: 1px solid #29251e;
   border-radius: 16px;
   background:
-    radial-gradient(
-      circle at 100% 0%,
-      rgba(255, 208, 68, 0.17),
-      transparent 35%
-    ),
-    linear-gradient(
-      145deg,
-      #171717 0%,
-      #101010 65%,
-      #211a0d 100%
-    );
-  color: #ffffff;
-  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.12);
+    radial-gradient(circle at top right, rgba(255, 208, 68, 0.13), transparent 38%),
+    #111;
+  color: #fff;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.09);
 }
 
-.member-register-panel::before,
-.member-register-panel::after {
-  position: absolute;
-  border: 1px solid rgba(255, 208, 68, 0.13);
-  border-radius: 50%;
-  content: "";
-  pointer-events: none;
-}
-
-.member-register-panel::before {
-  top: -100px;
-  right: -100px;
-  width: 230px;
-  height: 230px;
-}
-
-.member-register-panel::after {
-  top: -50px;
-  right: -50px;
-  width: 135px;
-  height: 135px;
-}
-
-.member-register-panel > * {
-  position: relative;
-  z-index: 1;
-}
-
-/* PANEL TOP LINE */
-
-.member-register-panel-topline {
+.vendor-membership-topline {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.member-register-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 9px 11px;
-  border: 1px solid rgba(255, 208, 68, 0.32);
-  border-radius: 30px;
-  background: rgba(255, 208, 68, 0.08);
-  color: #ffdc79;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 1px;
-}
-
-.member-register-badge svg {
-  font-size: 14px;
-}
-
-.member-register-sparkle {
-  display: flex;
-  flex: 0 0 38px;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba(255, 208, 68, 0.3);
-  border-radius: 50%;
-  color: #ffdc79;
-  font-size: 18px;
-}
-
-/* PANEL CONTENT */
-
-.member-register-panel-copy {
-  margin-top: 28px;
-}
-
-.member-register-panel-copy .member-register-kicker {
-  display: block;
-  margin: 0 0 12px;
-  color: #d5b25c;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 1.7px;
-  line-height: 1.8;
-}
-
-.member-register-panel-copy h2 {
-  margin: 0;
-  color: #ffffff;
-  font-size: clamp(30px, 3vw, 40px);
-  font-weight: 850;
-  line-height: 1.12;
-  letter-spacing: -1px;
-}
-
-.member-register-panel-copy h2 span {
-  color: #ffda71;
-}
-
-.member-register-description {
-  max-width: 360px;
-  margin: 16px 0 0;
-  color: #c7c2b7;
+  gap: 9px;
+  color: var(--mr-gold);
   font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 1.5px;
+}
+
+.vendor-membership-star {
+  font-size: 24px;
+}
+
+.vendor-membership-label {
+  margin-top: 35px;
+  color: #c6a64f;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.member-register-membership h2 {
+  margin: 12px 0;
+  color: #fff;
+  font-size: clamp(25px, 2.3vw, 34px);
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.member-register-membership h2 span {
+  color: var(--mr-gold);
+}
+
+.vendor-membership-description {
+  margin: 0;
+  color: #c4c0b8;
+  font-size: 12px;
   line-height: 1.9;
 }
 
-/* =====================================================
-   MEMBERSHIP PRICE CARD
-===================================================== */
-
-.member-register-price-card {
-  margin-top: 25px;
-  padding: 21px;
-  border: 1px solid rgba(255, 208, 68, 0.42);
-  border-radius: 11px;
-  background: linear-gradient(
-    120deg,
-    rgba(255, 208, 68, 0.15),
-    rgba(255, 255, 255, 0.035)
-  );
-}
-
-.member-register-price-label {
-  display: block;
-  color: #d7c9a7;
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 1.4px;
-  line-height: 1.8;
-}
-
-.member-register-price {
+.vendor-membership-price-card {
   display: flex;
-  align-items: flex-start;
-  gap: 3px;
-  margin: 10px 0 12px;
-  color: #ffdc79;
-  font-size: 53px;
-  font-weight: 850;
-  line-height: 1;
-  letter-spacing: -1.5px;
-}
-
-.member-register-price > span {
-  margin-top: 5px;
-  font-size: 27px;
-}
-
-.member-register-price-card > p {
-  display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 8px;
-  margin: 0;
-  color: #e0dbcf;
-  font-size: 10px;
-  line-height: 1.8;
-}
-
-.member-register-price-card > p svg {
-  flex: 0 0 auto;
-  color: #ffdc79;
-  font-size: 15px;
-}
-
-.member-register-price-divider {
-  height: 1px;
-  margin: 16px 0;
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.member-register-price-caption {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #c7bda8;
-  font-size: 10px;
-  line-height: 1.7;
-}
-
-.member-register-price-caption svg {
-  flex: 0 0 auto;
-  color: #e1bd73;
-  font-size: 14px;
-}
-
-/* =====================================================
-   MEMBER BENEFITS
-===================================================== */
-
-.member-register-benefits {
   margin-top: 27px;
+  padding: 22px 18px;
+  border: 1px solid rgba(255, 208, 68, 0.3);
+  border-radius: 11px;
+  background: rgba(255, 255, 255, 0.045);
 }
 
-.member-register-benefits > h3,
-.member-register-steps > h3 {
-  margin: 0 0 18px;
-  color: #ffffff;
-  font-size: 14px;
+.vendor-membership-price-caption {
+  color: #c6b68d;
+  font-size: 9px;
   font-weight: 800;
-  line-height: 1.6;
+  letter-spacing: 1.2px;
 }
 
-.member-register-benefit {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 18px;
+.vendor-membership-price {
+  color: var(--mr-gold);
+  font-size: 43px;
+  font-weight: 850;
+  line-height: 1.1;
 }
 
-.member-register-benefit:last-child {
-  margin-bottom: 0;
+.vendor-membership-price > span {
+  margin-right: 3px;
+  font-size: 25px;
 }
 
-.member-register-benefit-icon {
-  display: flex;
-  flex: 0 0 38px;
-  align-items: center;
-  justify-content: center;
-  width: 38px;
-  height: 38px;
-  border: 1px solid rgba(255, 208, 68, 0.26);
-  border-radius: 9px;
-  background: rgba(255, 208, 68, 0.09);
-  color: #ffdc79;
-  font-size: 17px;
-}
-
-.member-register-benefit > div:last-child {
-  min-width: 0;
-}
-
-.member-register-benefit h4 {
-  margin: 1px 0 5px;
-  color: #f4e9cd;
-  font-size: 11px;
-  font-weight: 800;
+.vendor-membership-price-footnote {
+  color: #b8b3a9;
+  font-size: 10px;
   line-height: 1.7;
 }
 
-.member-register-benefit p {
-  margin: 0;
-  color: #bcb6a9;
-  font-size: 10px;
-  line-height: 1.9;
-}
-
-/* =====================================================
-   REGISTRATION STEPS
-===================================================== */
-
-.member-register-divider {
-  height: 1px;
-  margin: 25px 0;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 208, 68, 0.42),
-    rgba(255, 208, 68, 0.04)
-  );
-}
-
-.member-register-steps > h3 {
-  margin-bottom: 17px;
-}
-
-.member-register-step {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  margin-bottom: 13px;
-}
-
-.member-register-step:last-child {
-  margin-bottom: 0;
-}
-
-.member-register-step > span {
-  display: flex;
-  flex: 0 0 27px;
-  align-items: center;
-  justify-content: center;
-  width: 27px;
-  height: 27px;
-  border: 1px solid rgba(255, 208, 68, 0.4);
-  border-radius: 50%;
-  color: #ffdc79;
-  font-size: 10px;
+.vendor-membership-benefits-title {
+  margin: 27px 0 14px;
+  color: #fff;
+  font-size: 12px;
   font-weight: 800;
 }
 
-.member-register-step p {
+.vendor-membership-benefits {
+  display: grid;
+  gap: 14px;
   margin: 0;
-  color: #d0c9b9;
-  font-size: 10px;
-  line-height: 1.8;
+  padding: 0;
+  list-style: none;
 }
 
-/* PANEL FOOTER */
-
-.member-register-panel-footer {
+.vendor-membership-benefits li {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  margin-top: 25px;
-  padding-top: 17px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  color: #c0b7a3;
-  font-size: 9px;
-  line-height: 1.9;
+  gap: 10px;
+  color: #d8d5cd;
+  font-size: 11px;
+  line-height: 1.7;
 }
 
-.member-register-panel-footer svg {
+.vendor-membership-benefits li svg {
   flex: 0 0 auto;
   margin-top: 2px;
-  color: #e1bd73;
-  font-size: 14px;
-}
-
-/* =====================================================
-   PAGE FOOTER
-===================================================== */
-
-.member-register-footer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 27px;
-  color: #898579;
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 1.8;
-  text-align: center;
-}
-
-.member-register-footer svg {
-  flex: 0 0 auto;
-  color: #a77b20;
+  color: var(--mr-gold);
   font-size: 15px;
 }
 
-/* =====================================================
-   TABLET — 1024px
-===================================================== */
+/* Tablet */
 
-@media (max-width: 1024px) {
+@media (max-width: 1050px) {
   .member-register-page {
-    padding: 34px 18px 28px;
+    padding: 32px 18px;
   }
 
-  .member-register-grid-layout {
-    grid-template-columns: minmax(0, 1.08fr) minmax(270px, 0.92fr);
-    gap: 17px;
-  }
-
-  .member-register-form-card {
-    padding: 23px 19px;
-  }
-
-  .member-register-panel {
-    padding: 25px 20px 22px;
-  }
-
-  .member-register-grid {
-    gap: 17px 11px;
-  }
-
-  .member-register-input-wrap {
-    gap: 7px;
-    padding-right: 9px;
-    padding-left: 9px;
-  }
-
-  .member-register-input-wrap input,
-  .member-register-input-wrap select,
-  .member-register-input-wrap textarea {
-    font-size: 11px;
-  }
-
-  .member-register-panel-copy h2 {
-    font-size: 32px;
-  }
-
-  .member-register-price {
-    font-size: 45px;
-  }
-}
-
-/* =====================================================
-   SMALL LAPTOPS AND TABLETS — 850px
-===================================================== */
-
-@media (max-width: 850px) {
   .member-register-grid-layout {
     grid-template-columns: minmax(0, 1fr);
-    gap: 22px;
   }
 
-  .member-register-form-card {
-    padding: 27px;
+  .member-register-membership {
+    position: relative;
+    top: auto;
   }
 
-  .member-register-panel {
-    width: 100%;
-    padding: 28px;
-  }
-
-  .member-register-panel-copy h2 {
-    font-size: 38px;
-  }
-
-  .member-register-description {
-    max-width: 520px;
+  .vendor-membership-label {
+    margin-top: 22px;
   }
 }
 
-/* =====================================================
-   MOBILE — 600px
-===================================================== */
+/* Mobile */
 
 @media (max-width: 600px) {
   .member-register-page {
-    padding: 26px 14px 22px;
+    padding: 23px 12px;
   }
 
   .member-register-header {
     margin-bottom: 23px;
+    padding-inline: 4px;
   }
 
-  .member-register-header h1 {
-    font-size: 31px;
-  }
-
-  .member-register-header > p {
-    font-size: 12px;
-    line-height: 1.8;
-  }
-
-  .member-register-grid-layout {
-    gap: 17px;
-  }
-
-  .member-register-form-card {
-    padding: 22px 18px;
-    border-radius: 12px;
-  }
-
-  .member-register-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px 12px;
-  }
-
-  .member-register-panel {
-    padding: 25px 21px;
-    border-radius: 12px;
-  }
-
-  .member-register-panel-copy h2 {
-    font-size: 35px;
-  }
-
-  .member-register-price {
-    font-size: 47px;
-  }
-}
-
-/* =====================================================
-   SMALL MOBILE — 480px
-===================================================== */
-
-@media (max-width: 480px) {
-  .member-register-page {
-    padding: 22px 11px 20px;
-  }
-
-  .member-register-header {
-    margin-bottom: 20px;
-  }
-
-  .member-register-header .member-register-kicker {
+  .member-register-kicker {
     font-size: 9px;
     letter-spacing: 1.2px;
   }
 
   .member-register-header h1 {
-    font-size: 27px;
-    letter-spacing: -0.6px;
+    font-size: 29px;
+    letter-spacing: -0.5px;
   }
 
   .member-register-header > p {
     margin-top: 10px;
-    font-size: 11px;
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .member-register-grid-layout {
+    gap: 18px;
   }
 
   .member-register-form-card {
     padding: 19px 14px;
+    border-radius: 12px;
+  }
+
+  .mr-card-heading {
+    gap: 10px;
+    padding-bottom: 18px;
+  }
+
+  .mr-card-heading-icon {
+    flex-basis: 39px;
+    width: 39px;
+    height: 39px;
+  }
+
+  .mr-card-heading h2 {
+    font-size: 17px;
   }
 
   .member-register-grid {
     grid-template-columns: minmax(0, 1fr);
-    gap: 15px;
+    gap: 16px;
   }
 
   .member-register-full {
@@ -1180,53 +880,46 @@
 
   .member-register-section-title {
     gap: 9px;
-    margin: 23px 0 14px;
+    margin: 25px 0 15px;
+  }
+
+  .member-register-section-title > span {
+    flex-basis: 28px;
+    width: 28px;
+    height: 28px;
   }
 
   .member-register-section-title h3 {
     font-size: 12px;
   }
 
-  .member-register-field label {
-    margin-bottom: 7px;
-    font-size: 11px;
+  .member-register-field > label:not(.mr-upload-box) {
+    font-size: 12px;
   }
 
   .member-register-input-wrap {
-    min-height: 48px;
-    padding-right: 10px;
-    padding-left: 10px;
+    min-height: 49px;
+    padding-inline: 11px;
   }
 
   .member-register-input-wrap input,
   .member-register-input-wrap select {
-    height: 46px;
-    font-size: 12px;
-  }
-
-  .member-register-address-wrap {
-    padding-top: 12px;
-    padding-bottom: 10px;
-  }
-
-  .member-register-address-wrap textarea {
-    min-height: 68px;
+    height: 47px;
     font-size: 12px;
   }
 
   .member-register-mobile-wrap {
-    gap: 6px;
-    padding-right: 7px;
-    padding-left: 8px;
+    gap: 7px;
+    padding-inline: 8px;
   }
 
   .member-register-country-code {
-    padding-right: 6px;
+    padding-right: 7px;
     font-size: 10px;
   }
 
   .member-register-otp-button {
-    padding: 10px 8px;
+    padding: 9px 8px;
     font-size: 9px;
   }
 
@@ -1238,183 +931,86 @@
 
   .member-register-verify-button {
     width: 100%;
-    min-height: 46px;
+    min-height: 45px;
   }
 
-  .member-register-payment-summary {
-    gap: 8px;
-    padding: 12px 10px;
+  .mr-vendor-wrap {
+    padding-right: 83px;
   }
 
-  .member-register-payment-summary span {
-    font-size: 10px;
+  .mr-vendor-wrap > button {
+    padding: 8px;
+    font-size: 9px;
   }
 
-  .member-register-payment-summary strong {
-    font-size: 20px;
+  .mr-upload-box {
+    min-height: 73px;
   }
 
   .member-register-submit {
+    gap: 8px;
     min-height: 51px;
-    gap: 7px;
-    padding: 11px 9px;
-    font-size: 10px;
-  }
-
-  .member-register-security-note {
-    font-size: 10px;
-  }
-
-  .member-register-panel {
-    padding: 22px 16px 19px;
-  }
-
-  .member-register-badge {
-    gap: 5px;
-    padding: 8px 9px;
-    font-size: 8px;
-    letter-spacing: 0.6px;
-  }
-
-  .member-register-sparkle {
-    flex-basis: 34px;
-    width: 34px;
-    height: 34px;
-  }
-
-  .member-register-panel-copy {
-    margin-top: 22px;
-  }
-
-  .member-register-panel-copy .member-register-kicker {
-    font-size: 8px;
-  }
-
-  .member-register-panel-copy h2 {
-    font-size: 32px;
-  }
-
-  .member-register-description {
+    padding: 11px;
     font-size: 11px;
   }
 
-  .member-register-price-card {
-    margin-top: 21px;
-    padding: 17px;
+  .mr-fee-summary {
+    padding: 13px;
   }
 
-  .member-register-price {
-    font-size: 43px;
-  }
-
-  .member-register-price > span {
+  .mr-fee-summary > strong {
     font-size: 23px;
   }
 
-  .member-register-benefits > h3,
-  .member-register-steps > h3 {
-    font-size: 13px;
+  .member-register-membership {
+    padding: 24px 19px;
+    border-radius: 12px;
   }
 
-  .member-register-benefit {
-    gap: 10px;
-    margin-bottom: 15px;
+  .vendor-membership-label {
+    margin-top: 23px;
   }
 
-  .member-register-benefit-icon {
-    flex-basis: 34px;
-    width: 34px;
-    height: 34px;
-    font-size: 15px;
+  .member-register-membership h2 {
+    font-size: 28px;
   }
 
-  .member-register-benefit h4 {
-    font-size: 11px;
-  }
-
-  .member-register-benefit p,
-  .member-register-step p {
-    font-size: 10px;
-  }
-
-  .member-register-footer {
-    font-size: 9px;
+  .vendor-membership-price {
+    font-size: 38px;
   }
 }
-
-/* =====================================================
-   VERY SMALL MOBILE — 360px
-===================================================== */
 
 @media (max-width: 360px) {
   .member-register-page {
-    padding-right: 8px;
-    padding-left: 8px;
+    padding-inline: 8px;
   }
 
   .member-register-form-card {
-    padding: 17px 11px;
+    padding-inline: 11px;
   }
 
-  .member-register-header h1 {
-    font-size: 25px;
+  .member-register-mobile-wrap {
+    gap: 5px;
   }
 
-  .member-register-section-title h3 {
-    font-size: 11px;
+  .member-register-mobile-wrap > svg {
+    display: none;
   }
 
-  .member-register-input-wrap {
-    gap: 7px;
-    padding-right: 8px;
-    padding-left: 8px;
-  }
-
-  .member-register-input-wrap > svg {
-    font-size: 14px;
-  }
-
-  .member-register-input-wrap input,
-  .member-register-input-wrap select {
-    font-size: 11px;
+  .member-register-country-code {
+    padding-right: 5px;
   }
 
   .member-register-otp-button {
-    padding: 9px 6px;
-    font-size: 8px;
+    padding-inline: 6px;
   }
 
-  .member-register-panel {
-    padding-right: 13px;
-    padding-left: 13px;
+  .mr-vendor-wrap {
+    padding-right: 76px;
   }
 
-  .member-register-panel-copy h2 {
-    font-size: 29px;
-  }
-
-  .member-register-price {
-    font-size: 39px;
-  }
-}
-
-/* =====================================================
-   ACCESSIBILITY
-===================================================== */
-
-.member-register-page button:focus-visible,
-.member-register-page a:focus-visible {
-  outline: 2px solid #c99c26;
-  outline-offset: 3px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .member-register-page *,
-  .member-register-page *::before,
-  .member-register-page *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  .mr-vendor-wrap > button {
+    right: 4px;
+    padding-inline: 6px;
   }
 }

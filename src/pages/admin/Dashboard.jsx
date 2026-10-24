@@ -7,6 +7,7 @@ import {
   FiArrowUpRight,
   FiArrowRight,
   FiDatabase,
+  FiImage,
 } from "react-icons/fi";
 import { Link } from "react-router-dom";
 
@@ -189,6 +190,17 @@ export default function Dashboard() {
               <span>
                 <strong>Vendor Data</strong>
                 <small>Save &amp; manage vendor directory</small>
+              </span>
+              <FiArrowRight />
+            </Link>
+
+            <Link to="/admin/banners">
+              <span className="shortcut-icon">
+                <FiImage />
+              </span>
+              <span>
+                <strong>Hero Banners</strong>
+                <small>Update home page banners</small>
               </span>
               <FiArrowRight />
             </Link>

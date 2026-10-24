@@ -44,7 +44,7 @@ export default function UserDashboardLayout() {
     const userToken = localStorage.getItem("userToken");
     if (!userToken) return;
 
-    fetch("http://localhost:5000/api/vendors/me", {
+    fetch("http://localhost:6065/api/vendors/me", {
       headers: { Authorization: `Bearer ${userToken}` },
     })
       .then((r) => r.json())

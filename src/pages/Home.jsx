@@ -18,10 +18,15 @@ import {
   FiBookOpen,
 } from "react-icons/fi";
 import "./Home.css";
+ 
+import EnquireNow from "./EnquireNow.jsx";
+
+
 import Footer from "../components/Footer";
 import { 
   getCategories, 
   getProducts, 
+  getBanners,
   formatImageUrl 
 } from "../lib/api.js";
 
@@ -76,24 +81,24 @@ const workItems = [
 const heroSlides = [
   {
     image:
-      "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?auto=format&fit=crop&w=1920&q=90",
+      "/Solar-Energy.png",
     alt: "Modern Living Furniture",
   },
   {
     image:
-      "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=1920&q=85",
+      "/Solar Energy Commercial Banner.png",
     alt: "Premium Sofa Sets",
   },
-  {
-    image:
-      "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1920&q=85",
-    alt: "Luxury Beds and Mattresses",
-  },
-  {
-    image:
-      "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=1920&q=85",
-    alt: "Designer Dining Sets",
-  },
+  // {
+  //   image:
+  //     "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?auto=format&fit=crop&w=1920&q=85",
+  //   alt: "Luxury Beds and Mattresses",
+  // },
+  // {
+  //   image:
+  //     "https://images.unsplash.com/photo-1617806118233-18e1de247200?auto=format&fit=crop&w=1920&q=85",
+  //   alt: "Designer Dining Sets",
+  // },
 ];
 
 /* OUR HEROES & DOCUMENTARIES */
@@ -181,14 +186,16 @@ export default function Home() {
   const [activeWork, setActiveWork] = useState(0);
   const [categories, setCategories] = useState([]);
   const [productsList, setProductsList] = useState([]);
+  const [banners, setBanners] = useState([]);
 
   useEffect(() => {
     let isMounted = true;
     const fetchCatalog = async () => {
       try {
-        const [catRes, prodRes] = await Promise.all([
+        const [catRes, prodRes, bannerRes] = await Promise.all([
           getCategories({ status: "Active" }).catch(() => ({ categories: [] })),
           getProducts().catch(() => ({ products: [] })),
+          getBanners({ status: "Active" }).catch(() => ({ banners: [] })),
         ]);
 
         if (isMounted) {
@@ -217,6 +224,10 @@ export default function Home() {
             setProductsList(formattedDbProducts);
           } else {
             setProductsList([]);
+          }
+
+          if (bannerRes?.success && Array.isArray(bannerRes.banners) && bannerRes.banners.length > 0) {
+            setBanners(bannerRes.banners);
           }
         }
       } catch (err) {
@@ -253,24 +264,40 @@ export default function Home() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
+  /* HERO SLIDES - DYNAMIC FROM BANNER API OR FALLBACK */
+  const activeSlides = useMemo(() => {
+    if (banners && banners.length > 0) {
+      return banners.map((b) => ({
+        id: b._id,
+        image: formatImageUrl(b.image),
+        alt: b.title || "Solar System Banner",
+        link: b.link || "",
+      }));
+    }
+    return heroSlides;
+  }, [banners]);
+
   /* HERO SLIDER STATE & AUTOPLAY */
   const [currentHeroSlide, setCurrentHeroSlide] = useState(0);
 
   const nextHeroSlide = () => {
-    setCurrentHeroSlide((curr) => (curr + 1) % heroSlides.length);
+    if (activeSlides.length === 0) return;
+    setCurrentHeroSlide((curr) => (curr + 1) % activeSlides.length);
   };
 
   const prevHeroSlide = () => {
-    setCurrentHeroSlide((curr) => (curr - 1 + heroSlides.length) % heroSlides.length);
+    if (activeSlides.length === 0) return;
+    setCurrentHeroSlide((curr) => (curr - 1 + activeSlides.length) % activeSlides.length);
   };
 
   useEffect(() => {
+    if (activeSlides.length <= 1) return;
     const heroTimer = window.setInterval(() => {
-      setCurrentHeroSlide((curr) => (curr + 1) % heroSlides.length);
+      setCurrentHeroSlide((curr) => (curr + 1) % activeSlides.length);
     }, 5000);
 
     return () => window.clearInterval(heroTimer);
-  }, []);
+  }, [activeSlides.length]);
 
   const [activeImpactSlide, setActiveImpactSlide] = useState(0);
 
@@ -352,56 +379,71 @@ export default function Home() {
         )}
 
         {/* HERO SECTION - SINGLE SLIDER */}
-        <section className="hero container" aria-label="Featured collection">
-          <div className="hero-single-slider">
-            <div
-              className="hero-slider-track"
-              style={{ transform: `translateX(-${currentHeroSlide * 100}%)` }}
-            >
-              {heroSlides.map((slide, index) => (
-                <div key={index} className="hero-slide-item">
-                  <img
-                    src={slide.image}
-                    alt={slide.alt || `Slide ${index + 1}`}
-                    loading={index === 0 ? "eager" : "lazy"}
-                  />
-                </div>
-              ))}
+        {activeSlides.length > 0 && (
+          <section className="hero container" aria-label="Featured collection">
+            <div className="hero-single-slider">
+              <div
+                className="hero-slider-track"
+                style={{ transform: `translateX(-${currentHeroSlide * 100}%)` }}
+              >
+                {activeSlides.map((slide, index) => (
+                  <div key={slide.id || index} className="hero-slide-item">
+                    {slide.link ? (
+                      <a href={slide.link} className="hero-slide-link" tabIndex={currentHeroSlide === index ? 0 : -1}>
+                        <img
+                          src={slide.image}
+                          alt={slide.alt || `Slide ${index + 1}`}
+                          loading={index === 0 ? "eager" : "lazy"}
+                        />
+                      </a>
+                    ) : (
+                      <img
+                        src={slide.image}
+                        alt={slide.alt || `Slide ${index + 1}`}
+                        loading={index === 0 ? "eager" : "lazy"}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {/* Navigation Arrows */}
+              {activeSlides.length > 1 && (
+                <>
+                  <button
+                    type="button"
+                    className="hero-nav-arrow prev"
+                    onClick={prevHeroSlide}
+                    aria-label="Previous slide"
+                  >
+                    <FiChevronLeft />
+                  </button>
+                  <button
+                    type="button"
+                    className="hero-nav-arrow next"
+                    onClick={nextHeroSlide}
+                    aria-label="Next slide"
+                  >
+                    <FiChevronRight />
+                  </button>
+
+                  {/* Slider Dots */}
+                  <div className="hero-dots">
+                    {activeSlides.map((_, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        className={`hero-dot-btn ${currentHeroSlide === index ? "selected" : ""}`}
+                        onClick={() => setCurrentHeroSlide(index)}
+                        aria-label={`Go to slide ${index + 1}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
             </div>
-
-            {/* Navigation Arrows */}
-            <button
-              type="button"
-              className="hero-nav-arrow prev"
-              onClick={prevHeroSlide}
-              aria-label="Previous slide"
-            >
-              <FiChevronLeft />
-            </button>
-            <button
-              type="button"
-              className="hero-nav-arrow next"
-              onClick={nextHeroSlide}
-              aria-label="Next slide"
-            >
-              <FiChevronRight />
-            </button>
-
-            {/* Slider Dots */}
-            <div className="hero-dots">
-              {heroSlides.map((_, index) => (
-                <button
-                  key={index}
-                  type="button"
-                  className={`hero-dot-btn ${currentHeroSlide === index ? "selected" : ""}`}
-                  onClick={() => setCurrentHeroSlide(index)}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-
+          </section>
+        )}
 
         {/* CATEGORIES */}
         {categories.length > 0 && (
@@ -454,7 +496,7 @@ export default function Home() {
 
         {/* ================= FEATURED PRODUCTS ================= */}
 
-        <section className="fp-section" id="products">
+        {/* <section className="fp-section" id="products">
           <div className="fp-container">
             <div className="fp-heading">
               <div className="fp-heading-copy">
@@ -601,7 +643,7 @@ export default function Home() {
               )}
             </div>
           </div>
-        </section>
+        </section> */}
 
 
         {/* OFFER BANNER */}
@@ -875,83 +917,112 @@ export default function Home() {
           </div>
         </section>
 
-        {/* TESTIMONIALS */}
-        <section
-          className="container section testimonial-section"
-          aria-label="Customer testimonials"
+        
+{/* TESTIMONIALS */}
+<section
+  className="container section testimonial-section"
+  aria-label="Customer testimonials"
+>
+  <div className="testimonial-heading">
+    <h2>
+      <span>Testimonials</span>
+    </h2>
+    <span className="testimonial-kicker">PATRONS</span>
+  </div>
+
+  <div className="testimonial-stage">
+    <div className="testimonial-layer testimonial-layer-back" />
+    <div className="testimonial-layer testimonial-layer-mid" />
+
+    <article
+      className="testimonial-feature"
+      key={activeReview.name}
+    >
+      {/* LEFT: Existing testimonial artwork */}
+      <div className="testimonial-art" aria-hidden="true">
+        <img
+          className="testimonial-thumb"
+          src="/download.png"
+          alt=""
+          loading="lazy"
+        />
+        <span className="testimonial-art-spark">✦</span>
+      </div>
+
+      {/* CENTER: Testimonial content */}
+      <div className="testimonial-copy">
+        <div className="testimonial-quote-icon">
+          <FiMessageSquare />
+        </div>
+
+        <p className="testimonial-quote">
+          “{activeReview.quote}”
+        </p>
+
+        <div className="testimonial-reviewer">
+          <strong>{activeReview.name}</strong>
+          <span>
+            {activeReview.city} · Customer Review
+          </span>
+        </div>
+
+        <div
+          className="testimonial-rating"
+          aria-label="5 out of 5 stars"
         >
-          <div className="testimonial-heading">
-            <h2><span>Testimonials</span></h2>
-            <span className="testimonial-kicker">PATRONS</span>
-          </div>
+          ★★★★★
+        </div>
+      </div>
 
-          <div className="testimonial-stage">
-            <div className="testimonial-layer testimonial-layer-back" />
-            <div className="testimonial-layer testimonial-layer-mid" />
+      {/* RIGHT: Customer image frame */}
+      <div className="testimonial-customer">
+        <div className="testimonial-customer-frame">
+          <img
+            src={
+              activeReview.image ||
+              "/images (3).jpeg"
+            }
+            alt={`${activeReview.name} customer portrait`}
+            className="testimonial-customer-image"
+            loading="lazy"
+            onError={(event) => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = "/download.png";
+            }}
+          />
 
-            <article className="testimonial-feature" key={activeReview.name}>
-              <div className="testimonial-art" aria-hidden="true">
+          <span className="testimonial-image-label">
+            CUSTOMER STORY
+          </span>
+        </div>
+      </div>
+    </article>
+  </div>
 
-                <img
-                  className="testimonial-thumb"
-                  src="/download.png"
-                  alt=""
-                  loading="lazy"
-                />
-                <span className="testimonial-art-spark">✦</span>
-              </div>
+  {/* Clickable testimonial pagination */}
+  <div
+    className="testimonial-pagination"
+    aria-label="Choose a customer review"
+  >
+    {testimonials.map((testimonial, index) => (
+      <button
+        type="button"
+        key={testimonial.name}
+        className={
+          activeTestimonial === index ? "active" : ""
+        }
+        onClick={() => setActiveTestimonial(index)}
+        aria-label={`Show review ${index + 1} by ${testimonial.name}`}
+        aria-current={
+          activeTestimonial === index ? "true" : undefined
+        }
+      >
+        <span />
+      </button>
+    ))}
+  </div>
+</section>
 
-              <div className="testimonial-copy">
-                <div className="testimonial-quote-icon">
-                  <FiMessageSquare />
-                </div>
-                <p className="testimonial-quote">“{activeReview.quote}”</p>
-                <div className="testimonial-reviewer">
-                  <strong>{activeReview.name}</strong>
-                  <span>{activeReview.city} · Customer Review</span>
-                </div>
-                <div className="testimonial-rating" aria-label="5 out of 5 stars">
-                  ★★★★★
-                </div>
-              </div>
-            </article>
-          </div>
-
-          <div
-            className="testimonial-pagination"
-            aria-label="Choose a customer review"
-          >
-            {testimonials.map((testimonial, index) => (
-              <button
-                type="button"
-                key={testimonial.name}
-                className={activeTestimonial === index ? "active" : ""}
-                onClick={() => setActiveTestimonial(index)}
-                aria-label={`Show review ${index + 1} by ${testimonial.name}`}
-                aria-current={activeTestimonial === index ? "true" : undefined}
-              >
-                <span />
-              </button>
-            ))}
-          </div>
-
-          {/* <div className="testimonial-mobile-controls">
-          <button
-            type="button"
-            onClick={previousTestimonial}
-            aria-label="Previous review"
-          >
-            <FiChevronLeft />
-          </button>
-          <button
-            type="button"
-            onClick={nextTestimonial}
-            aria-label="Next review"
-          >
-            <FiChevronRight />
-          </button>
-        </div> */}
-        </section>
 
         {/* FAQ SECTION */}
         <section
@@ -979,6 +1050,11 @@ export default function Home() {
             ))}
           </div>
         </section>
+
+
+
+        <EnquireNow />
+
 
         {/* FLOATING CART */}
         {cart.length > 0 && (
