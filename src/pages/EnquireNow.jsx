@@ -131,7 +131,7 @@ export default function EnquireNow() {
             <FiMail />
           </span>
           <strong>Email</strong>
-          <span>info@gautamsolar.com</span>
+          <span>info@slgsolar.com</span>
           <FiArrowRight className="enquiry-contact-arrow" />
         </a>
 
